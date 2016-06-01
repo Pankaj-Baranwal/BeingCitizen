@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="constituency_array">
+        <item>--Select your Constituency--</item>
+        <item>Australia</item>
+        <item>Canada</item>
+        <item>China</item>
+        <item>India</item>
+        <item>Sri Lanka</item>
+        <item>United States</item>
+    </string-array>
+    <string-array name="gender">
+        <item>--Select you Gender--</item>
+        <item>Female</item>
+        <item>Male</item>
+        <item>Other</item>
+    </string-array>
+</resources>

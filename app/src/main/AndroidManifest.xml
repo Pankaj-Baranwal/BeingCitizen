@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.beingcitizen">
+
+    <uses-permission android:name="android.permission.MANAGE_DOCUMENTS"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <permission android:name="android.permission.USE_CREDENTIALS"/>
+    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
+
+
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme"
+        android:name="android.support.multidex.MultiDexApplication">
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+        <meta-data android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id"/>
+        <activity
+            android:name="com.beingcitizen.beingcitizen.splashscreen"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Black.NoTitleBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".beingcitizen.MainActivity"
+            android:label="@string/app_name">
+
+        </activity>
+        <activity
+            android:name=".beingcitizen.LoginActivity"
+            android:label="@string/app_name">
+
+        </activity>
+        <activity
+            android:name=".beingcitizen.signUp"
+            android:label="@string/app_name">
+
+        </activity>
+        <activity
+            android:name=".beingcitizen.CommentActivity"
+            android:label="@string/app_name">
+        </activity>
+        <activity
+            android:name=".beingcitizen.CampaignExpanded"
+            android:label="@string/app_name">
+
+        </activity>
+        <activity
+            android:name=".beingcitizen.DebateExpanded"
+            android:label="@string/app_name">
+
+        </activity>
+        <activity
+            android:name=".beingcitizen.PollExpanded"
+            android:label="@string/app_name">
+
+        </activity>
+        <activity
+            android:name=".beingcitizen.BlogExpanded"
+            android:label="@string/app_name">
+
+        </activity>
+        <activity
+            android:name=".beingcitizen.UserProfileActivity"
+            android:label="@string/app_name">
+
+        </activity>
+        <activity
+            android:name=".beingcitizen.MlaProfileActivity"
+            android:label="@string/app_name">
+
+        </activity>
+
+        <activity
+            android:name=".beingcitizen.LoginMain"
+            android:label="@string/app_name">
+
+        </activity>
+
+        <activity
+            android:name=".beingcitizen.CreateCampaign"
+            android:label="@string/app_name">
+
+        </activity>
+
+
+        <activity
+            android:name="com.facebook.FacebookActivity"
+            android:configChanges="keyboard|screenLayout|screenSize|orientation"
+            android:label="@string/app_name"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+
+    </application>
+
+</manifest>

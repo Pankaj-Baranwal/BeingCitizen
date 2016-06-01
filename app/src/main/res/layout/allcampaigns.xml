@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
+
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+<FrameLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <ListView
+        android:id="@+id/allcampaign_listview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <com.github.clans.fab.FloatingActionMenu
+        android:id="@+id/fab_main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_gravity="right|bottom"
+        fab:menu_colorNormal="@color/campaign_fab_colour"
+        fab:menu_colorPressed="@color/white_pressed"
+        fab:menu_colorRipple="@color/half_black"
+        fab:menu_backgroundColor="#a6000000"
+        fab:menu_labels_style="@style/MenuLabelsStyle">
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/fab_hash"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:src="@drawable/add_hash"
+            fab:fab_label="#Hashtag"
+            fab:fab_size="normal"
+            fab:fab_colorNormal="#E55101"
+            fab:fab_colorPressed="#FDA626"
+            fab:fab_colorRipple="#99FFFFFF"/>
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/fab_create_campaign"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/add_campaign"
+            fab:fab_label="Add Campaign"
+            fab:fab_size="normal"
+            fab:fab_colorNormal="#FDA626"
+            fab:fab_colorPressed="#E55101"
+            fab:fab_colorRipple="#99FFFFFF"/>
+
+    </com.github.clans.fab.FloatingActionMenu>
+</FrameLayout>
+</LinearLayout>
