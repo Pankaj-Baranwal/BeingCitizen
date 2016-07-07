@@ -17,11 +17,9 @@ import java.io.IOException;
  */
 public class RetrieveDebateComments extends AsyncTask<String, Void, JSONObject> {
     CommentActivity context;
-    String debate_id="0";
 
     public RetrieveDebateComments(CommentActivity context){
         this.context = context;
-        this.debate_id = debate_id;
     }
 
     @Override
@@ -29,7 +27,7 @@ public class RetrieveDebateComments extends AsyncTask<String, Void, JSONObject> 
         JSONObject bool = null;
         Http http = new Http();
         try {
-            bool = new JSONObject(http.read("http://tnine.io/bc/main/viewcampaign?uid=16&campaign_id="+params[1]));
+            bool = new JSONObject(http.read("http://beingcitizen.com/bc/index.php/main/viewdebate?uid="+params[0]+"&debate_id="+params[1]));
         } catch (IOException e) {
             e.printStackTrace();
             Log.e("TAG_ERROR", "ERROR");
@@ -42,7 +40,7 @@ public class RetrieveDebateComments extends AsyncTask<String, Void, JSONObject> 
     @Override
     protected void onPostExecute(JSONObject s) {
         super.onPostExecute(s);
-        context.functions(s);
+        context.functions_debate(s);
 
     }
 }

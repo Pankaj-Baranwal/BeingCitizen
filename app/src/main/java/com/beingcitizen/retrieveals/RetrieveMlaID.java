@@ -1,10 +1,12 @@
 package com.beingcitizen.retrieveals;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.beingcitizen.Http;
-import com.beingcitizen.beingcitizen.signUp;
+import com.beingcitizen.interfaces.mla_id;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -12,13 +14,15 @@ import org.json.JSONObject;
 import java.io.IOException;
 
 /**
- * Created by pankaj on 30/5/16.
+ * Created by pankaj on 28/6/16.
  */
-public class SendCampaign extends AsyncTask<String, Void, String> {
-    signUp context;
+public class RetrieveMlaID extends AsyncTask<String, Void, String> {
+    mla_id ref;
+    Context mContext;
 
-    public SendCampaign(signUp context){
-        this.context = context;
+    public RetrieveMlaID(mla_id ref, Context context){
+        this.ref = ref;
+        mContext = context;
     }
 
     @Override
@@ -26,7 +30,7 @@ public class SendCampaign extends AsyncTask<String, Void, String> {
         String bool = "";
         Http http = new Http();
         try {
-            bool = http.read("http://tnine.io/bc/main/campaign?id="+params[0]+"&title="+params[1]+"&const="+params[2]+"&startedby="+params[3]+"&status="+params[4]+"&category="+params[5]+"&tags="+params[4]+"&status="+params[4]+"&status="+params[4]);
+            bool = http.read("http://beingcitizen.com/bc/index.php/main/getmla?const="+params[0]);
         } catch (IOException e) {
             e.printStackTrace();
             Log.e("TAG_ERROR", "ERROR");
@@ -39,13 +43,13 @@ public class SendCampaign extends AsyncTask<String, Void, String> {
         super.onPostExecute(s);
         try {
             JSONObject obj = new JSONObject(s);
-            context.functions(obj.getString("status"));
+            if (ref != null){
+                ref.mla_ids(obj.getString("mla_id"));
+            }
         } catch (JSONException e) {
+            Toast.makeText(mContext, "Error retrieving data", Toast.LENGTH_SHORT).show();
             e.printStackTrace();
         }
-
     }
 }
-
-
 

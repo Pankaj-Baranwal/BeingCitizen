@@ -13,6 +13,23 @@
         <item>--Select you Gender--</item>
         <item>Female</item>
         <item>Male</item>
-        <item>Other</item>
+    </string-array>
+    <string-array name="debate">
+        <item>--Select your choice--</item>
+        <item>upvote</item>
+        <item>downvote</item>
+    </string-array>
+    <string-array name="category">
+        <item>--Select your choice--</item>
+        <item>Law and Order</item>
+        <item>Public Health and Sanitation</item>
+        <item>Communication</item>
+        <item>Water-Irrigation,Drainage,Embankments</item>
+        <item>Lands, Agriculture</item>
+        <item>Trade,Commerce,Employment</item>
+        <item>Environment and Holticulture</item>
+        <item>Tourism, Art and Culture</item>
+        <item>Power</item>
+        <item>Corruption/Vigillance</item>
     </string-array>
 </resources>

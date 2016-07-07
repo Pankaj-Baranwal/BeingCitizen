@@ -27,7 +27,7 @@ public class RetrieveSingleCampaign extends AsyncTask<String, Void, JSONObject> 
         JSONObject bool = null;
         Http http = new Http();
         try {
-            bool = new JSONObject(http.read("http://tnine.io/bc/main/viewcampaign?uid="+params[0]+"&campaign_id="+params[1]));
+            bool = new JSONObject(http.read("http://beingcitizen.com/bc/index.php/main/viewcampaign?uid="+params[0]+"&campaign_id="+params[1]));
         } catch (IOException e) {
             e.printStackTrace();
             Log.e("TAG_ERROR", "ERROR");

@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -23,61 +24,71 @@ import org.json.JSONObject;
  */
 public class LoginActivity extends Activity {
 
-    public TextView welocomeback,citizen,forgotPassword;
+    public TextView welocomeback, citizen, forgotPassword;
     public Button login;
-    public EditText email,password;
+    public EditText email, password;
+    String uid = "16";
+    SharedPreferences sharedpreferences;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.login1);
-        welocomeback=(TextView)findViewById(R.id.textView);
-        citizen=(TextView)findViewById(R.id.textView1);
-        login=(Button)findViewById(R.id.button);
-        email=(EditText)findViewById(R.id.editText);
-        password=(EditText)findViewById(R.id.editText2);
-        forgotPassword=(TextView)findViewById(R.id.textView5);
-        forgotPassword.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(LoginActivity.this, "Facility not available yet", Toast.LENGTH_SHORT).show();
-            }
-        });
+        sharedpreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        if (sharedpreferences.contains("email")) {
+            Intent i = new Intent(getBaseContext(), MainActivity.class);
+            startActivity(i);
+            finish();
+        } else {
+            setContentView(R.layout.login1);
+            welocomeback = (TextView) findViewById(R.id.textView);
+            citizen = (TextView) findViewById(R.id.textView1);
+            login = (Button) findViewById(R.id.button);
+            email = (EditText) findViewById(R.id.editText);
+            password = (EditText) findViewById(R.id.editText2);
+            forgotPassword = (TextView) findViewById(R.id.textView5);
+            forgotPassword.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //TODO: Forgot passowrd
+                    Toast.makeText(LoginActivity.this, "Facility not available yet", Toast.LENGTH_SHORT).show();
+                }
+            });
 
-        // Font path
-        String fontPath = "fonts/GOTHIC_0.TTF";
-        String fontPath1 = "fonts/GOTHICB_0.TTF";
+            // Font path
+            String fontPath = "fonts/GOTHIC_0.TTF";
+            String fontPath1 = "fonts/GOTHICB_0.TTF";
 
-        // Loading Font Face
-        Typeface tf = Typeface.createFromAsset(getAssets(), fontPath);
-        Typeface tf1 = Typeface.createFromAsset(getAssets(), fontPath1);
+            // Loading Font Face
+            Typeface tf = Typeface.createFromAsset(getAssets(), fontPath);
+            Typeface tf1 = Typeface.createFromAsset(getAssets(), fontPath1);
 
-        // Applying font
-        welocomeback.setTypeface(tf);
-        citizen.setTypeface(tf);
-        login.setTypeface(tf1);
-        email.setTypeface(tf);
-        password.setTypeface(tf);
-        forgotPassword.setTypeface(tf);
+            // Applying font
+            welocomeback.setTypeface(tf);
+            citizen.setTypeface(tf);
+            login.setTypeface(tf1);
+            email.setTypeface(tf);
+            password.setTypeface(tf);
+            forgotPassword.setTypeface(tf);
+        }
     }
 
     public void onClicklogIn(View v) {
         String email_edit = email.getText().toString();
         String pass_edit = password.getText().toString();
-        if (email_edit.length()>0 && pass_edit.length()>0) {
+        if (email_edit.length() > 0 && pass_edit.length() > 0) {
             RetrieveFeedTask rft = new RetrieveFeedTask(this);
             rft.execute(email_edit, pass_edit);
-        }else{
+        } else {
             Toast.makeText(this, "Entries incomplete", Toast.LENGTH_SHORT).show();
         }
     }
 
-    public void functions(JSONObject s){
-        if (s.has("id")){
-            SharedPreferences sharedpreferences = PreferenceManager.getDefaultSharedPreferences(this);
+    public void functions(JSONObject s) {
+        if (s.has("id")) {
             SharedPreferences.Editor edit = sharedpreferences.edit();
             try {
+                uid = s.getString("id");
                 edit.putString("id", s.getString("id"));
                 edit.putString("name", s.getString("name"));
                 edit.putString("email", s.getString("email"));
@@ -86,11 +97,12 @@ public class LoginActivity extends Activity {
                 edit.apply();
             } catch (JSONException e) {
                 e.printStackTrace();
+                Log.e("ERROR", "Error in storing to shared prefs");
             }
             Intent i = new Intent(getBaseContext(), MainActivity.class);
             startActivity(i);
             finish();
-        }else{
+        } else {
             Toast.makeText(this, "Incorrect details", Toast.LENGTH_SHORT).show();
         }
     }
@@ -99,6 +111,7 @@ public class LoginActivity extends Activity {
     public void onBackPressed() {
         super.onBackPressed();
         Intent i = new Intent(getBaseContext(), LoginMain.class);
+        //i.putExtra("uid", uid);
         startActivity(i);
         finish();
     }

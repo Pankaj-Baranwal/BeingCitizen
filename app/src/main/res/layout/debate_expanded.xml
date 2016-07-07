@@ -19,7 +19,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+            <android.support.v7.widget.CardView
                 android:id="@+id/CardView_campaignExpanded"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -39,122 +39,104 @@
                         android:orientation="horizontal">
 
                         <TextView
+                            android:id="@+id/debate_title"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="5dp"
                             android:fontFamily="sans-serif-light"
                             android:padding="15dp"
-                            android:text="Global Warming"
+                            android:text="Title"
                             android:textColor="#000000"
                             android:textSize="17dp"
                             android:textStyle="bold" />
 
                     </LinearLayout>
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="#FF7F00"
-                        android:orientation="horizontal">
+                    <RelativeLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
 
-                        <de.hdodenhof.circleimageview.CircleImageView
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:layout_alignParentLeft="true"
-                            android:layout_alignParentStart="true"
-                            android:layout_alignParentTop="true"
-                            android:layout_marginBottom="6dp"
-                            android:layout_marginLeft="10dp"
-                            android:layout_marginTop="6dp"
-                            android:background="@drawable/ic_profile" />
-
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_vertical"
-                            android:layout_marginLeft="7dp"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:gravity="center_vertical"
-                                android:text="User Name"
-                                android:textColor="#FFFFFF"
-                                android:textSize="12dp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Posted 4 Hours ago"
-                                android:textColor="#FFFFFF"
-                                android:textSize="10dp" />
-
-
-                        </LinearLayout>
+                        <ImageView
+                            android:id="@+id/image_debate"
+                            android:layout_width="match_parent"
+                            android:layout_height="220dp"
+                            android:layout_gravity="center_horizontal"
+                            android:adjustViewBounds="true"
+                            android:scaleType="fitXY"
+                            android:background="@drawable/roads" />
 
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:gravity="end">
+                            android:gravity="bottom"
+                            android:layout_alignBottom="@+id/image_debate"
+                            android:orientation="horizontal"
+                            >
 
                             <LinearLayout
+                                android:id="@+id/yes_percent"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_gravity="center_vertical"
-                                android:layout_marginRight="10dp">
+                                android:layout_weight="0.70"
+                                android:background="#B111FF1D">
 
-                                <View
-                                    android:layout_width="2dp"
-                                    android:layout_height="50dp"
-                                    android:background="#ffffff" />
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:layout_margin="7dp"
+                                    android:gravity="center"
+                                    android:orientation="horizontal">
+
+                                    <TextView
+                                        android:id="@+id/yes_txt"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_gravity="center"
+                                        android:layout_margin="5dp"
+                                        android:text="70%"
+                                        android:layout_marginLeft="3dp"
+                                        android:textColor="#FFFFFF"
+                                        android:textSize="17dp"
+                                        android:textStyle="bold" />
+
+                                </LinearLayout>
+
 
                             </LinearLayout>
 
-
                             <LinearLayout
+                                android:id="@+id/no_percent"
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center"
-                                android:layout_marginRight="5dp"
-                                android:orientation="vertical">
-
+                                android:layout_height="match_parent"
+                                android:background="#b1ff553a"
+                                android:layout_weight="0.30"
+                                >
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:layout_margin="7dp"
+                                    android:gravity="center"
+                                    android:orientation="horizontal">
                                 <TextView
+                                    android:id="@+id/no_txt"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:layout_gravity="end"
-                                    android:gravity="center_vertical"
-                                    android:text="User Level"
+                                    android:layout_gravity="center"
+                                    android:layout_margin="5dp"
+                                    android:layout_marginLeft="3dp"
+                                    android:text="30%"
                                     android:textColor="#FFFFFF"
-                                    android:textSize="12dp" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Main Anna Hoon"
-                                    android:textColor="#FFFFFF"
-                                    android:textSize="10dp" />
+                                    android:textSize="17dp"
+                                    android:textStyle="bold" />
 
                             </LinearLayout>
-
-                            <de.hdodenhof.circleimageview.CircleImageView
-                                android:layout_width="40dp"
-                                android:layout_height="40dp"
-                                android:layout_alignParentLeft="true"
-                                android:layout_alignParentStart="true"
-                                android:layout_alignParentTop="true"
-                                android:layout_marginBottom="7dp"
-                                android:layout_marginRight="5dp"
-                                android:layout_marginTop="7dp"
-                                android:background="@drawable/ic_profile" />
-
+                                </LinearLayout>
                         </LinearLayout>
 
-                    </LinearLayout>
-
+                    </RelativeLayout>
 
                     <TextView
+                        android:id="@+id/debate_content"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:layout_gravity="center_horizontal"
@@ -163,86 +145,30 @@
                         android:padding="10dp"
                         android:text="@string/debate"
                         android:textColor="#000000" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_alignBottom="@+id/imageView1"
-                        android:gravity="bottom"
-                        android:orientation="horizontal"
-                        android:weightSum="1">
-
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="0.70"
-                            android:background="#B111FF1D">
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:layout_margin="7dp"
-                                android:gravity="center"
-                                android:orientation="horizontal">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_gravity="center"
-                                    android:layout_margin="5dp"
-                                    android:text="70%"
-                                    android:layout_marginLeft="3dp"
-                                    android:textColor="#FFFFFF"
-                                    android:textSize="17dp"
-                                    android:textStyle="bold" />
-
-                            </LinearLayout>
-
-
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:layout_weight="0.30"
-                            android:background="#b1ff553a"
-                            android:gravity="center"
-                            android:orientation="horizontal">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center"
-                                android:layout_marginLeft="3dp"
-                                android:text="30%"
-                                android:textColor="#FFFFFF"
-                                android:textSize="17dp"
-                                android:textStyle="bold" />
-
-                        </LinearLayout>
-
-                    </LinearLayout>
-
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal">
+                        <TextView
+                            android:id="@+id/viewComments"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="14dp"
+                            android:text="View all 00 comments" />
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginRight="@dimen/activity_horizontal_margin"
+                        android:gravity="right"
+                        >
 
                         <ImageView
-                            android:id="@+id/comment"
+                            android:id="@+id/comment_icon"
                             android:layout_width="30dp"
                             android:layout_height="30dp"
-                            android:layout_gravity="center_vertical"
                             android:layout_margin="5dp"
                             android:background="@drawable/comments" />
-
-                        <ImageView
-                            android:id="@+id/like"
-                            android:layout_width="30dp"
-                            android:layout_height="30dp"
-                            android:layout_gravity="center_vertical"
-                            android:layout_margin="5dp"
-                            android:background="@drawable/like" />
                     </LinearLayout>
 
                     <LinearLayout
@@ -251,22 +177,12 @@
                         android:layout_gravity="center_horizontal">
 
                         <View
-                            android:layout_width="fill_parent"
+                            android:layout_width="match_parent"
                             android:layout_height="2dp"
                             android:background="#85455a64" />
 
                     </LinearLayout>
-
-                    <TextView
-                        android:id="@+id/viewComments"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="bottom"
-                        android:layout_margin="14dp"
-                        android:gravity="bottom"
-                        android:text="View all 32 comments" />
-
-
+                </LinearLayout>
                 </LinearLayout>
 
             </android.support.v7.widget.CardView>

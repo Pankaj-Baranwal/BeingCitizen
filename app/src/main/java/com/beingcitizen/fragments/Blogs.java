@@ -7,33 +7,55 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.Toast;
 
+import com.beingcitizen.BCApplication;
 import com.beingcitizen.R;
 import com.beingcitizen.adapters.BlogsAdapter;
-import com.beingcitizen.adapters.CampaignAdapter;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * Created by saransh on 22-06-2015.
  */
 public class Blogs extends Fragment {
     private ListView userList;
+    static JSONObject s;
+    static boolean called = false;
 
-    String TITLES[] = {"Public Law & Order","Police","Public Health & Sanitation","Local Government","Communications – Roads & Bridges"
-            ,"Water Supplies","Industries","Markets & Fairs","Trade & Commerce (within State)","State Taxes (Electricity, Land, Roads, Toll)"};
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         setHasOptionsMenu(true);
         View rootView = inflater.inflate(R.layout.allblogs, container, false);
-
         userList = (ListView) rootView.findViewById(R.id.blogs_listview);
-        userList.setAdapter(new BlogsAdapter(getActivity(), TITLES));
+        if (called) {
+            try {
+                if (s.getJSONArray("blog").length()!=0) {
+                    JSONArray jA = new JSONArray();
+                    if (s.getJSONArray("blog").length()>8){
+                        int i =0;
+                        while(i<8) {
+                            jA.put(s.getJSONArray("blog").getJSONObject(i));
+                            i++;
+                        }
+                    }else{
+                        jA = s.getJSONArray("blog");
+                    }
+                    userList.setAdapter(new BlogsAdapter(getActivity(), jA));
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
         return rootView;
     }
-    @Override
-    public void onResume() {
 
-        userList.setAdapter(new BlogsAdapter(getActivity(), TITLES));
-        super.onResume();
+    public static void function(JSONObject b){
+
+        called = true;
+        s = b;
     }
 }

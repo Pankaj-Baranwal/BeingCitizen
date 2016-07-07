@@ -19,21 +19,20 @@ public class CampaignCategory  extends Fragment {
     private ListView userList;
 
     Drawable drawable;
-    String TITLES[] = {"Public Law & Order","Police","Public Health & Sanitation","Local Government","Communications – Roads & Bridges"
-    ,"Water Supplies","Industries","Markets & Fairs","Trade & Commerce (within State)","State Taxes (Electricity, Land, Roads, Toll)"};
+    String TITLES[] = {"Law and Order", "Public Health and Sanitation","Communication"
+    ,"Water Supplies","Lands, Agriculture", "Trade,Commerce,Employment","Environment and Holticulture", "Tourism, Art and Culture", "Power", "Corruption/Vigillance"};
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         //setHasOptionsMenu(true);
         View rootView = inflater.inflate(R.layout.campaign_category, container, false);
         userList = (ListView) rootView.findViewById(R.id.campaign_category_list);
-        userList.setAdapter(new CategoryAdapter(getActivity(), TITLES));
+        userList.setAdapter(new CategoryAdapter(getActivity().getApplicationContext(), TITLES));
         return rootView;
     }
 
     @Override
     public void onResume() {
-
         userList.setAdapter(new CategoryAdapter(getActivity(), TITLES));
         super.onResume();
     }

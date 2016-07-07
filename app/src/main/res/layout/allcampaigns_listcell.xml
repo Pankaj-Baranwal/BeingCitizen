@@ -48,10 +48,13 @@
                     android:layout_width="match_parent"
                     android:layout_height="220dp"
                     android:layout_gravity="center_horizontal"
-                    android:background="@drawable/roads" />
+                    android:adjustViewBounds="true"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/roads" />
 
 
                 <LinearLayout
+                    android:id="@+id/verification_lL"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_alignBottom="@+id/imageView1"
@@ -59,38 +62,10 @@
                     android:orientation="horizontal">
 
                     <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent">
-
-                        <ImageView
-                            android:layout_width="35dp"
-                            android:layout_height="35dp"
-                            android:layout_gravity="center"
-                            android:layout_marginLeft="7dp"
-                            android:background="@drawable/mla1" />
-
-                        <TextView
-                            android:id="@+id/mla_name"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignBottom="@id/imageView1"
-                            android:layout_alignParentLeft="true"
-                            android:layout_alignParentStart="true"
-                            android:paddingRight="15dp"
-                            android:paddingBottom="15dp"
-                            android:paddingTop="15dp"
-                            android:paddingLeft="5dp"
-                            android:text="Kejriwal"
-                            android:textColor="#FFFFFF"
-                            android:textSize="17dp"
-                            android:textStyle="bold" />
-
-                    </LinearLayout>
-
-                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:gravity="end">
+                        android:gravity="start"
+                        android:layout_marginLeft="8dp">
 
                         <ImageView
                             android:layout_width="40dp"
@@ -149,8 +124,10 @@
 
                 <de.hdodenhof.circleimageview.CircleImageView
                     android:id="@+id/circleImageView"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp"
                     android:layout_gravity="center_vertical"
                     android:background="@drawable/roads_and_bridges_black" />
 
@@ -164,36 +141,20 @@
                     android:text="Roads and Bridges"
                     android:textSize="15sp" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="right">
+                <!--<LinearLayout-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="match_parent"-->
+                    <!--android:gravity="right">-->
 
-                    <ImageView
-                        android:id="@+id/follow"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:layout_gravity="center_vertical"
-                        android:src="@drawable/like" />
-
-                    <ImageView
-                        android:id="@+id/volunteer"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginRight="5dp"
-                        android:background="@drawable/volunteer" />
-
-                    <ImageView
-                        android:id="@+id/comment"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginRight="5dp"
-                        android:background="@drawable/comments" />
-                </LinearLayout>
+                    <!--<ImageButton-->
+                        <!--android:id="@+id/comment"-->
+                        <!--android:layout_width="30dp"-->
+                        <!--android:layout_height="30dp"-->
+                        <!--android:layout_gravity="center_vertical"-->
+                        <!--android:layout_marginLeft="10dp"-->
+                        <!--android:layout_marginRight="5dp"-->
+                        <!--android:background="@drawable/comments" />-->
+                <!--</LinearLayout>-->
 
             </LinearLayout>
 

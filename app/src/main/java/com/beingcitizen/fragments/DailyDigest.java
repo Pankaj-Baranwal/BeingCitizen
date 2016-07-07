@@ -11,23 +11,37 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.beingcitizen.R;
+import com.beingcitizen.retrieveals.RetrieveDailyDigest;
 import com.beingcitizen.tab.SlidingTabLayout;
+
+import org.json.JSONObject;
 
 import java.util.Locale;
 
 public class DailyDigest extends Fragment implements ActionBar.TabListener {
 
     SectionsPagerAdapter mSectionsPagerAdapter;
-
     ViewPager mViewPager;
     private SlidingTabLayout mTabs;
+    String uid = "16";
+    static boolean called = false;
+    View view;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.viewpager_main1, container, false);
+        view = inflater.inflate(R.layout.viewpager_main1, container, false);
+        RetrieveDailyDigest rdd = new RetrieveDailyDigest(this);
+        rdd.execute(uid);
+        //mTabs.setCustomTabView(R.layout.custom_tab_view, R.id.tabText);
 
+        /*mTabs.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
+            @Override
+            public int getIndicatorColor(int position) {
+                return getResources().getColor(R.color.opaque_red);
+            }
+        });*/
         mSectionsPagerAdapter = new SectionsPagerAdapter(getChildFragmentManager());
 
         // Set up the ViewPager with the sections adapter.
@@ -40,15 +54,6 @@ public class DailyDigest extends Fragment implements ActionBar.TabListener {
         mTabs.setBackgroundColor(0xFF009688);
 
         setHasOptionsMenu(true);
-        //mTabs.setCustomTabView(R.layout.custom_tab_view, R.id.tabText);
-
-        /*mTabs.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
-            @Override
-            public int getIndicatorColor(int position) {
-                return getResources().getColor(R.color.opaque_red);
-            }
-        });*/
-
         mTabs.setViewPager(mViewPager);
 
         return view;
@@ -70,6 +75,29 @@ public class DailyDigest extends Fragment implements ActionBar.TabListener {
 
     }
 
+    public void functions(JSONObject s) {
+        called = true;
+        Polls.function(s);
+        Blogs.function(s);
+        Cartoons.function(s);
+
+        mSectionsPagerAdapter = new SectionsPagerAdapter(getChildFragmentManager());
+
+        // Set up the ViewPager with the sections adapter.
+        mViewPager = (ViewPager) view.findViewById(R.id.pager);
+        mViewPager.setAdapter(mSectionsPagerAdapter);
+        mTabs = (SlidingTabLayout) view.findViewById(R.id.tabs);
+        mTabs.setDistributeEvenly(true);
+
+        //set tab strip backgroung color (grey)
+        mTabs.setBackgroundColor(0xFF009688);
+
+        setHasOptionsMenu(true);
+        mTabs.setViewPager(mViewPager);
+
+    }
+
+
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
@@ -84,21 +112,18 @@ public class DailyDigest extends Fragment implements ActionBar.TabListener {
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
-            switch (position) {
 
+            switch (position) {
                 // Open FragmentTab1.java
                 case 0:
-                    Polls fragmenttab2 = new Polls();
-                    return fragmenttab2;
+                    return new Polls();
 
                 // Open FragmentTab2.java
                 case 1:
-                    Blogs fragmenttab = new Blogs();
-                    return fragmenttab;
+                    return new Blogs();
                 // Open FragmentTab3.java
                 case 2:
-                    Cartoons fragmenttab1 = new Cartoons();
-                    return fragmenttab1;
+                    return new Cartoons();
 
             }
             return null;

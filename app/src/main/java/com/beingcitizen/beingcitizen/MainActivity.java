@@ -33,14 +33,19 @@ import android.widget.Toast;
 
 import com.beingcitizen.adapters.Draweradapter;
 import com.beingcitizen.R;
+import com.beingcitizen.fragments.AllCampaign;
 import com.beingcitizen.fragments.Campaign;
 import com.beingcitizen.fragments.DailyDigest;
 import com.beingcitizen.fragments.Debate;
 import com.beingcitizen.fragments.TermsCondition;
+import com.beingcitizen.interfaces.adapterUpdate;
+import com.beingcitizen.interfaces.retrieveCamp;
+import com.beingcitizen.retrieveals.RetrieveCampaign;
 import com.facebook.login.LoginManager;
-import com.squareup.picasso.Picasso;
 import com.yalantis.contextmenu.lib.interfaces.OnMenuItemClickListener;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -50,18 +55,22 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 
-public class MainActivity extends AppCompatActivity implements OnMenuItemClickListener {
+public class MainActivity extends AppCompatActivity implements OnMenuItemClickListener, retrieveCamp {
 
     //First We Declare Titles And Icons For Our Navigation Drawer List View
     //This Icons And Titles Are holded in an Array as you can see
 
     String TITLES[] = {"Campaign", "Debated", "Daily Digest", "Terms and Conditions", "Help", "Logout"};
+    String menuTITLES[] = {"Law and Order", "Public Health and Sanitation", "Communication", "Water-Irrigation,Drainage,Embankments", "Lands, Agriculture", "Trade,Commerce,Employment", "Environment & Holticulture", "Tourism, Art and Culture", "Power", "Corruption/Vigillance"};
     int ICONS[] = {R.drawable.campaign, R.drawable.debates, R.drawable.digest, R.drawable.terms, R.drawable.help, R.drawable.logout};
 
     //Similarly we Create a String Resource for the name and email in the header view
     //And we also create a int resource for profile picture in the header view
 
     String user,email;
+    String NAME_i, EMAIL_i, MLA_name, consti;
+    String selected="";
+
     JSONObject response, profile_pic_data, profile_pic_url;
     int PROFILE= R.drawable.ic_profile2;
     Fragment campaign = new Campaign();
@@ -84,11 +93,11 @@ public class MainActivity extends AppCompatActivity implements OnMenuItemClickLi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Intent intent = getIntent();
-        String jsondata = intent.getStringExtra("jsondata");
+        //Intent intent = getIntent();
+        //String jsondata = intent.getStringExtra("jsondata");
 
     profile_pic=(ImageView)findViewById(R.id.profile_picture);
-        setUserProfile(jsondata);  // call setUserProfile Method.
+        //setUserProfile(jsondata);  // call setUserProfile Method.
 
 
         try {
@@ -100,10 +109,8 @@ public class MainActivity extends AppCompatActivity implements OnMenuItemClickLi
                 md.update(signature.toByteArray());
                 //Log.d("KeyHash:", Base64.encodeToString(md.digest(), Base64.DEFAULT));
             }
-        } catch (PackageManager.NameNotFoundException e) {
-
-        } catch (NoSuchAlgorithmException e) {
-
+        } catch (PackageManager.NameNotFoundException | NoSuchAlgorithmException ignored) {
+            Log.e("PACkageManager", "ERROR");
         }
         if (savedInstanceState == null) {
             FragmentManager fragmentManager = getSupportFragmentManager();
@@ -123,12 +130,15 @@ public class MainActivity extends AppCompatActivity implements OnMenuItemClickLi
 
         mRecyclerView.setHasFixedSize(true);                            // Letting the system know that the list objects are of fixed size
         sharedpreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        String NAME=sharedpreferences.getString("name", null);
-        String EMAIL=sharedpreferences.getString("email", null);
+        NAME_i=sharedpreferences.getString("name", null);
+        EMAIL_i=sharedpreferences.getString("email", null);
+        MLA_name = sharedpreferences.getString("mla_id", null);
+        consti = sharedpreferences.getString("constituency", null);
+        Log.e("CONSTI", consti+" ");
         //String face_id=sharedpreferences.getString("id",null);
 //        PROFILE=Integer.parseInt(face_id);
        // PROFILE=getBitmapFromURL("http://graph.facebook.com/" +facebook_id+ "/picture?type=square");
-        mAdapter = new Draweradapter(TITLES, ICONS, NAME, EMAIL, PROFILE);       // Creating the Adapter of Draweradapter class(which we are going to see in a bit)
+        mAdapter = new Draweradapter(TITLES, ICONS, NAME_i, EMAIL_i, MLA_name, consti, PROFILE);
         // And passing the titles,icons,header view name, header view email,
         // and header view profile picture
         mRecyclerView.setAdapter(mAdapter);                              // Setting the adapter to RecyclerView
@@ -159,6 +169,7 @@ public class MainActivity extends AppCompatActivity implements OnMenuItemClickLi
                     Drawer.closeDrawers();
                     switch (childv) {
                         case 0:
+                            //TODO: Profiles of user and MLA
                             float i=motionEvent.getX();
                             if(i<300){
                                 Intent l = new Intent(getBaseContext(), UserProfileActivity.class);
@@ -297,8 +308,8 @@ public class MainActivity extends AppCompatActivity implements OnMenuItemClickLi
             public void onClick(View v) {
                 SharedPreferences.Editor editor = sharedpreferences.edit();
                 editor.clear();
-                editor.commit();
-                LoginManager.getInstance().logOut();
+                editor.apply();
+//                LoginManager.getInstance().logOut();
                 Intent i = new Intent(MainActivity.this, LoginMain.class);
                 MainActivity.this.startActivity(i);
             }
@@ -311,8 +322,13 @@ public class MainActivity extends AppCompatActivity implements OnMenuItemClickLi
     // set this to set according to category  ---Campaign fragment
     @Override
     public void onMenuItemClick(View view, int i) {
-        Toast.makeText(MainActivity.this, "Clicked on position: " + i, Toast.LENGTH_SHORT).show();
-        Log.e("campaign", "" + i);
+        if (i!=0) {
+            selected = menuTITLES[i-1];
+            SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+            RetrieveCampaign rtC = new RetrieveCampaign(MainActivity.this);
+            String uid = sp.getString("id", "16");
+            rtC.execute(uid);
+        }
     }
 
 
@@ -331,8 +347,9 @@ public class MainActivity extends AppCompatActivity implements OnMenuItemClickLi
             profile_pic_url = new JSONObject(profile_pic_data.getString("data"));
 
             Toast.makeText(getApplicationContext(),user+"  "+email,Toast.LENGTH_LONG).show();
-            Picasso.with(this).load(profile_pic_url.getString("url"))
+            /*Picasso.with(this).load(profile_pic_url.getString("url"))
                     .into(profile_pic);
+                    */
         } catch (Exception e){
             e.printStackTrace();
         }
@@ -357,4 +374,25 @@ public class MainActivity extends AppCompatActivity implements OnMenuItemClickLi
            return null;
        }
    }
+
+    @Override
+    public void retrieve(JSONObject param) {
+        try {
+            if (param.getJSONArray("campaigns")!=null && param.getJSONArray("campaigns").length()!=0) {
+                Log.e("Length", param.getJSONArray("campaigns").length()+"");
+                JSONArray jA;
+                JSONArray jASorted = new JSONArray();
+                jA = param.getJSONArray("campaigns");
+                for (int i=0; i<jA.length(); i++) {
+                    Log.e("TAG", jA.getJSONObject(i).getString("category"));
+                    if (jA.getJSONObject(i).getString("category").contains(selected))
+                        jASorted.put(jA.getJSONObject(i));
+                }
+                    adapterUpdate upd = Campaign.alc;
+                    upd.updateAdapt(jASorted);
+            }
+        }catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
 }

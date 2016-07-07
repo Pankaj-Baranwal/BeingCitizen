@@ -4,13 +4,8 @@ package com.beingcitizen.adapters;
  * Created by saransh on 14-06-2015.
  */
 import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,15 +14,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.beingcitizen.R;
-import com.beingcitizen.beingcitizen.CommentActivity;
-import com.beingcitizen.beingcitizen.LoginActivity;
-import com.beingcitizen.beingcitizen.MainActivity;
 import com.facebook.login.widget.ProfilePictureView;
-import com.squareup.picasso.Picasso;
-
-import org.json.JSONObject;
-
-import java.util.HashMap;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -47,7 +34,7 @@ public class Draweradapter extends RecyclerView.Adapter<Draweradapter.ViewHolder
 int image=R.drawable.ic_profile2;
     private String name;        //String Resource for header View Name
     private int profileid;        //int Resource for header view profile picture
-    private String email;       //String Resource for header view email
+    private String email, mlaName, mlaConsti;       //String Resource for header view email
 
 
     // Creating a ViewHolder which extends the RecyclerView View Holder
@@ -61,8 +48,7 @@ int image=R.drawable.ic_profile2;
         ProfilePictureView profile;
 
         CircleImageView profile1;
-        TextView Name;
-        TextView email;
+        TextView Name, email, mla_name, mla_consti;
 
         public ViewHolder(final View itemView,int ViewType) {                 // Creating ViewHolder Constructor with View and viewType As a parameter
             super(itemView);
@@ -84,34 +70,14 @@ int image=R.drawable.ic_profile2;
                 Holderid = 1;                                               // setting holder id as 1 as the object being populated are of type item row
             }
             else{
-
-
                 Name = (TextView) itemView.findViewById(R.id.username);         // Creating Text View object from header.xml for name
-
-
                 email = (TextView) itemView.findViewById(R.id.email);       // Creating Text View object from header.xml for email
-
+                mla_name = (TextView) itemView.findViewById(R.id.mla_name);
+                mla_consti = (TextView) itemView.findViewById(R.id.mla_constituency);
 
                 profile = (ProfilePictureView)itemView.findViewById(R.id.profile_picture);
                 profile.setCropped(true);
-                //profile.setProfileId(profileid);
-               // profile1 = (CircleImageView) itemView.findViewById(R.id.profile_pic);// Creating Image view object from header.xml for profile pic
                 Holderid = 0;                                                // Setting holder id = 0 as the object being populated are of type header view
-                /*profile.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Intent i = new Intent(itemView.getContext(), LoginActivity.class);
-                        itemView.getContext().startActivity(i);
-                    }
-                });
-
-                profile1.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Intent i = new Intent(itemView.getContext(), CommentActivity.class);
-                        itemView.getContext().startActivity(i);
-                    }
-                });*/
             }
         }
 
@@ -120,13 +86,13 @@ int image=R.drawable.ic_profile2;
 
 
 
-    public Draweradapter(String Titles[], int Icons[], String Name, String Email, int Profile){ // Draweradapter Constructor with titles and icons parameter
+    public Draweradapter(String Titles[], int Icons[], String Name, String Email, String mla_name_txt, String mla_consti_txt, int Profile){ // Draweradapter Constructor with titles and icons parameter
         // titles, icons, name, email, profile pic are passed from the main activity as we
         mNavTitles = Titles;                //have seen earlier
         mIcons = Icons;
         name = Name;
         email = Email;
-
+        mlaConsti = mla_consti_txt;
         profileid=Profile;
         //in adapter
 
@@ -193,6 +159,7 @@ int image=R.drawable.ic_profile2;
            // holder.profile.setImageResource(image);           // Similarly we set the resources for header view
             holder.Name.setText(name);
             holder.email.setText(email);
+            holder.mla_consti.setText(mlaConsti);
         }
     }
 

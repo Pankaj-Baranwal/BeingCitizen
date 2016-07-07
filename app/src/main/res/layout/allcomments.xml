@@ -9,11 +9,31 @@
         android:id="@+id/allcomment_listview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="50dp"/>
+        android:layout_marginBottom="2dp"
+        android:layout_above="@+id/rL_comm"
+        />
 
     <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:id="@+id/rL_comm"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true">
+        <Spinner
+            android:id="@+id/debate_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:background="@drawable/signupbackground_white"
+            android:dropDownSelector="#FFFFFF"
+            android:gravity="center"
+            android:layoutMode="clipBounds"
+            android:spinnerMode="dropdown"
+            android:textColor="#000000"
+            android:textSize="15sp"
+            android:transitionGroup="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:entries="@array/debate"
+            />
 
         <EditText
             android:layout_width="match_parent"
@@ -22,10 +42,11 @@
             android:id="@+id/editText5"
             android:hint="Add a comment"
             android:paddingLeft="10dp"
-            android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:background="#ffffff"/>
+            android:background="#ffffff"
+            android:layout_below="@+id/debate_spinner"
+            />
 
         <ImageButton
             android:layout_width="50dp"

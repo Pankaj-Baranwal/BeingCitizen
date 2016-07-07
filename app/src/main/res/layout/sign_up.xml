@@ -5,6 +5,15 @@
     android:background="#000000"
     android:gravity="center_horizontal"
     android:orientation="vertical">
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            >
 
     <ScrollView
         android:layout_width="wrap_content"
@@ -133,23 +142,6 @@
                     android:textSize="15sp"
                     android:transitionGroup="true"/>
 
-                <Spinner
-                    android:id="@+id/contituency_spinner"
-                    android:layout_width="match_parent"
-                    android:layout_height="45dp"
-                    android:layout_below="@+id/editText4"
-                    android:layout_centerHorizontal="true"
-                    android:layout_marginRight="60dp"
-                    android:layout_marginTop="5dp"
-                    android:background="@drawable/signupbackground"
-                    android:dropDownSelector="@android:color/darker_gray"
-                    android:entries="@array/constituency_array"
-                    android:gravity="center"
-                    android:layoutMode="clipBounds"
-                    android:spinnerMode="dropdown"
-                    android:textColor="#FFFFFF"
-                    android:textSize="15sp"
-                    android:transitionGroup="true"/>
             </RelativeLayout>
         </LinearLayout>
     </ScrollView>
@@ -164,27 +156,29 @@
         android:textColor="#ffffff"
         android:textSize="7dp" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="center_horizontal">
-
-
-        <Button
-            android:id="@+id/button"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:background="#EE7E1B"
-            android:onClick="onClickSign"
-            android:padding="5dp"
-            android:text="Sign up"
-            android:textAllCaps="false"
-            android:textColor="#FFFFFF"
-            android:textSize="17dp"
-            android:textStyle="bold" />
+            android:layout_height="match_parent"
+            android:layout_gravity="center_horizontal">
 
 
-    </LinearLayout>
+            <Button
+                android:id="@+id/button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:background="#EE7E1B"
+                android:onClick="onClickSign"
+                android:padding="5dp"
+                android:text="Sign up"
+                android:textAllCaps="false"
+                android:textColor="#FFFFFF"
+                android:textSize="17dp"
+                android:textStyle="bold" />
+
+
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
 
 </LinearLayout>

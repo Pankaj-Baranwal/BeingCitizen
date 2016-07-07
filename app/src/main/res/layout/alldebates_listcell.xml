@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/screen_background"
     android:orientation="vertical">
 
-    <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    <android.support.v7.widget.CardView
         android:id="@+id/CardView_alldebate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -32,7 +31,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="5dp"
                     android:padding="15dp"
-                    android:text="Global Warming"
+                    android:text="Title"
                     android:textColor="#000000"
                     android:textSize="17dp"
                     android:textStyle="bold"
@@ -50,7 +49,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="220dp"
                     android:layout_gravity="center_horizontal"
-                    android:background="@drawable/roads" />
+                    android:adjustViewBounds="true"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/roads" />
+                <!--
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -122,14 +124,14 @@
                             android:text="No"
                             android:textColor="#FFFFFF"
                             android:textStyle="bold"
-                            android:textSize="17dp"/>
+                            a                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 ndroid:textSize="17dp"/>
 
                             </LinearLayout>
 
                     </LinearLayout>
 
                 </LinearLayout>
-
+                -->
             </RelativeLayout>
 
             <TextView
@@ -144,7 +146,7 @@
                 android:textColor="#000000" />
 
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="5dp"
                 android:layout_marginLeft="5dp"
@@ -156,13 +158,18 @@
                     android:layout_height="wrap_content"
                     android:paddingLeft="5dp"
                     android:paddingRight="5dp"
+                    android:layout_marginBottom="4dp"
+                    android:layout_marginTop="4dp"
                     android:text="56 in favour"
                     android:fontFamily="sans-serif-light"/>
 
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical">
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="4dp"
+                    android:layout_marginTop="4dp"
+                    >
 
                     <View
                         android:layout_width="1dp"
@@ -178,6 +185,8 @@
                     android:paddingLeft="5dp"
                     android:paddingRight="5dp"
                     android:text="45 against"
+                    android:layout_marginBottom="4dp"
+                    android:layout_marginTop="4dp"
                     android:fontFamily="sans-serif-light"/>
 
             </LinearLayout>
@@ -191,36 +200,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="2dp"
                     android:background="#FFDFDFDF" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="7dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="right">
-
-                    <ImageView
-                        android:id="@+id/like_image"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:layout_gravity="center_vertical"
-                        android:background="@drawable/like" />
-
-                    <ImageView
-                        android:id="@+id/comment_image"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginRight="5dp"
-                        android:background="@drawable/comments" />
-
-                </LinearLayout>
 
             </LinearLayout>
 

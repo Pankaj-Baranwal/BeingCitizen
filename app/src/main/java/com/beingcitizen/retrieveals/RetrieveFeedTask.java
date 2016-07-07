@@ -26,7 +26,7 @@ public class RetrieveFeedTask extends AsyncTask<String, Void, JSONObject> {
         JSONObject bool = null;
         Http http = new Http();
         try {
-            bool = new JSONObject(http.read("http://tnine.io/bc/login/process?email="+params[0]+"&password="+params[1]));
+            bool = new JSONObject(http.read("http://beingcitizen.com/bc/index.php/login/process?email="+params[0]+"&password="+params[1]));
         } catch (IOException e) {
             e.printStackTrace();
             Log.e("TAG_ERROR", "ERROR");

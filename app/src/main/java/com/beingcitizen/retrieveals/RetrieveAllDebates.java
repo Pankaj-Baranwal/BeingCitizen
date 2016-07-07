@@ -27,12 +27,10 @@ public class RetrieveAllDebates extends AsyncTask<String, Void, JSONObject> {
         JSONObject bool = null;
         Http http = new Http();
         try {
-            bool = new JSONObject(http.read("http://tnine.io/bc/main/debate?uid=16"));
-        } catch (IOException e) {
+            bool = new JSONObject(http.read("http://beingcitizen.com/bc/index.php/main/debate?uid="+params[0]));
+        } catch (Exception e) {
             e.printStackTrace();
-            Log.e("TAG_ERROR", "ERROR");
-        } catch (JSONException e) {
-            e.printStackTrace();
+            Log.e("TAG_ERROR", "ERROR   "+e.getMessage());
         }
         return bool;
     }

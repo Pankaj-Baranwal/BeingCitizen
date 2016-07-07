@@ -33,6 +33,7 @@
                 android:textStyle="bold" />
 
             <EditText
+                android:id="@+id/title_create"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
@@ -62,15 +63,66 @@
                 android:layout_margin="10dp"
                 android:orientation="horizontal">
 
-                <ImageView
-                    android:id="@+id/buttonLoadPicture"
-                    android:layout_width="40dp"
+                <Spinner
+                    android:id="@+id/constituency_spinner"
+                    android:layout_width="match_parent"
                     android:layout_height="40dp"
-                    android:layout_marginRight="5dp"
-                    android:background="@drawable/constituency" />
+                    android:dropDownSelector="@android:color/darker_gray"
+                    android:entries="@array/constituency_array"
+                    android:layoutMode="clipBounds"
+                    android:spinnerMode="dropdown"
+                    android:textColor="#FFFFFF"
+                    android:textSize="20sp"
+                    android:transitionGroup="true"/>
+
+            </LinearLayout>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#000000"
+                android:padding="10dp"
+                android:text="Select Category"
+                android:textColor="@color/white"
+                android:textSize="15dp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:orientation="horizontal">
 
                 <Spinner
-                    android:id="@+id/contituency_spinner"
+                    android:id="@+id/category_spinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:dropDownSelector="@android:color/darker_gray"
+                    android:entries="@array/category"
+                    android:layoutMode="clipBounds"
+                    android:spinnerMode="dropdown"
+                    android:textColor="#FFFFFF"
+                    android:textSize="20sp"
+                    android:transitionGroup="true"></Spinner>
+
+            </LinearLayout>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#000000"
+                android:padding="10dp"
+                android:text="Select Tags"
+                android:textColor="@color/white"
+                android:textSize="15dp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:orientation="horizontal">
+
+                <Spinner
+                    android:id="@+id/tag_spinner"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
                     android:dropDownSelector="@android:color/darker_gray"
@@ -83,6 +135,7 @@
 
             </LinearLayout>
 
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -94,6 +147,7 @@
                 android:textStyle="bold" />
 
             <EditText
+                android:id="@+id/text_create"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
@@ -160,17 +214,17 @@
                 android:layout_alignParentRight="true"
                 android:layout_alignParentEnd="true">
 
-                <com.github.clans.fab.FloatingActionButton
-                    android:id="@+id/fab_gallery"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="10dp"
-                    android:src="@mipmap/gallery"
-                    fab:fab_label="Gallery"
-                    fab:fab_size="normal"
-                    fab:fab_colorNormal="#000000"
-                    fab:fab_colorPressed="#FDA626"
-                    fab:fab_colorRipple="#99FFFFFF"/>
+                <!--<com.github.clans.fab.FloatingActionButton-->
+                    <!--android:id="@+id/fab_gallery"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_margin="10dp"-->
+                    <!--android:src="@mipmap/gallery"-->
+                    <!--fab:fab_label="Gallery"-->
+                    <!--fab:fab_size="normal"-->
+                    <!--fab:fab_colorNormal="#000000"-->
+                    <!--fab:fab_colorPressed="#FDA626"-->
+                    <!--fab:fab_colorRipple="#99FFFFFF"/>-->
 
                 <com.github.clans.fab.FloatingActionButton
                     android:id="@+id/fab_camera"

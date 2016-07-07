@@ -2,78 +2,71 @@ package com.beingcitizen.beingcitizen;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Typeface;
-import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.provider.Settings;
-import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.beingcitizen.R;
+import com.beingcitizen.interfaces.mla_id;
+import com.beingcitizen.interfaces.retrieveCampaign;
+import com.beingcitizen.interfaces.signUp_interface;
+import com.beingcitizen.retrieveals.RetrieveConstitutency;
+import com.beingcitizen.retrieveals.RetrieveMlaID;
 import com.beingcitizen.retrieveals.RetrieveSignUp;
 import com.beingcitizen.utils.AppLocationService;
-import com.beingcitizen.utils.LocationAddress;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 /**
  * Created by saransh on 14-06-2015.
  */
-public class signUp extends Activity {
+public class signUp extends Activity implements retrieveCampaign, signUp_interface, mla_id {
 
-    public EditText name,password,email,pin;
-    public Button signup;
-    public Spinner constituency, gender;
-    public String cont="", gender_text="";
-
+    private EditText name, password, email, pin;
+    private Button signup;
+    private Spinner gender;
+    private String gender_text = "", uid = "16";
     /**************************************/
     AppLocationService appLocationService;
+
     /***************************************/
 
+    ArrayAdapter<String> adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.sign_up);
 
-        name=(EditText)findViewById(R.id.editText);
-        password=(EditText)findViewById(R.id.editText3);
-        email=(EditText)findViewById(R.id.editText2);
-        pin=(EditText)findViewById(R.id.editText4);
-        gender=(Spinner) findViewById(R.id.gender_spinner);
-        signup=(Button) findViewById(R.id.button);
-        constituency=(Spinner) findViewById(R.id.contituency_spinner);
+        name = (EditText) findViewById(R.id.editText);
+        password = (EditText) findViewById(R.id.editText3);
+        email = (EditText) findViewById(R.id.editText2);
+        pin = (EditText) findViewById(R.id.editText4);
+        gender = (Spinner) findViewById(R.id.gender_spinner);
+        signup = (Button) findViewById(R.id.button);
 
         //ArrayAdapter adapter1=ArrayAdapter.createFromResource(this,R.array.constituency_array,R.layout.spinner_item);
-
-        final ArrayAdapter adapter = ArrayAdapter.createFromResource(this, R.array.constituency_array, R.layout.spinner_item);
-
-        constituency.setAdapter(adapter);
-        constituency.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (position!=0)
-                    cont = (String) parent.getItemAtPosition(position);
-                else
-                    Toast.makeText(signUp.this, "Incorrect Entry", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-
+        // TODO: Implement constituency using location service
         final ArrayAdapter adapter1 = ArrayAdapter.createFromResource(this, R.array.gender, R.layout.spinner_item);
 
         gender.setAdapter(adapter1);
@@ -81,7 +74,7 @@ public class signUp extends Activity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (position!=0)
-                gender_text= (String) parent.getItemAtPosition(position);
+                    gender_text= (String) parent.getItemAtPosition(position);
                 else
                     Toast.makeText(signUp.this, "Incorrect Entry", Toast.LENGTH_SHORT).show();
             }
@@ -106,47 +99,30 @@ public class signUp extends Activity {
         email.setTypeface(tf);
         pin.setTypeface(tf);
         signup.setTypeface(tf1);
-
-        //Spinner constituency = (Spinner) findViewById(R.id.contituency_spinner);
-        // Create an adapter from the string array resource and use
-        // android's inbuilt layout file simple_spinner_item
-        // that represents the default spinner in the UI
-        //ArrayAdapter adapter = ArrayAdapter.createFromResource(this, R.array.constituency_array, android.R.layout.simple_spinner_item);
-        // Set the layout to use for each dropdown item
-        //adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-        //constituency.setAdapter(adapter);
-        /*************************************/
-        appLocationService = new AppLocationService(signUp.this);
-
-        Location location = appLocationService
-                .getLocation(LocationManager.NETWORK_PROVIDER);
-
-
-
-        //you can hard-code the lat & long if you have issues with getting it
-        //remove the below if-condition and use the following couple of lines
-        //double latitude = 37.422005;
-        //double longitude = -122.084095
-
-        if (location != null) {
-            double latitude = location.getLatitude();
-            double longitude = location.getLongitude();
-            LocationAddress locationAddress = new LocationAddress();
-            locationAddress.getAddressFromLocation(latitude, longitude,
-                    getApplicationContext(), new GeocoderHandler());
-        } else {
-            //showSettingsAlert();
-        }
-
-        /***************************************/
     }
 
     public void onClickSign(View v) {
-        if(name.getText().toString().length()>0 && email.getText().toString().length()>0 && password.getText().toString().length()>0 && gender_text.length()>0 && cont.length()>0) {
-            RetrieveSignUp retrieveSignUp = new RetrieveSignUp(this);
-            retrieveSignUp.execute(name.getText().toString(), email.getText().toString(), password.getText().toString(), gender_text, cont);
-        }else{
+        if(name.getText().toString().length()>0 && email.getText().toString().length()>0 && password.getText().toString().length()>0 && gender_text.length()>0) {
+            Toast.makeText(signUp.this, "Details sent", Toast.LENGTH_SHORT).show();
+                final Dialog dialogLogout = new Dialog(this);
+                dialogLogout.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                dialogLogout.setContentView(R.layout.dialog_pincode);
+                final EditText pin_txt = (EditText)dialogLogout.findViewById(R.id.pin_txt);
+                Button update = (Button) dialogLogout.findViewById(R.id.update);
+                update.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (pin_txt.getText().toString().length()!=6){
+                            Toast.makeText(signUp.this, "Wrong Pincode", Toast.LENGTH_SHORT).show();
+                        }else{
+                            RetrieveConstitutency rcc = new RetrieveConstitutency(signUp.this, signUp.this);
+                            dialogLogout.cancel();
+                            rcc.execute(pin_txt.getText().toString());
+                        }
+                    }
+                });
+                dialogLogout.show();
+            }else{
             Toast.makeText(this, "Details incomplete", Toast.LENGTH_SHORT).show();
         }
     }
@@ -161,14 +137,95 @@ public class signUp extends Activity {
         finish();
     }
 
-    public void functions(String status) {
-        if (status.contentEquals("success")){
-            Intent i = new Intent(getBaseContext(), MainActivity.class);
-            startActivity(i);
-            finish();
-        }else{
-            Toast.makeText(this, "Error Occured", Toast.LENGTH_SHORT).show();
+    @Override
+    public void constituency(JSONObject s) {
+        JSONArray namearray;
+        try {
+            namearray = s.getJSONObject("const").names();
+            ArrayList<String> obj = new ArrayList<>();
+            obj.add("Enter constituency");
+            for (int i = 0; i < namearray.length(); i++)
+                obj.add(namearray.getString(i));
+            adapter = new ArrayAdapter<>(this, R.layout.spinner_item, obj);
+            final Dialog dialogLogout = new Dialog(this);
+            dialogLogout.requestWindowFeature(Window.FEATURE_NO_TITLE);
+            dialogLogout.setContentView(R.layout.dialog_pincode);
+            final EditText pin_txt = (EditText)dialogLogout.findViewById(R.id.pin_txt);
+            pin_txt.setVisibility(View.GONE);
+            Button update = (Button) dialogLogout.findViewById(R.id.update);
+            final Spinner consti = (Spinner) dialogLogout.findViewById(R.id.consti_spinner);
+            consti.setAdapter(adapter);
+            consti.setVisibility(View.VISIBLE);
+            final String[] content = new String[]{"err"};
+            consti.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    if (position==0)
+                        content[0] = "err";
+                    else
+                        content[0] = (String)parent.getItemAtPosition(position);
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+
+                }
+            });
+            update.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (content[0].contentEquals("err")){
+                        Toast.makeText(signUp.this, "Choose constituency", Toast.LENGTH_SHORT).show();
+                    }else {
+                        SharedPreferences sharedpreferences = PreferenceManager.getDefaultSharedPreferences(signUp.this);
+                        SharedPreferences.Editor edit = sharedpreferences.edit();
+                        edit.putString("constituency", content[0]);
+                        RetrieveMlaID rmlaid = new RetrieveMlaID(signUp.this, signUp.this);
+                        rmlaid.execute(content[0]);
+                        edit.apply();
+                        RetrieveSignUp rsup = new RetrieveSignUp(signUp.this, signUp.this);
+                        dialogLogout.cancel();
+                        rsup.execute(name.getText().toString(), email.getText().toString(), password.getText().toString(), gender_text, content[0]);
+                    }
+                }
+            });
+            dialogLogout.show();
+        } catch (JSONException e) {
+            Log.e("namearray", "ERROR");
+            e.printStackTrace();
         }
+    }
+
+    @Override
+    public void result(JSONObject obj) {
+        if (obj.has("user_id")) {
+            SharedPreferences sharedpreferences = PreferenceManager.getDefaultSharedPreferences(this);
+            SharedPreferences.Editor edit = sharedpreferences.edit();
+            try {
+                uid = obj.getString("user_id");
+                edit.putString("id", uid);
+                edit.putString("name", obj.getString("name"));
+                edit.putString("email", obj.getString("email"));
+                edit.putString("sex", obj.getString("gender"));
+                edit.apply();
+                Intent i = new Intent(getBaseContext(), MainActivity.class);
+                startActivity(i);
+                finish();
+            } catch (JSONException e) {
+                Log.e("TAG_function", "JSONERROR");
+                e.printStackTrace();
+            }
+        }else{
+            Toast.makeText(signUp.this, "Error Signing in", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void mla_ids(String mlaID) {
+        SharedPreferences sharedpreferences = PreferenceManager.getDefaultSharedPreferences(signUp.this);
+        SharedPreferences.Editor edit = sharedpreferences.edit();
+        edit.putString("mla_id", mlaID);
+        edit.apply();
     }
 
     private class GeocoderHandler extends Handler {

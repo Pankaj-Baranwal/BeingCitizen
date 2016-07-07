@@ -3,7 +3,6 @@ package com.beingcitizen.fragments;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -24,12 +23,17 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.Toast;
 import com.beingcitizen.R;
+import com.beingcitizen.interfaces.adapterUpdate;
+import com.beingcitizen.interfaces.retrieveCamp;
 import com.beingcitizen.tab.SlidingTabLayout;
 import com.yalantis.contextmenu.lib.ContextMenuDialogFragment;
 import com.yalantis.contextmenu.lib.MenuObject;
 import com.yalantis.contextmenu.lib.MenuParams;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,14 +42,16 @@ import java.util.List;
 /**
  * Created by saransh on 19-06-2015.
  */
-public class Campaign extends Fragment {
+public class Campaign extends Fragment implements retrieveCamp {
 
   private FragmentManager fragmentManager;
    private DialogFragment mMenuDialogFragment;
    // private Toolbar toolbar;
     private ViewPager mPager;
     private SlidingTabLayout mTabs;
-    String TITLES[] = {"All Campaign","Campaign Genre"};
+    String selected = "";
+    List<MenuObject> menuObjects;
+    public static AllCampaign alc;
 
 
     @Override
@@ -59,7 +65,8 @@ public class Campaign extends Fragment {
         mTabs.setDistributeEvenly(true);
         setHasOptionsMenu(true);
         initMenuFragment();
-        addFragment(new AllCampaign(), true, R.id.container);
+        alc = new AllCampaign();
+        addFragment(alc, true, R.id.container);
         mTabs.setCustomTabView(R.layout.custom_tab_view, R.id.tabText);
         mTabs.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
             @Override
@@ -84,76 +91,63 @@ public class Campaign extends Fragment {
         mMenuDialogFragment = ContextMenuDialogFragment.newInstance(menuParams);
     }
     private List<MenuObject> getMenuObjects() {
-        // You can use any [resource, bitmap, drawable, color] as image:
-        // item.setResource(...)
-        // item.setBitmap(...)
-        // item.setDrawable(...)
-        // item.setColor(...)
-        // You can set image ScaleType:
-        // item.setScaleType(ScaleType.FIT_XY)
-        // You can use any [resource, drawable, color] as background:
-        // item.setBgResource(...)
-        // item.setBgDrawable(...)
-        // item.setBgColor(...)
-        // You can use any [color] as text color:
-        // item.setTextColor(...)
-        // You can set any [color] as divider color:
-        // item.setDividerColor(...)
 
-        List<MenuObject> menuObjects = new ArrayList<>();
+        menuObjects = new ArrayList<>();
 
         MenuObject close = new MenuObject();
         close.setResource(R.mipmap.icn_close);
 
-        MenuObject laworder = new MenuObject("Public Law & Order");
+        MenuObject laworder = new MenuObject("Law and Order");
         laworder.setResource(R.drawable.public_law_and_order);
         laworder.setBgColor(Color.alpha(R.color.color_white));
         laworder.setDividerColor(Color.alpha(R.color.color_white));
         laworder.setScaleType(ImageView.ScaleType.FIT_START);
 
-        MenuObject police = new MenuObject("Police");
-        Bitmap b = BitmapFactory.decodeResource(getResources(), R.drawable.police);
-        police.setBitmap(b);
-        police.setBgColor(Color.alpha(R.color.color_white));
-        police.setDividerColor(Color.alpha(R.color.color_white));
+        MenuObject phs = new MenuObject("Public Health and Sanitation");
+        Bitmap b = BitmapFactory.decodeResource(getResources(), R.drawable.public_health_and_sanitation);
+        phs.setBitmap(b);
+        phs.setBgColor(Color.alpha(R.color.color_white));
+        phs.setDividerColor(Color.alpha(R.color.color_white));
 
-        MenuObject publichealth = new MenuObject("Public Health & Sanitation");
-        BitmapDrawable bd = new BitmapDrawable(getResources(),
-                BitmapFactory.decodeResource(getResources(), R.drawable.public_health_and_sanitation));
-        publichealth.setDrawable(bd);
-        publichealth.setBgColor(Color.alpha(R.color.color_white));
-        publichealth.setDividerColor(Color.alpha(R.color.color_white));
+        MenuObject communication = new MenuObject("Communication");
+        communication.setResource(R.drawable.debates);
+        communication.setBgColor(Color.alpha(R.color.color_white));
+        communication.setDividerColor(Color.alpha(R.color.color_white));
 
-        MenuObject government = new MenuObject("Local Government");
-        government.setResource(R.drawable.local_government);
-        government.setBgColor(Color.alpha(R.color.color_white));
-        government.setDividerColor(Color.alpha(R.color.color_white));
-
-        MenuObject roadsbridges = new MenuObject("Communications – Roads & Bridges");
-        roadsbridges.setResource(R.drawable.roads_and_bridges);
-        roadsbridges.setBgColor(Color.alpha(R.color.color_white));
-        roadsbridges.setDividerColor(Color.alpha(R.color.color_white));
-
-        MenuObject watersupply = new MenuObject("Water Supplies");
+        MenuObject watersupply = new MenuObject("Water-Irrigation,Drainage,Embankments");
         watersupply.setResource(R.drawable.water_supplies);
         watersupply.setBgColor(Color.alpha(R.color.color_white));
         watersupply.setDividerColor(Color.alpha(R.color.color_white));
 
-        MenuObject industry = new MenuObject("Industries");
-        industry.setResource(R.drawable.industries);
-        industry.setBgColor(Color.alpha(R.color.color_white));
-        industry.setDividerColor(Color.alpha(R.color.color_white));
+        MenuObject land = new MenuObject("Lands, Agriculture");
+        land.setResource(R.drawable.water_supplies);
+        land.setBgColor(Color.alpha(R.color.color_white));
+        land.setDividerColor(Color.alpha(R.color.color_white));
 
-        MenuObject market = new MenuObject("Markets & Fairs");
+        MenuObject trade = new MenuObject("Trade,Commerce,Employment");
+        trade.setResource(R.drawable.market);
+        trade.setBgColor(Color.alpha(R.color.color_white));
+        trade.setDividerColor(Color.alpha(R.color.color_white));
+
+        MenuObject environ = new MenuObject("Environment and Holticulture");
+        environ.setResource(R.drawable.water_supplies);
+        environ.setBgColor(Color.alpha(R.color.color_white));
+        environ.setDividerColor(Color.alpha(R.color.color_white));
+
+        MenuObject market = new MenuObject("Tourism, Art and Culture");
         market.setResource(R.drawable.market);
         market.setBgColor(Color.alpha(R.color.color_white));
         market.setDividerColor(Color.alpha(R.color.color_white));
 
-        MenuObject trade = new MenuObject("Trade & Commerce (within State)");
-        trade.setResource(R.drawable.trade);
+        MenuObject power = new MenuObject("Power");
+        trade.setResource(R.drawable.industries);
         trade.setBgColor(Color.alpha(R.color.color_white));
         trade.setDividerColor(Color.alpha(R.color.color_white));
 
+        MenuObject corruption = new MenuObject("Corruption/Vigillance");
+        corruption.setResource(R.drawable.police);
+        corruption.setBgColor(Color.alpha(R.color.color_white));
+        corruption.setDividerColor(Color.alpha(R.color.color_white));
        // MenuObject tax = new MenuObject("State Taxes (Electricity, Land, Roads, Toll)");
         //tax.setResource(R.drawable.industries);
         //tax.setBgColor(Color.alpha(R.color.color_white));
@@ -161,14 +155,15 @@ public class Campaign extends Fragment {
 
         menuObjects.add(close);
         menuObjects.add(laworder);
-        menuObjects.add(police);
-        menuObjects.add(publichealth);
-        menuObjects.add(government);
-        menuObjects.add(roadsbridges);
+        menuObjects.add(phs);
+        menuObjects.add(communication);
         menuObjects.add(watersupply);
-        menuObjects.add(industry);
-        menuObjects.add(market);
+        menuObjects.add(land);
         menuObjects.add(trade);
+        menuObjects.add(environ);
+        menuObjects.add(market);
+        menuObjects.add(power);
+        menuObjects.add(corruption);
        // menuObjects.add(tax);
         return menuObjects;
     }
@@ -187,7 +182,6 @@ public class Campaign extends Fragment {
     }
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-
         inflater.inflate(R.menu.menu_main, menu);
 
     }
@@ -207,20 +201,33 @@ public class Campaign extends Fragment {
    // set this to set according to category
 
 
- //   public void onMenuItemClick(View clickedView, int position) {
- //       Toast.makeText(Campaign.this.getActivity(), "Clicked on position: " + position, Toast.LENGTH_SHORT).show();
-  //      Log.e("campaign", "" + position);
-  //  }
+//    public void onMenuItemClick(View clickedView, int position) {
+////        selected = menuObjects.get(position).getTitle();
+////        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getContext());
+////        RetrieveCampaign rtC = new RetrieveCampaign(Campaign.this);
+////        String uid = sp.getString("id", "16");
+////        rtC.execute(uid);
+////        Toast.makeText(Campaign.this.getActivity(), "Clicked on position: " + position, Toast.LENGTH_SHORT).show();
+//    }
 
+    @Override
+    public void retrieve(JSONObject param) {
+        try {
+            if (param.getJSONArray("campaigns")!=null && param.getJSONArray("campaigns").length()!=0) {
+                JSONArray jA;
+                JSONArray jASorted = new JSONArray();
+                jA = param.getJSONArray("campaigns");
+                for (int i=0; i<jA.length(); i++)
+                    if (jA.getJSONObject(i).getString("tags").contentEquals(selected))
+                        jASorted.put(jA.getJSONObject(i));
+                adapterUpdate upd = new AllCampaign();
+                upd.updateAdapt(jA);
+            }
+        }catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
 
-   // @Override
-    // public void onStop() {
-        // TODO Auto-generated method stub
-
-    //    super.onStop();
-
-
-   // }
     class MyPagerAdapter extends FragmentPagerAdapter{
         int ICONS[] = {R.mipmap.ic_notifications_off_white_24dp,R.drawable.aka};
         public MyPagerAdapter(FragmentManager fm) {
@@ -229,17 +236,16 @@ public class Campaign extends Fragment {
 
         @Override
         public Fragment getItem(int position) {
+            Log.e("POSITION", position+"");
             switch (position) {
 
                 // Open FragmentTab1.java
                 case 0:
-                    AllCampaign fragmenttab2 = new AllCampaign();
-                    return fragmenttab2;
+                    return new AllCampaign();
 
                 // Open FragmentTab2.java
                 case 1:
-                CampaignCategory fragmenttab = new CampaignCategory();
-                return fragmenttab;
+                    return new CampaignCategory();
                 // Open FragmentTab3.java
 
             }

@@ -4,20 +4,28 @@ package com.beingcitizen.beingcitizen;
  * Created by saransh on 14-06-2015.
  */
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
 import android.widget.VideoView;
 
+import com.beingcitizen.NetworkUtil;
 import com.beingcitizen.R;
+import com.beingcitizen.retrieveals.RetrieveConstitutency;
 
 import org.json.JSONObject;
 
@@ -98,8 +106,8 @@ public class splashscreen extends Activity {
 
 
 
-        JSONObject jsonobject;
-        jsonobject = JSONfunctions.getJSONfromURL("http://beingcitizen.com:2082/cpsess5911541994/3rdparty/phpMyAdmin/index.php");
+//        JSONObject jsonobject;
+//        jsonobject = JSONfunctions.getJSONfromURL("http://beingcitizen.com:2082/cpsess5911541994/3rdparty/phpMyAdmin/index.php");
 
 
 
@@ -115,13 +123,44 @@ public class splashscreen extends Activity {
             public void run() {
                 // This method will be executed once the timer is over
                 // Start your app main activity
-                Intent i = new Intent(splashscreen.this, LoginMain.class);
-                startActivity(i);
-                //overridePendingTransition(R.layout.fade_in, R.layout.fade_out);
-                // close this activity
-                finish();
+                if (NetworkUtil.getConnectivityStatusString(splashscreen.this).contentEquals("Not connected to Internet")) {
+                    final Dialog dialogLogout = new Dialog(splashscreen.this);
+                    final boolean[] candid = {false};
+                    dialogLogout.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                    dialogLogout.setContentView(R.layout.no_network);
+                    Button update = (Button) dialogLogout.findViewById(R.id.update);
+                    //pNKJ;
+                    update.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            candid[0] = true;
+                            dialogLogout.cancel();
+                        }
+                    });
+                    dialogLogout.show();
+                    if (candid[0]){
+                        onPause();
+                    }
+                } else {
+                    SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(splashscreen.this);
+                    if (sp.contains("id")) {
+                        Intent i = new Intent(splashscreen.this, MainActivity.class);
+                        startActivity(i);
+                    } else {
+                        Intent i = new Intent(splashscreen.this, LoginMain.class);
+                        startActivity(i);
+                    }
+                    //overridePendingTransition(R.layout.fade_in, R.layout.fade_out);
+                    // close this activity
+                    finish();
+                }
             }
         }, SPLASH_TIME_OUT);
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        finish();
+    }
 }
