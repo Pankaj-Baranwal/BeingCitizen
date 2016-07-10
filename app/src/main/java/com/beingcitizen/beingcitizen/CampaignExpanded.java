@@ -76,11 +76,9 @@ public class CampaignExpanded extends AppCompatActivity{
 
             @Override
             public void onClick(View v) {
-                if (viewComments.getText().toString().length()>12) {
                     Intent i = new Intent(CampaignExpanded.this, CommentActivity.class);
                     i.putExtra("campaign_id", campaign_id);
                     startActivity(i);
-                }
             }
         });
         like = (ImageView)findViewById(R.id.like);
@@ -155,6 +153,7 @@ public class CampaignExpanded extends AppCompatActivity{
                         level_img.setImageResource(R.drawable.level4);
                     }
                     foll = s.getString("follow");
+                    Log.e("follow", foll);
                     volu = s.getString("volunteer");
                     if (foll.contentEquals("true")) {
                         like.setBackgroundResource(R.drawable.like_on);
