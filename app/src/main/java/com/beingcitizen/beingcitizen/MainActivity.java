@@ -1,7 +1,6 @@
 package com.beingcitizen.beingcitizen;
 
 import android.app.Dialog;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
@@ -10,12 +9,12 @@ import android.content.pm.Signature;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
-import android.os.Bundle;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -31,9 +30,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.beingcitizen.adapters.Draweradapter;
 import com.beingcitizen.R;
-import com.beingcitizen.fragments.AllCampaign;
+import com.beingcitizen.adapters.Draweradapter;
 import com.beingcitizen.fragments.Campaign;
 import com.beingcitizen.fragments.DailyDigest;
 import com.beingcitizen.fragments.Debate;
@@ -41,7 +39,6 @@ import com.beingcitizen.fragments.TermsCondition;
 import com.beingcitizen.interfaces.adapterUpdate;
 import com.beingcitizen.interfaces.retrieveCamp;
 import com.beingcitizen.retrieveals.RetrieveCampaign;
-import com.facebook.login.LoginManager;
 import com.yalantis.contextmenu.lib.interfaces.OnMenuItemClickListener;
 
 import org.json.JSONArray;
@@ -134,10 +131,6 @@ public class MainActivity extends AppCompatActivity implements OnMenuItemClickLi
         EMAIL_i=sharedpreferences.getString("email", null);
         MLA_name = sharedpreferences.getString("mla_id", null);
         consti = sharedpreferences.getString("constituency", null);
-        Log.e("CONSTI", consti+" ");
-        //String face_id=sharedpreferences.getString("id",null);
-//        PROFILE=Integer.parseInt(face_id);
-       // PROFILE=getBitmapFromURL("http://graph.facebook.com/" +facebook_id+ "/picture?type=square");
         mAdapter = new Draweradapter(TITLES, ICONS, NAME_i, EMAIL_i, MLA_name, consti, PROFILE);
         // And passing the titles,icons,header view name, header view email,
         // and header view profile picture
@@ -208,8 +201,8 @@ public class MainActivity extends AppCompatActivity implements OnMenuItemClickLi
                         case 5:
                             Draweradapter.mSelectedPosition=5;
                             recyclerView.getAdapter().notifyDataSetChanged();
-                            //TODO: WTF???
-                            Toast.makeText(MainActivity.this, "asfsafd: " + recyclerView.getChildPosition(child), Toast.LENGTH_SHORT).show();
+                            //TODO: HELP...
+                            Toast.makeText(MainActivity.this, "asfsafd: " + recyclerView.getChildAdapterPosition(child), Toast.LENGTH_SHORT).show();
                             break;
                         case 6:
                             Draweradapter.mSelectedPosition=6;
@@ -217,7 +210,7 @@ public class MainActivity extends AppCompatActivity implements OnMenuItemClickLi
                             logout();
                             break;
                         default:
-                            Toast.makeText(MainActivity.this, "default: "+ recyclerView.getChildPosition(child), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MainActivity.this, "default: "+ recyclerView.getChildAdapterPosition(child), Toast.LENGTH_SHORT).show();
                             break;
                     }
                     ft.commit();
@@ -330,32 +323,6 @@ public class MainActivity extends AppCompatActivity implements OnMenuItemClickLi
             rtC.execute(uid);
         }
     }
-
-
-
-
-
-
-
-    public  void  setUserProfile(String jsondata){
-        try {
-            response = new JSONObject(jsondata);
-             user=response.get("name").toString();
-             email=response.get("email").toString();
-            //user_name.setText(response.get("name").toString());
-            profile_pic_data = new JSONObject(response.get("picture").toString());
-            profile_pic_url = new JSONObject(profile_pic_data.getString("data"));
-
-            Toast.makeText(getApplicationContext(),user+"  "+email,Toast.LENGTH_LONG).show();
-            /*Picasso.with(this).load(profile_pic_url.getString("url"))
-                    .into(profile_pic);
-                    */
-        } catch (Exception e){
-            e.printStackTrace();
-        }
-    }
-
-
 
 
 

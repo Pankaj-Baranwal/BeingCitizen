@@ -8,8 +8,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.util.Log;
@@ -29,7 +27,6 @@ import com.beingcitizen.interfaces.signUp_interface;
 import com.beingcitizen.retrieveals.RetrieveConstitutency;
 import com.beingcitizen.retrieveals.RetrieveMlaID;
 import com.beingcitizen.retrieveals.RetrieveSignUp;
-import com.beingcitizen.utils.AppLocationService;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -43,13 +40,7 @@ import java.util.ArrayList;
 public class signUp extends Activity implements retrieveCampaign, signUp_interface, mla_id {
 
     private EditText name, password, email, pin;
-    private Button signup;
-    private Spinner gender;
-    private String gender_text = "", uid = "16";
-    /**************************************/
-    AppLocationService appLocationService;
-
-    /***************************************/
+    private String gender_text = "";
 
     ArrayAdapter<String> adapter;
 
@@ -62,8 +53,8 @@ public class signUp extends Activity implements retrieveCampaign, signUp_interfa
         password = (EditText) findViewById(R.id.editText3);
         email = (EditText) findViewById(R.id.editText2);
         pin = (EditText) findViewById(R.id.editText4);
-        gender = (Spinner) findViewById(R.id.gender_spinner);
-        signup = (Button) findViewById(R.id.button);
+        Spinner gender = (Spinner) findViewById(R.id.gender_spinner);
+        Button signup = (Button) findViewById(R.id.button);
 
         //ArrayAdapter adapter1=ArrayAdapter.createFromResource(this,R.array.constituency_array,R.layout.spinner_item);
         // TODO: Implement constituency using location service
@@ -102,29 +93,28 @@ public class signUp extends Activity implements retrieveCampaign, signUp_interfa
     }
 
     public void onClickSign(View v) {
-        if(name.getText().toString().length()>0 && email.getText().toString().length()>0 && password.getText().toString().length()>0 && gender_text.length()>0) {
+        if (name.getText().toString().length() > 0 && email.getText().toString().length() > 0 && password.getText().toString().length() > 0 && gender_text.length() > 0) {
             Toast.makeText(signUp.this, "Details sent", Toast.LENGTH_SHORT).show();
-                final Dialog dialogLogout = new Dialog(this);
-                dialogLogout.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                dialogLogout.setContentView(R.layout.dialog_pincode);
-                final EditText pin_txt = (EditText)dialogLogout.findViewById(R.id.pin_txt);
-                Button update = (Button) dialogLogout.findViewById(R.id.update);
-                update.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (pin_txt.getText().toString().length()!=6){
-                            Toast.makeText(signUp.this, "Wrong Pincode", Toast.LENGTH_SHORT).show();
-                        }else{
-                            RetrieveConstitutency rcc = new RetrieveConstitutency(signUp.this, signUp.this);
-                            dialogLogout.cancel();
-                            rcc.execute(pin_txt.getText().toString());
-                        }
+            final Dialog dialogLogout = new Dialog(this);
+            dialogLogout.requestWindowFeature(Window.FEATURE_NO_TITLE);
+            dialogLogout.setContentView(R.layout.dialog_pincode);
+            final EditText pin_txt = (EditText) dialogLogout.findViewById(R.id.pin_txt);
+            Button update = (Button) dialogLogout.findViewById(R.id.update);
+            update.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (pin_txt.getText().toString().length() != 6) {
+                        Toast.makeText(signUp.this, "Wrong Pincode", Toast.LENGTH_SHORT).show();
+                    } else {
+                        RetrieveConstitutency rcc = new RetrieveConstitutency(signUp.this, signUp.this);
+                        dialogLogout.dismiss();
+                        rcc.execute(pin_txt.getText().toString());
                     }
-                });
-                dialogLogout.show();
-            }else{
+                }
+            });
+            dialogLogout.show();
+        } else
             Toast.makeText(this, "Details incomplete", Toast.LENGTH_SHORT).show();
-        }
     }
 
 
@@ -180,9 +170,9 @@ public class signUp extends Activity implements retrieveCampaign, signUp_interfa
                         SharedPreferences sharedpreferences = PreferenceManager.getDefaultSharedPreferences(signUp.this);
                         SharedPreferences.Editor edit = sharedpreferences.edit();
                         edit.putString("constituency", content[0]);
+                        edit.apply();
                         RetrieveMlaID rmlaid = new RetrieveMlaID(signUp.this, signUp.this);
                         rmlaid.execute(content[0]);
-                        edit.apply();
                         RetrieveSignUp rsup = new RetrieveSignUp(signUp.this, signUp.this);
                         dialogLogout.cancel();
                         rsup.execute(name.getText().toString(), email.getText().toString(), password.getText().toString(), gender_text, content[0]);
@@ -202,7 +192,7 @@ public class signUp extends Activity implements retrieveCampaign, signUp_interfa
             SharedPreferences sharedpreferences = PreferenceManager.getDefaultSharedPreferences(this);
             SharedPreferences.Editor edit = sharedpreferences.edit();
             try {
-                uid = obj.getString("user_id");
+                String uid = obj.getString("user_id");
                 edit.putString("id", uid);
                 edit.putString("name", obj.getString("name"));
                 edit.putString("email", obj.getString("email"));
@@ -226,22 +216,6 @@ public class signUp extends Activity implements retrieveCampaign, signUp_interfa
         SharedPreferences.Editor edit = sharedpreferences.edit();
         edit.putString("mla_id", mlaID);
         edit.apply();
-    }
-
-    private class GeocoderHandler extends Handler {
-        @Override
-        public void handleMessage(Message message) {
-            String locationAddress;
-            switch (message.what) {
-                case 1:
-                    Bundle bundle = message.getData();
-                    locationAddress = bundle.getString("address");
-                    break;
-                default:
-                    locationAddress = null;
-            }
-            pin.setText(locationAddress);
-        }
     }
 
 
