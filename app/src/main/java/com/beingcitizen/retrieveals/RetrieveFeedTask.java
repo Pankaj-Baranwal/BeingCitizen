@@ -4,7 +4,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.beingcitizen.Http;
-import com.beingcitizen.beingcitizen.LoginActivity;
+import com.beingcitizen.interfaces.login;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -15,10 +15,10 @@ import java.io.IOException;
  * Created by pankaj on 29/5/16.
  */
 public class RetrieveFeedTask extends AsyncTask<String, Void, JSONObject> {
-    LoginActivity context;
+    login logg = null;
 
-    public RetrieveFeedTask(LoginActivity context){
-        this.context = context;
+    public RetrieveFeedTask(login context){
+        logg = context;
     }
 
     @Override
@@ -26,7 +26,7 @@ public class RetrieveFeedTask extends AsyncTask<String, Void, JSONObject> {
         JSONObject bool = null;
         Http http = new Http();
         try {
-            bool = new JSONObject(http.read("http://beingcitizen.com/bc/index.php/login/process?email="+params[0]+"&password="+params[1]));
+            bool = new JSONObject(http.read("http://beingcitizen.com/bc/index.php/login/process?email="+params[0].replace(" ", "%20")+"&password="+params[1].replace(" ", "%20")));
         } catch (IOException e) {
             e.printStackTrace();
             Log.e("TAG_ERROR", "ERROR");
@@ -39,6 +39,6 @@ public class RetrieveFeedTask extends AsyncTask<String, Void, JSONObject> {
     @Override
     protected void onPostExecute(JSONObject s) {
         super.onPostExecute(s);
-            context.functions(s);
+            logg.login_feed(s);
     }
 }

@@ -1,6 +1,7 @@
 package com.beingcitizen.beingcitizen;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
@@ -8,14 +9,24 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import com.beingcitizen.R;
 import com.beingcitizen.retrieveals.RetrieveSingleDebate;
+import com.facebook.share.model.ShareLinkContent;
+import com.facebook.share.widget.ShareDialog;
+import com.rey.material.widget.ProgressView;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
+import com.twitter.sdk.android.core.TwitterAuthConfig;
+import com.twitter.sdk.android.core.TwitterCore;
+import com.twitter.sdk.android.tweetcomposer.TweetComposer;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import io.fabric.sdk.android.Fabric;
 
 
 public class DebateExpanded extends AppCompatActivity{
@@ -24,10 +35,13 @@ public class DebateExpanded extends AppCompatActivity{
     CardView cardView;
     String uid = "16", debate_id = "10";
     String nature="yes";
-
+    String url_img = "";
+    ProgressView image_loading;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        TwitterAuthConfig authConfig =  new TwitterAuthConfig("consumerKey", "consumerSecret");
+        Fabric.with(this, new TwitterCore(authConfig), new TweetComposer());
         setContentView(R.layout.debate_expanded);
 
         toolbar = (Toolbar) findViewById(R.id.tool_bar);
@@ -36,6 +50,7 @@ public class DebateExpanded extends AppCompatActivity{
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         debate_id = getIntent().getExtras().getString("debate_id");
+        image_loading = (ProgressView) findViewById(R.id.progress_imageLoading);
         cardView=(CardView)findViewById(R.id.CardView_campaignExpanded);
         cardView.setRadius(16.0f);
         cardView.setCardElevation(16.0f);
@@ -79,11 +94,9 @@ public class DebateExpanded extends AppCompatActivity{
     }
 
     public void functions(JSONObject s) {
-        ImageView img_debate = (ImageView)findViewById(R.id.image_debate);
+        final ImageView img_debate = (ImageView)findViewById(R.id.image_debate);
         TextView debate_title = (TextView) findViewById(R.id.debate_title);
         TextView debate_content = (TextView) findViewById(R.id.debate_content);
-        LinearLayout yes_perc = (LinearLayout) findViewById(R.id.yes_percent);
-        LinearLayout no_perc = (LinearLayout) findViewById(R.id.no_percent);
         TextView yes_txt = (TextView)findViewById(R.id.yes_txt);
         TextView no_txt = (TextView)findViewById(R.id.no_txt);
         TextView viewComments = (TextView) findViewById(R.id.viewComments);
@@ -96,18 +109,67 @@ public class DebateExpanded extends AppCompatActivity{
             Float dv2 = Float.parseFloat(s.getJSONArray("debDetails").getJSONObject(0).getString("against"));
             Float per1 = dv1/(dv1+dv2);
             Float per2 = dv2/(dv1+dv2);
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-            params.weight = per1;
-            yes_perc.setLayoutParams(params);
-            params.weight = per2;
-            no_perc.setLayoutParams(params);
-            yes_txt.setText(Math.round(per1*100)+" %");
-            no_txt.setText(Math.round(per2*100)+" %");
-            String url_img = "http://beingcitizen.com/uploads/debates/" + s.getJSONArray("debDetails").getJSONObject(0).getString("dimage") + s.getJSONArray("debDetails").getJSONObject(0).getString("dext");
-            Picasso.with(this).load(url_img).resize(256, 256).into(img_debate);
+//            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+//                    LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+//            params.weight = per1;
+//            yes_perc.setLayoutParams(params);
+//            params.weight = per2;
+//            no_perc.setLayoutParams(params);
+            yes_txt.setText(Math.round(per1*100)+" % in favour");
+            no_txt.setText(Math.round(per2*100)+" % against");
+            url_img = "http://beingcitizen.com/uploads/debates/" + s.getJSONArray("debDetails").getJSONObject(0).getString("dimage") + s.getJSONArray("debDetails").getJSONObject(0).getString("dext");
+            Picasso.with(this).load(url_img).resize(256, 256).into(img_debate, new Callback() {
+                @Override
+                public void onSuccess() {
+                    img_debate.setVisibility(View.VISIBLE);
+                    image_loading.setVisibility(View.GONE);
+                }
+
+                @Override
+                public void onError() {
+
+                }
+            });
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    private void shareOnWhatsapp(String picture_text){
+        /**
+         * Show share dialog BOTH image and text
+         */
+        Uri imageUri = Uri.parse(url_img);
+        Intent shareIntent = new Intent();
+        shareIntent.setAction(Intent.ACTION_SEND);
+        //Target whatsapp:
+        shareIntent.setPackage("com.whatsapp");
+        //Add text and then Image URI
+        shareIntent.putExtra(Intent.EXTRA_TEXT, picture_text);
+        shareIntent.putExtra(Intent.EXTRA_STREAM, imageUri);
+        shareIntent.setType("image/*");
+        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+        try {
+            startActivity(shareIntent);
+        } catch (android.content.ActivityNotFoundException ex) {
+            Toast.makeText(DebateExpanded.this, "Whatsapp not installed!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void shareOnTwitter(String picture_text){
+        TweetComposer.Builder builder = new TweetComposer.Builder(this)
+                .text(picture_text)
+                .image(Uri.parse(url_img));
+        builder.show();
+    }
+
+    private void shareOnFacebook(String text){
+        ShareLinkContent content = new ShareLinkContent.Builder()
+                .setContentUrl(Uri.parse("http://beingcitizen.com/Main/viewCampaign/"+debate_id))
+                .setImageUrl(Uri.parse(url_img))
+                .setContentDescription(text)
+                .build();
+        ShareDialog.show(DebateExpanded.this, content);
     }
 }

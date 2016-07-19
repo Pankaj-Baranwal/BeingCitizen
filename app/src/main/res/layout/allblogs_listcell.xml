@@ -20,16 +20,29 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="220dp">
 
             <ImageView
                 android:id="@+id/blog_image"
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:src ="@drawable/heavy_rain"
+                android:layout_height="220dp"
                 android:adjustViewBounds="true"
                 android:layout_gravity="center_horizontal"
                 android:scaleType="fitXY"
+                android:visibility="gone"
                 />
+                <com.rey.material.widget.ProgressView
+                    android:id="@+id/progress_imageLoading"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_centerInParent="true"
+                    app:pv_autostart="true"
+                    app:pv_circular="true"
+                    app:pv_progressStyle="@style/Material.Drawable.CircularProgress"
+                    app:pv_progressMode="indeterminate"/>
+            </RelativeLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -42,7 +55,7 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-light"
                     android:padding="5dp"
-                    android:text="Heavy rain causes water-logging, traffic snarls across Delhi-NCR"
+                    android:text=""
                     android:textColor="#000000"
                     android:textSize="15dp"
                     android:textStyle="bold" />
@@ -86,7 +99,7 @@
                         android:id="@+id/posted_at"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Posted 4 Hours ago"
+                        android:text="Posted n Hours ago"
                         android:textColor="#FFFFFF"
                         android:textSize="10dp" />
 

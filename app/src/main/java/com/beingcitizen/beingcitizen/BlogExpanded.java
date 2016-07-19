@@ -1,11 +1,8 @@
 package com.beingcitizen.beingcitizen;
 
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.preference.PreferenceManager;
-import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
@@ -17,11 +14,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.beingcitizen.R;
-import com.beingcitizen.retrieveals.RetrieveDailyDigest;
 import com.beingcitizen.retrieveals.SendLikeBlog;
+import com.rey.material.widget.ProgressView;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -57,11 +54,23 @@ public class BlogExpanded extends AppCompatActivity{
         uid = sp.getString("id", "16");
 
         final ImageView blog_img = (ImageView) findViewById(R.id.blog_img);
+        final ProgressView imageLoading = (ProgressView) findViewById(R.id.progress_imageLoading);
         TextView user_name = (TextView) findViewById(R.id.user_name);
         TextView posted_at = (TextView) findViewById(R.id.posted_at);
         TextView title_blog = (TextView) findViewById(R.id.title_blog);
         TextView text_blog = (TextView) findViewById(R.id.text_blog);
-        Picasso.with(this).load(url).resize(300, 300).into(blog_img);
+        Picasso.with(this).load(url).resize(300, 300).into(blog_img, new Callback() {
+            @Override
+            public void onSuccess() {
+                blog_img.setVisibility(View.VISIBLE);
+                imageLoading.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onError() {
+
+            }
+        });
         try {
             text_blog.setText(b.getString("body"));
             posted_at.setText(b.getString("created_at"));

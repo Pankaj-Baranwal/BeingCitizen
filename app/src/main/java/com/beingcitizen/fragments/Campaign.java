@@ -120,7 +120,7 @@ public class Campaign extends Fragment implements retrieveCamp {
         watersupply.setDividerColor(Color.alpha(R.color.color_white));
 
         MenuObject land = new MenuObject("Lands, Agriculture");
-        land.setResource(R.drawable.water_supplies);
+        land.setResource(R.drawable.ecology);
         land.setBgColor(Color.alpha(R.color.color_white));
         land.setDividerColor(Color.alpha(R.color.color_white));
 
@@ -130,7 +130,7 @@ public class Campaign extends Fragment implements retrieveCamp {
         trade.setDividerColor(Color.alpha(R.color.color_white));
 
         MenuObject environ = new MenuObject("Environment and Holticulture");
-        environ.setResource(R.drawable.water_supplies);
+        environ.setResource(R.drawable.ecology);
         environ.setBgColor(Color.alpha(R.color.color_white));
         environ.setDividerColor(Color.alpha(R.color.color_white));
 
@@ -140,9 +140,9 @@ public class Campaign extends Fragment implements retrieveCamp {
         market.setDividerColor(Color.alpha(R.color.color_white));
 
         MenuObject power = new MenuObject("Power");
-        trade.setResource(R.drawable.industries);
-        trade.setBgColor(Color.alpha(R.color.color_white));
-        trade.setDividerColor(Color.alpha(R.color.color_white));
+        power.setResource(R.drawable.power);
+        power.setBgColor(Color.alpha(R.color.color_white));
+        power.setDividerColor(Color.alpha(R.color.color_white));
 
         MenuObject corruption = new MenuObject("Corruption/Vigillance");
         corruption.setResource(R.drawable.police);

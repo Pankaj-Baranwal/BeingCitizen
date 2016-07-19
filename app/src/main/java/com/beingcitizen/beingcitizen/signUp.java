@@ -35,11 +35,13 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 /**
- * Created by saransh on 14-06-2015.
+ * Created by zon 14-06-2015.
  */
 public class signUp extends Activity implements retrieveCampaign, signUp_interface, mla_id {
 
-    private EditText name, password, email, pin;
+    private EditText name;
+    private EditText password;
+    private EditText email;
     private String gender_text = "";
 
     ArrayAdapter<String> adapter;
@@ -52,7 +54,6 @@ public class signUp extends Activity implements retrieveCampaign, signUp_interfa
         name = (EditText) findViewById(R.id.editText);
         password = (EditText) findViewById(R.id.editText3);
         email = (EditText) findViewById(R.id.editText2);
-        pin = (EditText) findViewById(R.id.editText4);
         Spinner gender = (Spinner) findViewById(R.id.gender_spinner);
         Button signup = (Button) findViewById(R.id.button);
 
@@ -66,8 +67,6 @@ public class signUp extends Activity implements retrieveCampaign, signUp_interfa
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (position!=0)
                     gender_text= (String) parent.getItemAtPosition(position);
-                else
-                    Toast.makeText(signUp.this, "Incorrect Entry", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -88,7 +87,6 @@ public class signUp extends Activity implements retrieveCampaign, signUp_interfa
         name.setTypeface(tf);
         password.setTypeface(tf);
         email.setTypeface(tf);
-        pin.setTypeface(tf);
         signup.setTypeface(tf1);
     }
 
@@ -136,7 +134,7 @@ public class signUp extends Activity implements retrieveCampaign, signUp_interfa
             obj.add("Enter constituency");
             for (int i = 0; i < namearray.length(); i++)
                 obj.add(namearray.getString(i));
-            adapter = new ArrayAdapter<>(this, R.layout.spinner_item, obj);
+            adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, obj);
             final Dialog dialogLogout = new Dialog(this);
             dialogLogout.requestWindowFeature(Window.FEATURE_NO_TITLE);
             dialogLogout.setContentView(R.layout.dialog_pincode);
@@ -205,8 +203,16 @@ public class signUp extends Activity implements retrieveCampaign, signUp_interfa
                 Log.e("TAG_function", "JSONERROR");
                 e.printStackTrace();
             }
-        }else{
-            Toast.makeText(signUp.this, "Error Signing in", Toast.LENGTH_SHORT).show();
+        }else if(obj.has("status")){
+            try {
+                if (obj.getString("status").contentEquals("Already used email")) {
+                    Toast.makeText(signUp.this, "Email already exists!", Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(signUp.this, "Error signing in!", Toast.LENGTH_SHORT).show();
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -214,8 +220,14 @@ public class signUp extends Activity implements retrieveCampaign, signUp_interfa
     public void mla_ids(String mlaID) {
         SharedPreferences sharedpreferences = PreferenceManager.getDefaultSharedPreferences(signUp.this);
         SharedPreferences.Editor edit = sharedpreferences.edit();
-        edit.putString("mla_id", mlaID);
-        edit.apply();
+        if (!mlaID.contentEquals("null")) {
+            edit.putString("mla_id", mlaID);
+            edit.apply();
+        }else{
+            edit.putString("mla_id", "No_mla_id");
+            edit.apply();
+            Toast.makeText(signUp.this, "No MLA found!", Toast.LENGTH_SHORT).show();
+        }
     }
 
 

@@ -6,7 +6,6 @@ import android.widget.Toast;
 
 import com.beingcitizen.Http;
 import com.beingcitizen.beingcitizen.MlaProfileActivity;
-import com.beingcitizen.beingcitizen.UserProfileActivity;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -43,6 +42,7 @@ public class RetrieveMlaProfile extends AsyncTask<String, Void, String> {
             JSONObject obj = new JSONObject(s);
             context.functions(obj);
         } catch (JSONException e) {
+            Log.e("MLA", "Retrieval failed");
             Toast.makeText(context, "Error retrieving data", Toast.LENGTH_SHORT).show();
             e.printStackTrace();
         }

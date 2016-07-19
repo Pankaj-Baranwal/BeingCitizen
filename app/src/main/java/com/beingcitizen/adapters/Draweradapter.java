@@ -35,7 +35,11 @@ int image=R.drawable.ic_profile2;
     private String name;        //String Resource for header View Name
     private int profileid;        //int Resource for header view profile picture
     private String email, mlaName, mlaConsti;       //String Resource for header view email
-
+    private boolean mlaExists = true;
+    static ImageView arrows;
+    static CircleImageView mla_image;
+    static TextView mla_name;
+    static TextView mla_consti;
 
     // Creating a ViewHolder which extends the RecyclerView View Holder
     // ViewHolder are used to to store the inflated views in order to recycle them
@@ -48,7 +52,7 @@ int image=R.drawable.ic_profile2;
         ProfilePictureView profile;
 
         CircleImageView profile1;
-        TextView Name, email, mla_name, mla_consti;
+        TextView Name, email;
 
         public ViewHolder(final View itemView,int ViewType) {                 // Creating ViewHolder Constructor with View and viewType As a parameter
             super(itemView);
@@ -74,7 +78,8 @@ int image=R.drawable.ic_profile2;
                 email = (TextView) itemView.findViewById(R.id.email);       // Creating Text View object from header.xml for email
                 mla_name = (TextView) itemView.findViewById(R.id.mla_name);
                 mla_consti = (TextView) itemView.findViewById(R.id.mla_constituency);
-
+                mla_image = (CircleImageView) itemView.findViewById(R.id.mlaImage);
+                arrows = (ImageView) itemView.findViewById(R.id.arrows);
                 profile = (ProfilePictureView)itemView.findViewById(R.id.profile_picture);
                 profile.setCropped(true);
                 Holderid = 0;                                                // Setting holder id = 0 as the object being populated are of type header view
@@ -92,7 +97,15 @@ int image=R.drawable.ic_profile2;
         mIcons = Icons;
         name = Name;
         email = Email;
-        mlaConsti = mla_consti_txt;
+        if (!mla_name_txt.contentEquals("No_mla_id")) {
+            mlaConsti = mla_consti_txt;
+        }else{
+            mlaExists = false;
+            mla_consti.setVisibility(View.GONE);
+            arrows.setVisibility(View.GONE);
+            mla_image.setVisibility(View.GONE);
+            mla_name.setVisibility(View.GONE);
+        }
         profileid=Profile;
         //in adapter
 
@@ -159,7 +172,8 @@ int image=R.drawable.ic_profile2;
            // holder.profile.setImageResource(image);           // Similarly we set the resources for header view
             holder.Name.setText(name);
             holder.email.setText(email);
-            holder.mla_consti.setText(mlaConsti);
+            if (mlaExists)
+            mla_consti.setText(mlaConsti);
         }
     }
 

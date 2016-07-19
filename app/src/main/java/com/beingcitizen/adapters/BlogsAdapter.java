@@ -13,6 +13,8 @@ import android.widget.TextView;
 
 import com.beingcitizen.R;
 import com.beingcitizen.beingcitizen.BlogExpanded;
+import com.rey.material.widget.ProgressView;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
@@ -62,14 +64,27 @@ public class BlogsAdapter extends BaseAdapter implements View.OnClickListener {
         cardView.setRadius(5.0f);
         cardView.setCardElevation(10.0f);
 
-        ImageView blog_img = (ImageView) rowView.findViewById(R.id.blog_image);
+        final ProgressView image_loading = (ProgressView) rowView.findViewById(R.id.progress_imageLoading);
+
+        final ImageView blog_img = (ImageView) rowView.findViewById(R.id.blog_image);
         TextView blog_text = (TextView) rowView.findViewById(R.id.blog_heading);
         TextView user_name = (TextView) rowView.findViewById(R.id.user_name);
         TextView posted_at = (TextView) rowView.findViewById(R.id.posted_at);
 
         try {
             url_img = "http://beingcitizen.com/uploads/blogs/" + categorynam.getJSONObject(position).getString("bimage") + categorynam.getJSONObject(position).getString("bext");
-            Picasso.with(mContext).load(url_img).resize(256, 256).into(blog_img);
+            Picasso.with(mContext).load(url_img).resize(256, 256).into(blog_img, new Callback() {
+                @Override
+                public void onSuccess() {
+                    blog_img.setVisibility(View.VISIBLE);
+                    image_loading.setVisibility(View.GONE);
+                }
+
+                @Override
+                public void onError() {
+
+                }
+            });
             blog_id = categorynam.getJSONObject(position).getString("blog_id");
             blog_text.setText(categorynam.getJSONObject(position).getString("title"));
             user_name.setText(categorynam.getJSONObject(position).getString("author"));

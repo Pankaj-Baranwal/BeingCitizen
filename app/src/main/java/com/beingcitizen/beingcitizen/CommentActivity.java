@@ -18,15 +18,18 @@ import com.beingcitizen.R;
 import com.beingcitizen.adapters.CommentAdapter;
 import com.beingcitizen.adapters.CommentCampaignAdapter;
 import com.beingcitizen.interfaces.callUserProfile;
-import com.beingcitizen.retrieveals.RetrieveCampaign;
 import com.beingcitizen.retrieveals.RetrieveCampaignComments;
 import com.beingcitizen.retrieveals.RetrieveDebateComments;
-import com.beingcitizen.retrieveals.RetrieveSingleDebate;
 import com.beingcitizen.retrieveals.SendCampaignComment;
 import com.beingcitizen.retrieveals.SendDebateComment;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Created by saransh on 14-06-2015.
@@ -115,6 +118,46 @@ public class CommentActivity extends Activity implements callUserProfile {
     }
 
     public void functions_debate(JSONObject s) {
+        JSONArray total = new JSONArray();
+        try {
+            int count =0;
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Date[] array_dates = new Date[s.getJSONArray("for").length()+s.getJSONArray("against").length()];
+            for (int i=0; i<s.getJSONArray("for").length(); i++) {
+                array_dates[count++] =  sdf.parse(s.getJSONArray("for").getJSONObject(i).getString("created_at"));
+                s.getJSONArray("for").getJSONObject(i).put("which", "for");
+                total.put(s.getJSONArray("for").getJSONObject(i));
+            }
+            for (int i=0; i<s.getJSONArray("against").length(); i++) {
+                array_dates[count++] =  sdf.parse(s.getJSONArray("against").getJSONObject(i).getString("created_at"));
+                s.getJSONArray("against").getJSONObject(i).put("which", "against");
+                total.put(s.getJSONArray("against").getJSONObject(i));
+            }
+            Log.e("TOTAL_UPDATED", total.toString());
+            for (int j = 0; j<array_dates.length; j++) {
+                for (int k = 0; k < array_dates.length; k++){
+                    if (array_dates[j].getTime() < array_dates[k].getTime()) {
+                        Date buffer = array_dates[j];
+                        JSONObject buffer_json = total.getJSONObject(j);
+                        array_dates[j] = array_dates[k];
+                        Log.e("BUFFER_JSON", buffer_json.toString());
+                        Log.e("TOTAL_J", total.get(j).toString());
+                        Log.e("TOTAL_K", total.get(k).toString());
+                        total.put(j, total.get(k));
+                        total.put(k, buffer_json);
+                        Log.e("TOTAL_J", total.get(j).toString());
+                        Log.e("TOTAL_K", total.get(k).toString());
+                        array_dates[k] = buffer;
+                    }
+                }
+            }
+            Log.e("TOTAL_UPDATED", total.toString());
+            s.put("total_sorted", total);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
         if (first_time) {
             ca = new CommentAdapter(this, s);
             commentList.setAdapter(ca);
@@ -133,6 +176,7 @@ public class CommentActivity extends Activity implements callUserProfile {
         }else{
             cca.categorynam = s;
             cca.notifyDataSetChanged();
+            Log.e("DATASET", "Changed");
         }
     }
 

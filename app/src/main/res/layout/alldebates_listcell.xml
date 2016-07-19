@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/screen_background"
     android:orientation="vertical">
 
@@ -31,7 +32,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="5dp"
                     android:padding="15dp"
-                    android:text="Title"
+                    android:text=""
                     android:textColor="#000000"
                     android:textSize="17dp"
                     android:textStyle="bold"
@@ -41,8 +42,8 @@
 
 
             <RelativeLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                android:layout_width="match_parent"
+                android:layout_height="220dp">
 
                 <ImageView
                     android:id="@+id/image_debate"
@@ -51,87 +52,17 @@
                     android:layout_gravity="center_horizontal"
                     android:adjustViewBounds="true"
                     android:scaleType="fitXY"
-                    android:src="@drawable/roads" />
-                <!--
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="bottom"
-                    android:layout_alignBottom="@+id/image_debate"
-                    android:orientation="horizontal"
-                    android:weightSum="1">
-
-                    <LinearLayout
-                        android:id="@+id/btn_yes"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="#B111FF1D"
-                        android:layout_weight="0.50">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:gravity="center"
-                            android:layout_margin="5dp">
-
-                            <ImageView
-                                android:layout_width="35dp"
-                                android:layout_height="35dp"
-                                android:layout_gravity="center"
-                                android:background="@drawable/debate_like"/>
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center"
-                                android:layout_marginLeft="3dp"
-                                android:text="Yes"
-                                android:textColor="#FFFFFF"
-                                android:textStyle="bold"
-                                android:textSize="17dp"/>
-
-                        </LinearLayout>
-
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/btn_no"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:background="#b1ff553a"
-                        android:layout_weight="0.50">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:gravity="center"
-                            android:layout_margin="5dp">
-
-                        <ImageView
-                            android:layout_width="35dp"
-                            android:layout_height="35dp"
-                            android:layout_gravity="center"
-                            android:background="@drawable/debate_dislike"/>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:layout_marginLeft="3dp"
-                            android:text="No"
-                            android:textColor="#FFFFFF"
-                            android:textStyle="bold"
-                            a                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 ndroid:textSize="17dp"/>
-
-                            </LinearLayout>
-
-                    </LinearLayout>
-
-                </LinearLayout>
-                -->
+                    android:visibility="gone"
+                     />
+                <com.rey.material.widget.ProgressView
+                    android:id="@+id/progress_imageLoading"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_centerInParent="true"
+                    app:pv_autostart="true"
+                    app:pv_circular="true"
+                    app:pv_progressStyle="@style/Material.Drawable.CircularProgress"
+                    app:pv_progressMode="indeterminate"/>
             </RelativeLayout>
 
             <TextView
@@ -142,7 +73,7 @@
                 android:fontFamily="sans-serif-light"
                 android:maxLength="200"
                 android:padding="10dp"
-                android:text="@string/debate"
+                android:text=""
                 android:textColor="#000000" />
 
             <LinearLayout
@@ -160,7 +91,7 @@
                     android:paddingRight="5dp"
                     android:layout_marginBottom="4dp"
                     android:layout_marginTop="4dp"
-                    android:text="56 in favour"
+                    android:text="0 in favour"
                     android:fontFamily="sans-serif-light"/>
 
                 <LinearLayout
@@ -184,7 +115,7 @@
                     android:layout_height="wrap_content"
                     android:paddingLeft="5dp"
                     android:paddingRight="5dp"
-                    android:text="45 against"
+                    android:text="0 against"
                     android:layout_marginBottom="4dp"
                     android:layout_marginTop="4dp"
                     android:fontFamily="sans-serif-light"/>

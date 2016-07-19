@@ -30,7 +30,7 @@ public class RetrieveMlaID extends AsyncTask<String, Void, String> {
         String bool = "";
         Http http = new Http();
         try {
-            bool = http.read("http://beingcitizen.com/bc/index.php/main/getmla?const="+params[0]);
+            bool = http.read("http://beingcitizen.com/bc/index.php/main/getmla?const="+params[0].replace(" ", "%20"));
         } catch (IOException e) {
             e.printStackTrace();
             Log.e("TAG_ERROR", "ERROR");
@@ -43,8 +43,12 @@ public class RetrieveMlaID extends AsyncTask<String, Void, String> {
         super.onPostExecute(s);
         try {
             JSONObject obj = new JSONObject(s);
-            if (ref != null){
-                ref.mla_ids(obj.getString("mla_id"));
+            if (ref != null) {
+                if (obj.getJSONArray("mla").length() != 0)
+                    ref.mla_ids(obj.getJSONArray("mla").getJSONObject(0).getString("user_id"));
+                else{
+                    ref.mla_ids("null");
+                }
             }
         } catch (JSONException e) {
             Toast.makeText(mContext, "Error retrieving data", Toast.LENGTH_SHORT).show();

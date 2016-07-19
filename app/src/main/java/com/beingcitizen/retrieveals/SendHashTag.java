@@ -4,7 +4,6 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.beingcitizen.Http;
-import com.beingcitizen.beingcitizen.CommentActivity;
 import com.beingcitizen.fragments.AllCampaign;
 
 import org.json.JSONException;
@@ -27,7 +26,7 @@ public class SendHashTag extends AsyncTask<String, Void, JSONObject> {
         JSONObject bool = null;
         Http http = new Http();
         try {
-            bool = new JSONObject(http.read("http://beingcitizen.com/bc/index.php/main/createfeed?uid="+params[0]+"&feed="+params[1]+"&feed-states="+params[2]));
+            bool = new JSONObject(http.read("http://beingcitizen.com/bc/index.php/main/createfeed?uid="+params[0]+"&feed="+params[1].replace(" ", "%20")+"&feed-states="+params[2].replace(" ", "%20")));
 
         } catch (IOException e) {
             e.printStackTrace();

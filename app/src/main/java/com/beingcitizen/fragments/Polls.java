@@ -2,8 +2,7 @@ package com.beingcitizen.fragments;
 
 
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -12,15 +11,15 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.beingcitizen.R;
 import com.beingcitizen.retrieveals.SendPollResult;
 
+import org.eazegraph.lib.charts.PieChart;
+import org.eazegraph.lib.models.PieModel;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -33,8 +32,11 @@ public class Polls  extends Fragment {
     static boolean called = false;
     String pid="1";
     View rootView;
-    LinearLayout yes, no;
+    PieChart pieChart;
+
+    LinearLayout yes, no, other;
     boolean pollable = true;
+    TextView poll_title;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -47,8 +49,11 @@ public class Polls  extends Fragment {
         cardView.setCardElevation(16.0f);
         SharedPreferences sharedpreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
         final String uid =  sharedpreferences.getString("id", "16");
-
+        pieChart = (PieChart) rootView.findViewById(R.id.piechart);
         yes = (LinearLayout) rootView.findViewById(R.id.btn_yes);
+        other = (LinearLayout) rootView.findViewById(R.id.btn_other);
+        no = (LinearLayout) rootView.findViewById(R.id.btn_no);
+        getDetails();
         yes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -57,12 +62,15 @@ public class Polls  extends Fragment {
                     spr.execute(uid, pid, "yes");
                     Toast.makeText(getActivity(), "  Polled!  ", Toast.LENGTH_SHORT).show();
                 }else{
-                    Toast.makeText(getActivity(), "  Already polled!  ", Toast.LENGTH_SHORT).show();
+                    if (poll_title.getText().toString().contentEquals("No Polls Found!")) {
+                        Toast.makeText(getActivity(), "  Cannot poll!  ", Toast.LENGTH_SHORT).show();
+                    }else{
+                        Toast.makeText(getActivity(), "  Already polled!  ", Toast.LENGTH_SHORT).show();
+                    }
                 }
 
             }
         });
-        no = (LinearLayout) rootView.findViewById(R.id.btn_no);
         no.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -71,53 +79,90 @@ public class Polls  extends Fragment {
                     spr.execute(uid, pid, "no");
                     Toast.makeText(getActivity(), "  Polled!  ", Toast.LENGTH_SHORT).show();
                 }else {
-                    Toast.makeText(getActivity(), "  Already polled!  ", Toast.LENGTH_SHORT).show();
+                    if (poll_title.getText().toString().contentEquals("No Polls Found!")) {
+                        Toast.makeText(getActivity(), "  Cannot poll!  ", Toast.LENGTH_SHORT).show();
+                    }else{
+                        Toast.makeText(getActivity(), "  Already polled!  ", Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
         });
-        getDetails();
+        other.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (pollable) {
+                    SendPollResult spr = new SendPollResult(Polls.this);
+                    spr.execute(uid, pid, "other");
+                    Toast.makeText(getActivity(), "  Polled!  ", Toast.LENGTH_SHORT).show();
+                }else {
+                    if (poll_title.getText().toString().contentEquals("No Polls Found!")) {
+                        Toast.makeText(getActivity(), "  Cannot poll!  ", Toast.LENGTH_SHORT).show();
+                    }else{
+                        Toast.makeText(getActivity(), "  Already polled!  ", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+        });
 
         return rootView;
     }
 
-    void getDetails(){
-        if (called){
-            TextView poll_title = (TextView)rootView.findViewById(R.id.poll_title);
-            TextView poll_content= (TextView)rootView.findViewById(R.id.poll_content);
+    void getDetails() {
+        if (called) {
+            poll_title = (TextView) rootView.findViewById(R.id.poll_title);
+            TextView poll_content = (TextView) rootView.findViewById(R.id.poll_content);
             JSONObject t;
             try {
-                t = s.getJSONArray("poll").getJSONObject(0);
-                if (s.getJSONObject("pie").length()>1) {
-                    pollable = false;
-                    float dv1 = 0, dv2 = 0;
-                    try {
-                        dv1 = Float.parseFloat(s.getJSONObject("pie").getString("dv1")) / 100;
-                        dv2 = Float.parseFloat(s.getJSONObject("pie").getString("dv2")) / 100;
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+                if (s.getJSONArray("poll").length() > 0) {
+                    t = s.getJSONArray("poll").getJSONObject(0);
+                    Log.e("POLL", s.getJSONObject("pie").length() + "");
+                    if (s.getJSONObject("pie").length() > 1) {
+                        pollable = false;
+                        float dv1 = 0, dv2 = 0, dv3 = 0;
+                        try {
+                            dv1 = Float.parseFloat(s.getJSONObject("pie").getString("dv1")) / 100;
+                            dv2 = Float.parseFloat(s.getJSONObject("pie").getString("dv2")) / 100;
+                            dv3 = Float.parseFloat(s.getJSONObject("pie").getString("dv3")) / 100;
+                            pieChart.setDrawValueInPie(true);
+                            pieChart.addPieSlice(new PieModel("YES", Math.round(dv1 * 100), Color.parseColor("#B111FF1D")));
+                            pieChart.addPieSlice(new PieModel("NO", Math.round(dv2 * 100), Color.parseColor("#b1ff553a")));
+                            pieChart.addPieSlice(new PieModel("Other", Math.round(dv3 * 100), Color.parseColor("#b1111Dff")));
+                            pieChart.setDrawValueInPie(true);
+                            pieChart.startAnimation();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        TextView yes_txt = (TextView) rootView.findViewById(R.id.yes_text);
+                        TextView no_txt = (TextView) rootView.findViewById(R.id.no_text);
+                        TextView other_txt = (TextView) rootView.findViewById(R.id.other_text);
+                        yes_txt.setText(Math.round(dv1 * 100) + "%");
+                        no_txt.setText(Math.round(dv2 * 100) + "%");
+                        other_txt.setText(Math.round(dv3 * 100) + "%");
+                        no_txt.setVisibility(View.VISIBLE);
+                        yes_txt.setVisibility(View.VISIBLE);
+                        other_txt.setVisibility(View.VISIBLE);
+//                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+//                            0, LinearLayout.LayoutParams.WRAP_CONTENT);
+//                    params.weight = dv1;
+//                    yes.setLayoutParams(params);
+//                    params.weight = dv2;
+//                    no.setLayoutParams(params);
+//                    params.weight = dv3;
+//                    other.setLayoutParams(params);
+
                     }
-                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                            LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-                    params.weight = Math.round(dv1);
-                    yes.setLayoutParams(params);
-                    params.weight = Math.round(dv2);
-                    no.setLayoutParams(params);
-                    TextView yes_txt = (TextView) rootView.findViewById(R.id.yes_text);
-                    TextView no_txt = (TextView) rootView.findViewById(R.id.no_text);
-                    yes_txt.setText(Math.round(dv1 * 100) + "");
-                    no_txt.setText(Math.round(dv2 * 100) + "");
-                    Log.e("pers", yes_txt.getText().toString());
-                    Log.e("pers", no_txt.getText().toString());
-                    no_txt.setVisibility(View.VISIBLE);
-                    yes_txt.setVisibility(View.VISIBLE);
+                    poll_title.setText(t.getString("poll_title"));
+                    poll_content.setText(t.getString("poll_description"));
+                    pid = t.getString("poll_id");
                 }
-                poll_title.setText(t.getString("poll_title"));
-                poll_content.setText(t.getString("poll_description"));
-                pid = t.getString("poll_id");
-            } catch (JSONException e) {
-                Log.e("TAG_ERROR", "Polls error");
-                e.printStackTrace();
-            }
+                else{
+                    pollable = false;
+                    poll_title.setText("No Polls Found!");
+                }
+                }catch(JSONException e){
+                    Log.e("TAG_ERROR", "Polls error");
+                    e.printStackTrace();
+                }
         }
     }
 
@@ -128,5 +173,6 @@ public class Polls  extends Fragment {
 
     public void poll_function(JSONObject param) {
         getDetails();
+        pollable = false;
     }
 }

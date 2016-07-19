@@ -6,9 +6,10 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.InputFilter;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.MenuItem;
@@ -20,14 +21,11 @@ import android.widget.TextView;
 
 import com.beingcitizen.R;
 import com.beingcitizen.retrieveals.RetrieveMlaProfile;
-import com.beingcitizen.retrieveals.RetrieveUserProfile;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
  * Created by saransh on 12-07-2015.
@@ -67,26 +65,32 @@ public class MlaProfileActivity extends AppCompatActivity {
 
     public void functions(JSONObject obj) {
         try {
-            JSONArray info = obj.getJSONArray("info");
-            name = info.getJSONObject(0).getString("name");
-            num_camp = obj.getJSONArray("new").length()+obj.getJSONArray("active").length()+obj.getJSONArray("closed").length();
-            consti = info.getJSONObject(0).getString("constituency");
-            gender = info.getJSONObject(0).getString("gender");
-            String image_loc = "http://beingcitizen.com/uploads/mla/display/"+info.getJSONObject(0).getString("mlaimage")+info.getJSONObject(0).getString("mlaext");
-            Picasso.with(this).load(image_loc).resize(150, 150).into(img_mla);
-            JSONArray jA = new JSONArray();
-            for (int i =0; i<obj.getJSONArray("new").length(); i++){
-                jA.put(obj.getJSONArray("new").getJSONObject(i));
+            if (obj.getJSONArray("info").length()!=0) {
+                JSONArray info = obj.getJSONArray("info");
+                name = info.getJSONObject(0).getString("name");
+                num_camp = obj.getJSONArray("new").length() + obj.getJSONArray("active").length() + obj.getJSONArray("closed").length();
+                Log.e("LENGTH", num_camp + "");
+                consti = info.getJSONObject(0).getString("constituency");
+                gender = info.getJSONObject(0).getString("gender");
+                String image_loc = "http://beingcitizen.com/uploads/    mla/display/" + info.getJSONObject(0).getString("mlaimage") + info.getJSONObject(0).getString("mlaext");
+                Picasso.with(this).load(image_loc).resize(150, 150).into(img_mla);
+                JSONArray jA = new JSONArray();
+                for (int i = 0; i < obj.getJSONArray("new").length(); i++) {
+                    jA.put(obj.getJSONArray("new").getJSONObject(i));
+                }
+                for (int i = 0; i < obj.getJSONArray("active").length(); i++) {
+                    jA.put(obj.getJSONArray("active").getJSONObject(i));
+                }
+                for (int i = 0; i < obj.getJSONArray("closed").length(); i++) {
+                    jA.put(obj.getJSONArray("closed").getJSONObject(i));
+                }
+                mla_consti.setText(consti);
+                mla_name.setText(name);
+                //num_camps.setText(num_camp);
+                mla_gender.setText(gender);
+                createUIForConsti(jA);
+                createUIForActive(obj.getJSONArray("active"));
             }
-            for (int i =0; i<obj.getJSONArray("active").length(); i++){
-                jA.put(obj.getJSONArray("active").getJSONObject(i));
-            }
-            for (int i =0; i<obj.getJSONArray("closed").length(); i++){
-                jA.put(obj.getJSONArray("closed").getJSONObject(i));
-            }
-            createUIForConsti(jA);
-            createUIForActive(obj.getJSONArray("active"));
-
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -129,6 +133,10 @@ public class MlaProfileActivity extends AppCompatActivity {
             lL.setLayoutParams(rlp_ll);
             LinearLayout.LayoutParams llp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
             TextView tv = new TextView(this);
+            int maxLength = 16;
+            InputFilter[] fArray = new InputFilter[1];
+            fArray[0] = new InputFilter.LengthFilter(maxLength);
+            tv.setFilters(fArray);
             tv.setLayoutParams(llp);
             float scale = getResources().getDisplayMetrics().density;
             int dpAsPixels = (int) (8*scale + 0.5f);
@@ -193,6 +201,10 @@ public class MlaProfileActivity extends AppCompatActivity {
             lL.setPadding(px, 0, px, 0);
             LinearLayout.LayoutParams llp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
             TextView tv = new TextView(this);
+            int maxLength = 16;
+            InputFilter[] fArray = new InputFilter[1];
+            fArray[0] = new InputFilter.LengthFilter(maxLength);
+            tv.setFilters(fArray);
             tv.setLayoutParams(llp);
             float scale = getResources().getDisplayMetrics().density;
             int dpAsPixels = (int) (8*scale + 0.5f);

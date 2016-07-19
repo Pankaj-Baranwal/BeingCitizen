@@ -14,6 +14,8 @@ import android.widget.TextView;
 
 import com.beingcitizen.R;
 import com.beingcitizen.beingcitizen.DebateExpanded;
+import com.rey.material.widget.ProgressView;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
@@ -22,7 +24,7 @@ import org.json.JSONException;
 /**
  * Created by saransh on 27-06-2015.
  */
-public class DebateAdapter extends BaseAdapter implements View.OnClickListener {
+public class DebateAdapter extends BaseAdapter{
     private Context mContext;
     private JSONArray categorynam;
     //private Drawable icons;
@@ -70,7 +72,8 @@ public class DebateAdapter extends BaseAdapter implements View.OnClickListener {
         cardView=(CardView) rowView.findViewById(R.id.CardView_alldebate);
         cardView.setRadius(16.0f);
         cardView.setCardElevation(16.0f);
-        ImageView image_debate = (ImageView)rowView.findViewById(R.id.image_debate);
+        final ImageView image_debate = (ImageView)rowView.findViewById(R.id.image_debate);
+        final ProgressView imageLoading = (ProgressView) rowView.findViewById(R.id.progress_imageLoading);
         cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -91,7 +94,18 @@ public class DebateAdapter extends BaseAdapter implements View.OnClickListener {
         if (!nulling) {
             try {
                 String url_img = ("http://beingcitizen.com/uploads/debates/" + categorynam.getJSONObject(position).getString("dimage") + categorynam.getJSONObject(position).getString("dext"));
-                Picasso.with(mContext).load(url_img).resize(256, 256).into(image_debate);
+                Picasso.with(mContext).load(url_img).resize(256, 256).into(image_debate, new Callback() {
+                    @Override
+                    public void onSuccess() {
+                        image_debate.setVisibility(View.VISIBLE);
+                        imageLoading.setVisibility(View.GONE);
+                    }
+
+                    @Override
+                    public void onError() {
+
+                    }
+                });
 
 
                 title_debate.setText(categorynam.getJSONObject(position).getString("name"));
@@ -105,10 +119,5 @@ public class DebateAdapter extends BaseAdapter implements View.OnClickListener {
         }
 
         return rowView;
-    }
-
-    @Override
-    public void onClick(View view) {
-
     }
 }

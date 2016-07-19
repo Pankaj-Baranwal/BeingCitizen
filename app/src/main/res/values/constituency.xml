@@ -2,12 +2,6 @@
 <resources>
     <string-array name="constituency_array">
         <item>--Select your Constituency--</item>
-        <item>Australia</item>
-        <item>Canada</item>
-        <item>China</item>
-        <item>India</item>
-        <item>Sri Lanka</item>
-        <item>United States</item>
     </string-array>
     <string-array name="gender">
         <item>--Select you Gender--</item>
@@ -22,7 +16,7 @@
     <string-array name="category">
         <item>--Select your choice--</item>
         <item>Law and Order</item>
-        <item>Public Health and Sanitation</item>
+        <item>Public health and Sanitation</item>
         <item>Communication</item>
         <item>Water-Irrigation,Drainage,Embankments</item>
         <item>Lands, Agriculture</item>
@@ -31,5 +25,30 @@
         <item>Tourism, Art and Culture</item>
         <item>Power</item>
         <item>Corruption/Vigillance</item>
+    </string-array>
+    <string-array name="tags">
+        <item>--Select your choice--</item>
+    </string-array>
+    <string-array name="hash_tags">
+        <item>--Select your choice--</item>
+        <item>Ministry of Education</item>
+        <item>Ministry of Finance and Revenues</item>
+        <item>Ministry of Land, Building and Urban Development</item>
+        <item>Ministry of Vigilance</item>
+        <item>Ministry of Employment and Labour</item>
+        <item>Ministry of Transport</item>
+        <item>Ministry of Health</item>
+        <item>Ministry of Power</item>
+        <item>Ministry of Tourism, Art and Culture</item>
+        <item>Ministry of Law and Justice</item>
+        <item>Ministry of Water</item>
+        <item>Ministry of Environment and Forest</item>
+        <item>Ministry of Social Welfare</item>
+        <item>Ministry of Women and Child</item>
+        <item>Municipal Corporation of Delhi</item>
+        <item>New Delhi Municipal Corporation</item>
+        <item>Public Works Department of Delhi</item>
+        <item>Delhi Police</item>
+
     </string-array>
 </resources>

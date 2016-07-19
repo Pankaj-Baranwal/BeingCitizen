@@ -140,7 +140,8 @@
                     android:spinnerMode="dropdown"
                     android:textColor="#FFFFFF"
                     android:textSize="15sp"
-                    android:transitionGroup="true"/>
+                    android:transitionGroup="true"
+                    />
 
             </RelativeLayout>
         </LinearLayout>

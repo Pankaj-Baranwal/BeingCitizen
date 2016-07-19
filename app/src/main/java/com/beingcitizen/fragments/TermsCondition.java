@@ -4,11 +4,9 @@ import android.annotation.TargetApi;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebView;
 
 import com.beingcitizen.R;
 
@@ -21,33 +19,31 @@ import com.beingcitizen.R;
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        View rootView = inflater.inflate(R.layout.fragment_termconditions, container, false);
-
-        WebView browser = (WebView)rootView.findViewById(R.id.webview_terms);
-        //browser.setBackground(getResources().getDrawable(R.drawable.ic_bg_main));
-        browser.setBackgroundResource(R.drawable.ic_bg_main);
-        browser.setBackgroundColor(0x00000000);
-        browser.loadUrl("http://52.74.96.52/terms");
+        //        WebView browser = (WebView)rootView.findViewById(R.id.webview_terms);
+//        //browser.setBackground(getResources().getDrawable(R.drawable.ic_bg_main));
+//        browser.setBackgroundResource(R.drawable.ic_bg_main);
+//        browser.setBackgroundColor(0x00000000);
+//        browser.loadUrl("http://52.74.96.52/terms");
         //  hideNavBar();
-        return rootView;
+        return inflater.inflate(R.layout.fragment_termconditions, container, false);
     }
 
 
-    private void hideNavBar() {
-        // TODO Auto-generated method stub
-        int currentapiVersion = Build.VERSION.SDK_INT;
-        if (currentapiVersion <= Build.VERSION_CODES.FROYO){
-            // Do something for froyo and above versions
-        } else if (currentapiVersion== Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-            View decorView = getActivity().getWindow().getDecorView();
-            // Hide both the navigation bar and the status bar.
-            // SYSTEM_UI_FLAG_FULLSCREEN is only available on Android 4.1 and higher, but as
-            // a general rule, you should design your app to hide the status bar whenever you
-            // hide the navigation bar.
-            int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                    | View.SYSTEM_UI_FLAG_FULLSCREEN;
-            decorView.setSystemUiVisibility(uiOptions);
-        }
-    }
+//    private void hideNavBar() {
+//        // TODO Auto-generated method stub
+//        int currentapiVersion = Build.VERSION.SDK_INT;
+//        if (currentapiVersion <= Build.VERSION_CODES.FROYO){
+//            // Do something for froyo and above versions
+//        } else if (currentapiVersion== Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+//            View decorView = getActivity().getWindow().getDecorView();
+//            // Hide both the navigation bar and the status bar.
+//            // SYSTEM_UI_FLAG_FULLSCREEN is only available on Android 4.1 and higher, but as
+//            // a general rule, you should design your app to hide the status bar whenever you
+//            // hide the navigation bar.
+//            int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+//                    | View.SYSTEM_UI_FLAG_FULLSCREEN;
+//            decorView.setSystemUiVisibility(uiOptions);
+//        }
+//    }
 
 }

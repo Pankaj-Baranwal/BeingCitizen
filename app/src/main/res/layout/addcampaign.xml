@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:fab="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/tools"
     android:id="@+id/rl_addcampaign"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -102,7 +103,7 @@
                     android:spinnerMode="dropdown"
                     android:textColor="#FFFFFF"
                     android:textSize="20sp"
-                    android:transitionGroup="true"></Spinner>
+                    android:transitionGroup="true"/>
 
             </LinearLayout>
             <TextView
@@ -126,7 +127,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
                     android:dropDownSelector="@android:color/darker_gray"
-                    android:entries="@array/constituency_array"
+                    android:entries="@array/tags"
                     android:layoutMode="clipBounds"
                     android:spinnerMode="dropdown"
                     android:textColor="#FFFFFF"
@@ -214,17 +215,17 @@
                 android:layout_alignParentRight="true"
                 android:layout_alignParentEnd="true">
 
-                <!--<com.github.clans.fab.FloatingActionButton-->
-                    <!--android:id="@+id/fab_gallery"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_margin="10dp"-->
-                    <!--android:src="@mipmap/gallery"-->
-                    <!--fab:fab_label="Gallery"-->
-                    <!--fab:fab_size="normal"-->
-                    <!--fab:fab_colorNormal="#000000"-->
-                    <!--fab:fab_colorPressed="#FDA626"-->
-                    <!--fab:fab_colorRipple="#99FFFFFF"/>-->
+                <com.github.clans.fab.FloatingActionButton
+                    android:id="@+id/fab_gallery"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:src="@mipmap/gallery"
+                    fab:fab_label="Gallery"
+                    fab:fab_size="normal"
+                    fab:fab_colorNormal="#000000"
+                    fab:fab_colorPressed="#FDA626"
+                    fab:fab_colorRipple="#99FFFFFF"/>
 
                 <com.github.clans.fab.FloatingActionButton
                     android:id="@+id/fab_camera"

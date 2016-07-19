@@ -2,31 +2,30 @@ package com.beingcitizen.beingcitizen;
 
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.media.Image;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
+import android.text.InputFilter;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.beingcitizen.R;
 import com.beingcitizen.retrieveals.RetrieveUserProfile;
-import com.facebook.login.widget.ProfilePictureView;
+import com.beingcitizen.retrieveals.SendUserFollow;
+import com.beingcitizen.retrieveals.SendUserUnfollow;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
@@ -41,18 +40,38 @@ public class UserProfileActivity extends AppCompatActivity {
     TextView nameview,emailview;
     ImageView profile;
     SharedPreferences sharedpreferences;
-    String uid = "16";
+    String uid = "16", uid_viewing = "16";
+    TextView follow_button;
+    boolean followed = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.userprofile_layout1);
         sharedpreferences = PreferenceManager.getDefaultSharedPreferences(this);
-
+        follow_button = (TextView) findViewById(R.id.follow_button);
         uid = sharedpreferences.getString("id", "16");
-        if (getIntent().getExtras()!=null)
-            uid = getIntent().getExtras().getString("uid");
-        Log.e("UId", uid);
+        if (getIntent().getExtras()!=null) {
+            uid_viewing = getIntent().getExtras().getString("uid");
+            if (uid_viewing.contentEquals(uid)){
+                follow_button.setVisibility(View.GONE);
+            }else
+                uid = uid_viewing;
+        }
+        follow_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!followed){
+                    follow_button.setText("  FOLLOWED    ");
+                    SendUserFollow userFollow = new SendUserFollow(UserProfileActivity.this);
+                    userFollow.execute(uid, uid_viewing);
+                }else{
+                    follow_button.setText("+ FOLLOW      ");
+                    SendUserUnfollow userUnfollow = new SendUserUnfollow(UserProfileActivity.this);
+                    userUnfollow.execute(uid, uid_viewing);
+                }
+            }
+        });
         nameview=(TextView)findViewById(R.id.name);
         emailview=(TextView)findViewById(R.id.email);
         toolbar = (Toolbar) findViewById(R.id.tool_bar);
@@ -122,9 +141,33 @@ public class UserProfileActivity extends AppCompatActivity {
             createUIForFollowed(campsFollowed);
             nameview.setText(name);
             emailview.setText(email);
+            final ScrollView parent_scroll = (ScrollView) findViewById(R.id.parent_scroll);
+            parent_scroll.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    findViewById(R.id.scroll_content).getParent().requestDisallowInterceptTouchEvent(true);
+                    return false;
+                }
+            });
+            ScrollView scrollView = (ScrollView) findViewById(R.id.scroll_content);
             TextView const_view = (TextView)findViewById(R.id.consti);
             TextView numCamps = (TextView)findViewById(R.id.num_campaigns);
             TextView numConnect = (TextView)findViewById(R.id.num_connections);
+            TextView hash = (TextView) findViewById(R.id.feed);
+            if (obj.getJSONArray("feed").length()>0){
+                scrollView.setVisibility(View.VISIBLE);
+                scrollView.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        findViewById(R.id.scroll_content).getParent().requestDisallowInterceptTouchEvent(true);
+                        return false;
+                    }
+                });
+                for (int i=0; i<obj.getJSONArray("feed").length(); i++){
+                    hash.setText(hash.getText().toString()+obj.getJSONArray("feed").getJSONObject(i).getString("content")+"\n\n");
+                }
+            }
+            //hash.setText(obj.getJSONArray("feed").getJSONObject(0).getString("content"));
             if (const_view != null) {
                 const_view.setText(constituency);
             }
@@ -175,6 +218,10 @@ public class UserProfileActivity extends AppCompatActivity {
             lL.setLayoutParams(rlp_ll);
             LinearLayout.LayoutParams llp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
             TextView tv = new TextView(this);
+            int maxLength = 16;
+            InputFilter[] fArray = new InputFilter[1];
+            fArray[0] = new InputFilter.LengthFilter(maxLength);
+            tv.setFilters(fArray);
             tv.setLayoutParams(llp);
             float scale = getResources().getDisplayMetrics().density;
             int dpAsPixels = (int) (8*scale + 0.5f);
@@ -239,6 +286,10 @@ public class UserProfileActivity extends AppCompatActivity {
             lL.setPadding(px, 0, px, 0);
             LinearLayout.LayoutParams llp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
             TextView tv = new TextView(this);
+            int maxLength = 16;
+            InputFilter[] fArray = new InputFilter[1];
+            fArray[0] = new InputFilter.LengthFilter(maxLength);
+            tv.setFilters(fArray);
             tv.setLayoutParams(llp);
             float scale = getResources().getDisplayMetrics().density;
             int dpAsPixels = (int) (8*scale + 0.5f);

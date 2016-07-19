@@ -1,21 +1,20 @@
 package com.beingcitizen.fragments;
 
 
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.CardView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.beingcitizen.R;
+import com.rey.material.widget.ProgressView;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
@@ -34,24 +33,33 @@ public class Cartoons  extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.allcartoons_listcell, container, false);
+        final View rootView = inflater.inflate(R.layout.allcartoons_listcell, container, false);
 
         CardView cardView=(CardView) rootView.findViewById(R.id.CardView_allcartoons);
         cardView.setRadius(16.0f);
         cardView.setCardElevation(16.0f);
+
         if (called){
             TextView cartoon_title = (TextView)rootView.findViewById(R.id.cartoon_title);
             TextView cartoon_content= (TextView)rootView.findViewById(R.id.cartoon_text);
-            ImageView cartoon_image = (ImageView)rootView.findViewById(R.id.cartoon_image);
+            final ProgressView image_loading = (ProgressView) rootView.findViewById(R.id.progress_imageLoading);
+            final ImageView cartoon_image = (ImageView)rootView.findViewById(R.id.cartoon_image);
             JSONObject t = null;
             try {
-/*                Glide.with(this)
-                        .load("http://beingcitizen.com/uploads/cartoons/"+t.getString("carimage")+t.getString("carext"))
-                        .into(cartoon_image);
-                        */
                 int position = s.getJSONArray("cartoon").length()-1;
                 t = s.getJSONArray("cartoon").getJSONObject(position);
-                Picasso.with(getContext()).load("http://beingcitizen.com/uploads/cartoons/"+t.getString("carimage")+t.getString("carext")).resize(256, 256).into(cartoon_image);
+                Picasso.with(getContext()).load("http://beingcitizen.com/uploads/cartoons/"+t.getString("carimage")+t.getString("carext")).resize(256, 256).into(cartoon_image, new Callback() {
+                    @Override
+                    public void onSuccess() {
+                        cartoon_image.setVisibility(View.VISIBLE);
+                        image_loading.setVisibility(View.GONE);
+                    }
+
+                    @Override
+                    public void onError() {
+
+                    }
+                });
 
                 cartoon_title.setText(t.getString("Cartoon of the day"));
                 cartoon_content.setText(t.getString("description"));

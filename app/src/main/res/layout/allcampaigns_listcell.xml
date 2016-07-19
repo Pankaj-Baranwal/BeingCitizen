@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/screen_background"
     android:orientation="vertical">
 
@@ -32,7 +33,7 @@
                     android:layout_marginLeft="5dp"
                     android:fontFamily="sans-serif-light"
                     android:padding="15dp"
-                    android:text="Global Warming"
+                    android:text=""
                     android:textColor="#000000"
                     android:textSize="17sp"
                     android:textStyle="bold" />
@@ -43,21 +44,36 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
 
-                <ImageView
-                    android:id="@+id/image_campaign"
+                <RelativeLayout
+                    android:id="@+id/rl_image_campaign"
                     android:layout_width="match_parent"
-                    android:layout_height="220dp"
-                    android:layout_gravity="center_horizontal"
-                    android:adjustViewBounds="true"
-                    android:scaleType="fitXY"
-                    android:src="@drawable/roads" />
+                    android:layout_height="220dp">
 
+                    <ImageView
+                        android:id="@+id/image_campaign"
+                        android:layout_width="match_parent"
+                        android:layout_height="220dp"
+                        android:layout_gravity="center_horizontal"
+                        android:adjustViewBounds="true"
+                        android:scaleType="fitXY"
+                        android:visibility="gone"
+                        />
+                    <com.rey.material.widget.ProgressView
+                        android:id="@+id/progress_imageLoading"
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:layout_centerInParent="true"
+                        app:pv_autostart="true"
+                        app:pv_circular="true"
+                        app:pv_progressStyle="@style/Material.Drawable.CircularProgress"
+                        app:pv_progressMode="indeterminate"/>
+                </RelativeLayout>
 
                 <LinearLayout
                     android:id="@+id/verification_lL"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_alignBottom="@+id/imageView1"
+                    android:layout_alignBottom="@+id/rl_image_campaign"
                     android:background="#B111FF1D"
                     android:orientation="horizontal">
 
@@ -83,7 +99,7 @@
                             android:paddingBottom="15dp"
                             android:paddingTop="15dp"
                             android:paddingLeft="5dp"
-                            android:text="New Delhi"
+                            android:text=""
                             android:textColor="#FFFFFF"
                             android:textSize="17dp"
                             android:textStyle="bold" />
@@ -102,7 +118,7 @@
                 android:fontFamily="sans-serif-light"
                 android:maxLength="200"
                 android:padding="10dp"
-                android:text="@string/debate"
+                android:text=""
                 android:textColor="#000000" />
 
             <LinearLayout
@@ -123,38 +139,54 @@
                 android:layout_margin="7dp">
 
                 <de.hdodenhof.circleimageview.CircleImageView
-                    android:id="@+id/circleImageView"
+                    android:id="@+id/category_img"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
                     android:layout_marginTop="5dp"
                     android:layout_marginBottom="5dp"
                     android:layout_gravity="center_vertical"
-                    android:background="@drawable/roads_and_bridges_black" />
+                     />
 
                 <TextView
                     android:id="@+id/category"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
+                    android:maxLength="25"
                     android:layout_marginLeft="10dp"
                     android:fontFamily="sans-serif-light"
                     android:text="Roads and Bridges"
                     android:textSize="15sp" />
 
-                <!--<LinearLayout-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="match_parent"-->
-                    <!--android:gravity="right">-->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="right">
+                    <ImageButton
+                        android:id="@+id/like"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginRight="5dp"
+                        android:background="@drawable/like" />
+                    <ImageButton
+                        android:id="@+id/volunteer"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="5dp"
+                        android:background="@drawable/volunteer" />
 
-                    <!--<ImageButton-->
-                        <!--android:id="@+id/comment"-->
-                        <!--android:layout_width="30dp"-->
-                        <!--android:layout_height="30dp"-->
-                        <!--android:layout_gravity="center_vertical"-->
-                        <!--android:layout_marginLeft="10dp"-->
-                        <!--android:layout_marginRight="5dp"-->
-                        <!--android:background="@drawable/comments" />-->
-                <!--</LinearLayout>-->
+                    <ImageButton
+                        android:id="@+id/comment"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp"
+                        android:background="@drawable/comments" />
+                </LinearLayout>
 
             </LinearLayout>
 

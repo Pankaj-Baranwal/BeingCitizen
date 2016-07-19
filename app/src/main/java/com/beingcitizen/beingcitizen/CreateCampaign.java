@@ -1,5 +1,6 @@
 package com.beingcitizen.beingcitizen;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -15,6 +16,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Base64;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -69,7 +72,7 @@ public class CreateCampaign extends AppCompatActivity {
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         FloatingActionButton fab_camera = (FloatingActionButton) findViewById(R.id.fab_camera);
-        //FloatingActionButton fab_gallery = (FloatingActionButton) findViewById(R.id.fab_gallery);
+        FloatingActionButton fab_gallery = (FloatingActionButton) findViewById(R.id.fab_gallery);
         title_create = (EditText)findViewById(R.id.title_create);
         text_create = (EditText) findViewById(R.id.text_create);
 
@@ -86,9 +89,8 @@ public class CreateCampaign extends AppCompatActivity {
                     category = "err";
                 }else{
                     category = (String)parent.getItemAtPosition(position);
-//                    category = category.replace(" ", "%20");
                     RetrieveTags rtags = new RetrieveTags(CreateCampaign.this);
-                    rtags.execute(category);
+                    rtags.execute(category.replace(" ", "%20"));
                 }
             }
 
@@ -118,7 +120,6 @@ public class CreateCampaign extends AppCompatActivity {
                     consti = "err";
                 }else{
                     consti = (String)parent.getItemAtPosition(position);
-                    consti = consti.replace(" ", "%20");
                 }
             }
 
@@ -142,7 +143,7 @@ public class CreateCampaign extends AppCompatActivity {
                 fab_menu.close(true);
             }
         });
-        /*fab_gallery.setOnClickListener(new View.OnClickListener() {
+        fab_gallery.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
@@ -152,7 +153,7 @@ public class CreateCampaign extends AppCompatActivity {
                 fab_menu.close(true);
             }
         });
-        */
+
 
         Button update = (Button) findViewById(R.id.campaign_create);
         update.setOnClickListener(new View.OnClickListener() {
@@ -181,17 +182,25 @@ public class CreateCampaign extends AppCompatActivity {
     }
 
     void makeCampaign(){
+        final Dialog dialog = new Dialog(CreateCampaign.this);
+        dialog.setContentView(R.layout.dialog_progress);
+        dialog.setTitle("Updating Indexes");
+        dialog.show();
         StringRequest myReq = new StringRequest(Request.Method.POST,
                 "http://beingcitizen.com/bc/index.php/main/createcampaign",
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
+                        dialog.dismiss();
+                        finish();
                         Log.e("RESPONSE", response);
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
+                        dialog.dismiss();
+                        finish();
                         Log.e("RESPONSE", "ERROR!");
                     }
                 }) {
@@ -333,7 +342,7 @@ public class CreateCampaign extends AppCompatActivity {
     public void allConsts(JSONObject s) {
         if (s!=null){
             ArrayList<String> cons = new ArrayList<>();
-            cons.add("Enter constituency");
+            cons.add("Select you constituency");
             try {
                 for (int i=0; i<s.getJSONArray("consts").length(); i++)
                     cons.add(s.getJSONArray("consts").getJSONObject(i).getString("Constituency"));
@@ -349,6 +358,7 @@ public class CreateCampaign extends AppCompatActivity {
         try {
             JSONArray jA = s.getJSONArray("tags");
             ArrayList<String> arrayList = new ArrayList<>();
+            arrayList.add("--Select Tag--");
             for (int i=0; i<jA.length(); i++){
                 arrayList.add(jA.getString(i));
             }
@@ -359,5 +369,20 @@ public class CreateCampaign extends AppCompatActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+                finish();
+        return super.onOptionsItemSelected(item);
+
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        //getMenuInflater().inflate(R.menu.menu_edit, menu);
+        return true;
     }
 }

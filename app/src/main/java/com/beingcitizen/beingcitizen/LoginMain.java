@@ -3,26 +3,18 @@ package com.beingcitizen.beingcitizen;
 import android.Manifest;
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
-import android.media.MediaPlayer;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.SurfaceView;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -34,14 +26,13 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.VideoView;
 
 import com.beingcitizen.R;
-import com.beingcitizen.adapters.Draweradapter;
 import com.beingcitizen.interfaces.mla_id;
 import com.beingcitizen.interfaces.retrieveCampaign;
 import com.beingcitizen.interfaces.signUp_interface;
 import com.beingcitizen.retrieveals.RetrieveConstitutency;
+import com.beingcitizen.retrieveals.RetrieveFeedTask;
 import com.beingcitizen.retrieveals.RetrieveMlaID;
 import com.beingcitizen.retrieveals.RetrieveSignUp;
 import com.facebook.CallbackManager;
@@ -70,17 +61,14 @@ import com.google.android.gms.plus.model.people.Person;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
-import java.io.InputStream;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
  * Created by saransh on 14-06-2015.
  */
-public class LoginMain extends Activity implements GoogleApiClient.ConnectionCallbacks,GoogleApiClient.OnConnectionFailedListener, retrieveCampaign, signUp_interface, mla_id{
+public class LoginMain extends Activity implements GoogleApiClient.ConnectionCallbacks,GoogleApiClient.OnConnectionFailedListener, retrieveCampaign, signUp_interface, mla_id, com.beingcitizen.interfaces.login {
     SharedPreferences sharedpreferences;
     public Button login,signup;
     public TextView text;
@@ -97,7 +85,7 @@ public class LoginMain extends Activity implements GoogleApiClient.ConnectionCal
     CallbackManager callbackManager;
     private static final int PROFILE_PIC_SIZE = 120;
     ArrayAdapter<String> adapter;
-    String name, password, email, gender, uid = "16";
+    String name, password, email="No_Email_ID", gender, uid = "16";
 
 
     @Override
@@ -147,7 +135,7 @@ public class LoginMain extends Activity implements GoogleApiClient.ConnectionCal
         gplus_signin.setOnClickListener(onLoginListener());
 
         fb_signin=(LoginButton)findViewById(R.id.fb_signin);
-        fb_signin.setReadPermissions(Arrays.asList("public_profile", "email", "user_birthday", "user_friends"));
+        fb_signin.setReadPermissions(Arrays.asList("public_profile", "email", "user_birthday"));
 
         fb_signin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -194,7 +182,6 @@ And then callback manager will handle the login responses.
         login_button.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult login_result) {
-                getUserInfo(login_result);
                 Profile profile = Profile.getCurrentProfile();
                 //TODO: get more details from FB as well as Gmail.
                 if (profile != null) {
@@ -203,8 +190,12 @@ And then callback manager will handle the login responses.
                     m_name=profile.getMiddleName();
                     l_name=profile.getLastName();
                     full_name=profile.getName();
+                    Log.e("FB_PROFILE", facebook_id+" "+ full_name);
                     profile_image=profile.getProfilePictureUri(400, 400).toString();
+                }else{
+                    Log.e("PROFILE", "NULL");
                 }
+                getUserInfo(login_result);
 //                Toast.makeText(LoginMain.this,full_name,Toast.LENGTH_SHORT).show();
                 final Dialog dialogLogout = new Dialog(LoginMain.this);
                 dialogLogout.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -243,7 +234,7 @@ And then callback manager will handle the login responses.
 To get the facebook user's own profile information via  creating a new request.
 When the request is completed, a callback is called to handle the success condition.
 */
-    protected void getUserInfo(LoginResult login_result){
+    protected void getUserInfo(LoginResult login_result) {
 
         GraphRequest data_request = GraphRequest.newMeRequest(
                 login_result.getAccessToken(),
@@ -254,29 +245,18 @@ When the request is completed, a callback is called to handle the success condit
                             GraphResponse response) {
                         try {
                             //JSONArray namearray = json_object.names();
-                            email_id=json_object.getString("email");
+                            if (json_object.has("email")) {
+                                email_id = json_object.getString("email");
+                            } else {
+                                email_id = json_object.getString("id");
+                            }
                             gender = json_object.getString("gender");
                             name = json_object.getString("name");
                             password = "password";
-                            show(email_id);
-
                         } catch (JSONException e) {
                             e.printStackTrace();
+                            Log.e("TAG_EMAIL", "ERROR");
                         }
-                        sharedpreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-                        SharedPreferences.Editor editor = sharedpreferences.edit();
-
-                        editor.putString("name", full_name);
-                        editor.putString("email", email_id);
-                        editor.putString("gender", gender);
-                        editor.putString("id",facebook_id);
-
-                        editor.apply();
-
-
-//                        Intent intent = new Intent(LoginMain.this,MainActivity.class);
-//                        intent.putExtra("jsondata",json_object.toString());
-//                        startActivity(intent);
                     }
                 });
 
@@ -284,7 +264,6 @@ When the request is completed, a callback is called to handle the success condit
         permission_param.putString("fields", "id,name,email,gender,picture.width(120).height(120)");
         data_request.setParameters(permission_param);
         data_request.executeAsync();
-
     }
 
 
@@ -299,7 +278,7 @@ When the request is completed, a callback is called to handle the success condit
             obj.add("Enter constituency");
             for (int i = 0; i < namearray.length(); i++)
                 obj.add(namearray.getString(i));
-            adapter = new ArrayAdapter<>(this, R.layout.spinner_item, obj);
+            adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, obj);
             final String[] mlaID = new String[1];
             final Dialog dialogLogout = new Dialog(this);
             dialogLogout.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -334,12 +313,12 @@ When the request is completed, a callback is called to handle the success condit
                         SharedPreferences sharedpreferences = PreferenceManager.getDefaultSharedPreferences(LoginMain.this);
                         SharedPreferences.Editor edit = sharedpreferences.edit();
                         edit.putString("constituency", content[0]);
+                        edit.apply();
                         RetrieveMlaID rmlaid = new RetrieveMlaID(LoginMain.this, LoginMain.this);
                         rmlaid.execute(content[0]);
-                        edit.apply();
                         RetrieveSignUp rsup = new RetrieveSignUp(LoginMain.this, LoginMain.this);
-                        dialogLogout.cancel();
-                        rsup.execute(name, email, password, gender, content[0]);
+                        rsup.execute(name.replace(" ", "%20"), email, password.replace(" ", "%20"), gender, content[0].replace(" ", "%20"));
+                        dialogLogout.dismiss();
                     }
                 }
             });
@@ -369,8 +348,17 @@ When the request is completed, a callback is called to handle the success condit
                 Log.e("TAG_function", "JSONERROR");
                 e.printStackTrace();
             }
-        }else{
-            Toast.makeText(LoginMain.this, "Error Signing in", Toast.LENGTH_SHORT).show();
+        }else if (obj.has("status")){
+            try {
+                if (obj.getString("status").contentEquals("Already used email")) {
+                    RetrieveFeedTask rft = new RetrieveFeedTask(this);
+                    rft.execute(email, "password");
+                }else{
+                    Toast.makeText(LoginMain.this, "Error Signing in", Toast.LENGTH_SHORT).show();
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -551,10 +539,10 @@ getProfileInfo();
            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
        }
    */
-    public void show(String str)
-    {
-        Toast.makeText(this, str, Toast.LENGTH_LONG).show();
-    }
+//    public void show(String str)
+//    {
+//        Toast.makeText(this, str, Toast.LENGTH_LONG).show();
+//    }
 
     private void gPlusRevokeAccess() {
         if (googleApiClient.isConnected()) {
@@ -599,6 +587,7 @@ getProfileInfo();
 
             if (Plus.PeopleApi.getCurrentPerson(googleApiClient) != null) {
                 Person currentPerson = Plus.PeopleApi.getCurrentPerson(googleApiClient);
+                Log.e("TAG", currentPerson.getDisplayName()+" "+ currentPerson.getGender()+" "+ currentPerson.getName()+" "+ currentPerson.getAboutMe()+ " "+ currentPerson.getBirthday()+" "+ currentPerson.getUrl());
                 setPersonalInfo(currentPerson);
 
             } else {
@@ -608,7 +597,7 @@ getProfileInfo();
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.getStackTraceString(e);
         }
 
     }
@@ -653,8 +642,37 @@ getProfileInfo();
     public void mla_ids(String mlaID) {
         SharedPreferences sharedpreferences = PreferenceManager.getDefaultSharedPreferences(LoginMain.this);
         SharedPreferences.Editor edit = sharedpreferences.edit();
-        edit.putString("mla_id", mlaID);
+        if (!mlaID.contentEquals("null")) {
+            edit.putString("mla_id", mlaID);
+        }else{
+            edit.putString("mla_id", "No_mla_id");
+            Toast.makeText(LoginMain.this, "No MLA found!", Toast.LENGTH_SHORT).show();
+        }
         edit.apply();
+    }
+
+    @Override
+    public void login_feed(JSONObject s) {
+        if (s.has("id")) {
+            SharedPreferences.Editor edit = sharedpreferences.edit();
+            try {
+                uid = s.getString("id");
+                edit.putString("id", s.getString("id"));
+                edit.putString("name", s.getString("name"));
+                edit.putString("email", s.getString("email"));
+                edit.putString("sex", s.getString("sex"));
+                edit.putString("const", s.getString("const"));
+                edit.apply();
+            } catch (JSONException e) {
+                e.printStackTrace();
+                Log.e("ERROR", "Error in storing to shared prefs");
+            }
+            Intent i = new Intent(getBaseContext(), MainActivity.class);
+            startActivity(i);
+            finish();
+        } else {
+            Toast.makeText(this, "Incorrect details", Toast.LENGTH_SHORT).show();
+        }
     }
 }
 

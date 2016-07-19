@@ -22,7 +22,7 @@ import org.json.JSONObject;
 /**
  * Created by saransh on 14-06-2015.
  */
-public class LoginActivity extends Activity {
+public class LoginActivity extends Activity implements com.beingcitizen.interfaces.login {
 
     public TextView welocomeback, citizen, forgotPassword;
     public Button login;
@@ -84,7 +84,18 @@ public class LoginActivity extends Activity {
         }
     }
 
-    public void functions(JSONObject s) {
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent i = new Intent(getBaseContext(), LoginMain.class);
+        //i.putExtra("uid", uid);
+        startActivity(i);
+        finish();
+    }
+
+    @Override
+    public void login_feed(JSONObject s) {
         if (s.has("id")) {
             SharedPreferences.Editor edit = sharedpreferences.edit();
             try {
@@ -105,14 +116,5 @@ public class LoginActivity extends Activity {
         } else {
             Toast.makeText(this, "Incorrect details", Toast.LENGTH_SHORT).show();
         }
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        Intent i = new Intent(getBaseContext(), LoginMain.class);
-        //i.putExtra("uid", uid);
-        startActivity(i);
-        finish();
     }
 }

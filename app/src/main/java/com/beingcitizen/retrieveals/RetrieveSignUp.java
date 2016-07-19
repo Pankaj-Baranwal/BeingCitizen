@@ -6,8 +6,6 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.beingcitizen.Http;
-import com.beingcitizen.beingcitizen.LoginActivity;
-import com.beingcitizen.beingcitizen.signUp;
 import com.beingcitizen.interfaces.signUp_interface;
 
 import org.json.JSONArray;
@@ -33,7 +31,7 @@ public class RetrieveSignUp extends AsyncTask<String, Void, String> {
         String bool = "";
         Http http = new Http();
         try {
-            Log.e("URL", "http://beingcitizen.com/bc/index.php/register/reg?name="+params[0]+"&email="+params[1]+"&password="+params[2]+"&gender="+params[3]+"&const="+params[4]);
+            Log.e("URL", "http://beingcitizen.com/bc/index.php/register/reg?name="+params[0].replace(" ", "%20")+"&email="+params[1].replace(" ", "%20")+"&password="+params[2].replace(" ", "%20")+"&gender="+params[3]+"&const="+params[4].replace(" ", "%20"));
             bool = http.read("http://beingcitizen.com/bc/index.php/register/reg?name="+params[0]+"&email="+params[1]+"&password="+params[2]+"&gender="+params[3]+"&const="+params[4]);
         } catch (IOException e) {
             e.printStackTrace();
@@ -50,6 +48,7 @@ public class RetrieveSignUp extends AsyncTask<String, Void, String> {
             JSONObject obj = arr.getJSONObject(0);
             ref.result(obj);
         } catch (JSONException e) {
+            Log.e("Pankaj", "SignUp Error");
             Toast.makeText(context, "Error retrieving data", Toast.LENGTH_SHORT).show();
             e.printStackTrace();
         }

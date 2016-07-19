@@ -6,9 +6,7 @@ import android.widget.Toast;
 
 import com.beingcitizen.Http;
 import com.beingcitizen.beingcitizen.UserProfileActivity;
-import com.beingcitizen.beingcitizen.signUp;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 

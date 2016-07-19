@@ -13,6 +13,25 @@
     <string name="title_section1">Polls</string>
     <string name="title_section2">Blogs</string>
     <string name="title_section3">Cartoons</string>
-    <string name="terms">By Signing In, You Agree To Being Citizen\'s Terms Of Services. Privacy Policy. Cookie Policy &amp; Content Policies</string>
+    <string name="terms">BeingCitizen in all its technology, aims to be a curated hyperlocal social media network. Our services aim to connect citizens with the relevant stakeholders from the point of view of delivering
+Governance i.e. State legislators, executive, other government bodies as well as relevant citizens lying within the relevant governance boundaries at the Constituency/State/Country level.\nThis Privacy Policy (further referred to as ‘Policy’) lays down rules for how and when BeingCitizen
+uses and shares the information when you use the services on the Network between the various
+stakeholders i.e. Citizens, Government and Corporate Sector alike. We, at BeingCitizen respect your
+privacy and appreciate the sensitivity of all matters that will subsequently be put out in public
+domain and possibly scrutinized further outside the ambit of the Platform itself. Therefore, the
+minimum data collected across a user’s activity on the platform to further improve the user
+experience on the platform of BeingCitizen itself.\nHenceforth, this Policy document aims to list down feature-wise Privacy intention from the point of
+view of Users.\n\nCampaigns: Campaigns become the action centres on the BeingCitizen Platform that brings
+together the Government apparatus to the Citizens. More so, to balance the equation and add
+credibility to the platform, the identity of the creator of the Campaign and its followers becomes
+relevant even for his corresponding MLA to address the desired change and therefore visible to all
+users.\n\nThe ‘Community’: These, as a feature, necessitate opinion and for that reason, the identity of the
+users using the feature thereby is discoverable by all users to the platform alike. The information as
+gathered from these platforms can be discovered either by rendering to other users upon their use
+of the platform or could otherwise be discoverable through the user profiles. The data as generated
+can the stored by the website and could be used offline to analyse the relevant opinion from the use
+of the hash tags as provided and used.\n\nBlogs, Debates &amp; Cartoons: These elements are discoverable and promote user engagement
+within the BeingCitizen platform.\n\nPolls: Polls instigate user opinion over any kind of a broad theme that the platform does support.
+This can range to a host of topics that might be ranging to a sponsored interest to an opinion poll.</string>
     <string name="login">By Creating An Account, You Agree To Being Citizen\'s Terms Of Services. Privacy Policy. Cookie Policy &amp; Content Policies</string>
 </resources>

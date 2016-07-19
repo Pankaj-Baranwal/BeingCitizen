@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity implements OnMenuItemClickLi
     //First We Declare Titles And Icons For Our Navigation Drawer List View
     //This Icons And Titles Are holded in an Array as you can see
 
-    String TITLES[] = {"Campaign", "Debated", "Daily Digest", "Terms and Conditions", "Help", "Logout"};
+    String TITLES[] = {"Campaign", "Debate", "Daily Digest", "Terms and Conditions", "Help", "Logout"};
     String menuTITLES[] = {"Law and Order", "Public Health and Sanitation", "Communication", "Water-Irrigation,Drainage,Embankments", "Lands, Agriculture", "Trade,Commerce,Employment", "Environment & Holticulture", "Tourism, Art and Culture", "Power", "Corruption/Vigillance"};
     int ICONS[] = {R.drawable.campaign, R.drawable.debates, R.drawable.digest, R.drawable.terms, R.drawable.help, R.drawable.logout};
 
@@ -84,6 +84,7 @@ public class MainActivity extends AppCompatActivity implements OnMenuItemClickLi
 
     ActionBarDrawerToggle mDrawerToggle;                  // Declaring Action Bar Drawer Toggle
     SharedPreferences sharedpreferences;
+    SharedPreferences.Editor editor;
 
 
     @Override
@@ -127,9 +128,10 @@ public class MainActivity extends AppCompatActivity implements OnMenuItemClickLi
 
         mRecyclerView.setHasFixedSize(true);                            // Letting the system know that the list objects are of fixed size
         sharedpreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        editor = sharedpreferences.edit();
         NAME_i=sharedpreferences.getString("name", null);
         EMAIL_i=sharedpreferences.getString("email", null);
-        MLA_name = sharedpreferences.getString("mla_id", null);
+        MLA_name = sharedpreferences.getString("mla_id", "null");
         consti = sharedpreferences.getString("constituency", null);
         mAdapter = new Draweradapter(TITLES, ICONS, NAME_i, EMAIL_i, MLA_name, consti, PROFILE);
         // And passing the titles,icons,header view name, header view email,
@@ -169,8 +171,10 @@ public class MainActivity extends AppCompatActivity implements OnMenuItemClickLi
                                 startActivity(l);
                             }
                             else {
-                                Intent l = new Intent(getBaseContext(),MlaProfileActivity.class);
-                                startActivity(l);
+                                if (!MLA_name.contentEquals("No_mla_id")) {
+                                    Intent l = new Intent(getBaseContext(), MlaProfileActivity.class);
+                                    startActivity(l);
+                                }
                             }
                         case 1:
                             Draweradapter.mSelectedPosition=1;
@@ -202,7 +206,7 @@ public class MainActivity extends AppCompatActivity implements OnMenuItemClickLi
                             Draweradapter.mSelectedPosition=5;
                             recyclerView.getAdapter().notifyDataSetChanged();
                             //TODO: HELP...
-                            Toast.makeText(MainActivity.this, "asfsafd: " + recyclerView.getChildAdapterPosition(child), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MainActivity.this, "Coming Soon" + recyclerView.getChildAdapterPosition(child), Toast.LENGTH_SHORT).show();
                             break;
                         case 6:
                             Draweradapter.mSelectedPosition=6;
@@ -299,7 +303,6 @@ public class MainActivity extends AppCompatActivity implements OnMenuItemClickLi
         yes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SharedPreferences.Editor editor = sharedpreferences.edit();
                 editor.clear();
                 editor.apply();
 //                LoginManager.getInstance().logOut();

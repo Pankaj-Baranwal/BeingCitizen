@@ -26,7 +26,7 @@ public class SendCampaignComment extends AsyncTask<String, Void, JSONObject> {
         JSONObject bool = null;
         Http http = new Http();
         try {
-            bool = new JSONObject(http.read("http://beingcitizen.com/bc/index.php/main/campcomment?uid="+params[0]+"&campaign_id="+params[1]+"&comment="+params[2]));
+            bool = new JSONObject(http.read("http://beingcitizen.com/bc/index.php/main/campcomment?uid="+params[0]+"&campaign_id="+params[1]+"&comment="+params[2].replace(" ", "%20")));
         } catch (IOException e) {
             e.printStackTrace();
             Log.e("TAG_ERROR", "ERROR");
