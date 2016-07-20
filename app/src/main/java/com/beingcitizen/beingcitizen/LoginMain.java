@@ -506,8 +506,8 @@ getProfileInfo();
         mSignInClicked = false;
         //Toast.makeText(this, "User is connected!", Toast.LENGTH_LONG).show();
         getProfileInfo();
-        Intent i = new Intent(getBaseContext(), MainActivity.class);
-        startActivity(i);
+//        Intent i = new Intent(getBaseContext(), MainActivity.class);
+//        startActivity(i);
         finish();
     }
 
@@ -587,7 +587,7 @@ getProfileInfo();
 
             if (Plus.PeopleApi.getCurrentPerson(googleApiClient) != null) {
                 Person currentPerson = Plus.PeopleApi.getCurrentPerson(googleApiClient);
-                Log.e("TAG", currentPerson.getDisplayName()+" "+ currentPerson.getGender()+" "+ currentPerson.getName()+" "+ currentPerson.getAboutMe()+ " "+ currentPerson.getBirthday()+" "+ currentPerson.getUrl());
+                Log.e("TAG", currentPerson.getDisplayName()+" "+ currentPerson.getGender()+" "+ currentPerson.getName()+" "+ currentPerson.getAboutMe()+ " "+ currentPerson.getBirthday()+" " + currentPerson.getAgeRange()+" "+ currentPerson.getId());
                 setPersonalInfo(currentPerson);
 
             } else {
@@ -608,7 +608,7 @@ getProfileInfo();
         name = currentPerson.getDisplayName();
         String personPhotoUrl = currentPerson.getImage().getUrl();
         email = Plus.AccountApi.getAccountName(googleApiClient);
-        gender = currentPerson.getGender()==1?"Male":"Female";
+        gender = currentPerson.getGender()==2?"Female":"Male";
         password = "password";
         final Dialog dialogLogout = new Dialog(LoginMain.this);
         dialogLogout.requestWindowFeature(Window.FEATURE_NO_TITLE);

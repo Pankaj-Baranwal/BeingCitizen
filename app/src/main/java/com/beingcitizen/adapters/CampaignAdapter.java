@@ -161,13 +161,13 @@ public class CampaignAdapter extends BaseAdapter implements CampaignRelated{
                     category_img.setImageResource(R.drawable.public_health_and_sanitation_black);
                     break;
                 case "Communication":
-                    category_img.setImageResource(R.drawable.debates);
+                    category_img.setImageResource(R.drawable.communication_black);
                     break;
                 case "Water-Irrigation,Drainage,Embankments":
                     category_img.setImageResource(R.drawable.water_supplies_black);
                     break;
                 case "Lands, Agriculture":
-                    category_img.setImageResource(R.drawable.ecology);
+                    category_img.setImageResource(R.drawable.land_black);
                     break;
                 case "Trade,Commerce,Employment":
                     category_img.setImageResource(R.drawable.market);
@@ -176,10 +176,10 @@ public class CampaignAdapter extends BaseAdapter implements CampaignRelated{
                     category_img.setImageResource(R.drawable.ecology);
                     break;
                 case "Tourism, Art and Culture":
-                    category_img.setImageResource(R.drawable.market);
+                    category_img.setImageResource(R.drawable.tourism_black);
                     break;
                 case "Power":
-                    category_img.setImageResource(R.drawable.power);
+                    category_img.setImageResource(R.drawable.power_black);
                     break;
                 case "Corruption/Vigillance":
                     category_img.setImageResource(R.drawable.police_black);

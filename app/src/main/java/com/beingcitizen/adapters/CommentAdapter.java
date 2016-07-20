@@ -117,6 +117,21 @@ public class CommentAdapter extends BaseAdapter{
                 mContext.startActivity(intent);
             }
         });
+        rL_user_against.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    Log.e("POSITION", position+"");
+                    uid = categorynam.getJSONArray("total_sorted").getJSONObject(position).getString("user_id");
+                }catch (JSONException e) {
+                    Log.getStackTraceString(e);
+                }
+                Log.e("COMMENT_UID", uid+"");
+                Intent intent = new Intent(mContext, UserProfileActivity.class);
+                intent.putExtra("uid", uid);
+                mContext.startActivity(intent);
+            }
+        });
         return rowView;
     }
 }

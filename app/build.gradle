@@ -4,7 +4,7 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 23
     buildToolsVersion '23.0.2'
-    useLibrary 'org.apache.http.legacy'
+    //useLibrary 'org.apache.http.legacy'
 
 
     defaultConfig {
@@ -22,13 +22,18 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    dexOptions {
+        incremental true
+        javaMaxHeapSize "2g"
+    }
 }
 repositories {
     mavenCentral()
 }
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile files('libs/imageviewpopuphelper-0.1.1.jar')
+    //compile files('libs/imageviewpopuphelper-0.1.1.jar')
     // compile 'it.neokree:MaterialTabs:0.11'
     compile 'com.android.support:appcompat-v7:23.4.0'
     compile 'de.hdodenhof:circleimageview:1.2.1'

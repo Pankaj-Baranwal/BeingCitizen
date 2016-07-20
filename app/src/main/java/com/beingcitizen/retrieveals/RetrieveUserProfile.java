@@ -27,7 +27,7 @@ public class RetrieveUserProfile extends AsyncTask<String, Void, String> {
         String bool = "";
         Http http = new Http();
         try {
-            bool = http.read("http://beingcitizen.com/bc/index.php/main/userprofile?id="+params[0]);
+            bool = http.read("http://beingcitizen.com/bc/index.php/main/userprofile?current_user="+params[0]+"&id="+params[1]);
         } catch (IOException e) {
             e.printStackTrace();
             Log.e("TAG_ERROR", "ERROR");

@@ -349,15 +349,21 @@ public class MainActivity extends AppCompatActivity implements OnMenuItemClickLi
     public void retrieve(JSONObject param) {
         try {
             if (param.getJSONArray("campaigns")!=null && param.getJSONArray("campaigns").length()!=0) {
-                Log.e("Length", param.getJSONArray("campaigns").length()+"");
                 JSONArray jA;
                 JSONArray jASorted = new JSONArray();
                 jA = param.getJSONArray("campaigns");
                 for (int i=0; i<jA.length(); i++) {
-                    Log.e("TAG", jA.getJSONObject(i).getString("category"));
                     if (jA.getJSONObject(i).getString("category").contains(selected))
                         jASorted.put(jA.getJSONObject(i));
                 }
+                if (jASorted.length()==0){
+                    Toast.makeText(MainActivity.this, "No campaigns found!", Toast.LENGTH_SHORT).show();
+                }
+                for (int i=0; i<jA.length(); i++) {
+                    if (!jA.getJSONObject(i).getString("category").contains(selected))
+                        jASorted.put(jA.getJSONObject(i));
+                }
+
                     adapterUpdate upd = Campaign.alc;
                     upd.updateAdapt(jASorted);
             }

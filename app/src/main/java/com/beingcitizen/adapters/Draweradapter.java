@@ -35,7 +35,7 @@ int image=R.drawable.ic_profile2;
     private String name;        //String Resource for header View Name
     private int profileid;        //int Resource for header view profile picture
     private String email, mlaName, mlaConsti;       //String Resource for header view email
-    private boolean mlaExists = true;
+    public static boolean mlaExists = true;
     static ImageView arrows;
     static CircleImageView mla_image;
     static TextView mla_name;
@@ -80,6 +80,12 @@ int image=R.drawable.ic_profile2;
                 mla_consti = (TextView) itemView.findViewById(R.id.mla_constituency);
                 mla_image = (CircleImageView) itemView.findViewById(R.id.mlaImage);
                 arrows = (ImageView) itemView.findViewById(R.id.arrows);
+                if (!mlaExists){
+                    mla_consti.setVisibility(View.GONE);
+                    arrows.setVisibility(View.GONE);
+                    mla_image.setVisibility(View.GONE);
+                    mla_name.setVisibility(View.GONE);
+                }
                 profile = (ProfilePictureView)itemView.findViewById(R.id.profile_picture);
                 profile.setCropped(true);
                 Holderid = 0;                                                // Setting holder id = 0 as the object being populated are of type header view
@@ -101,10 +107,6 @@ int image=R.drawable.ic_profile2;
             mlaConsti = mla_consti_txt;
         }else{
             mlaExists = false;
-            mla_consti.setVisibility(View.GONE);
-            arrows.setVisibility(View.GONE);
-            mla_image.setVisibility(View.GONE);
-            mla_name.setVisibility(View.GONE);
         }
         profileid=Profile;
         //in adapter

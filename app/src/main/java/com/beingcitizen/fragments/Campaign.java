@@ -110,7 +110,7 @@ public class Campaign extends Fragment implements retrieveCamp {
         phs.setDividerColor(Color.alpha(R.color.color_white));
 
         MenuObject communication = new MenuObject("Communication");
-        communication.setResource(R.drawable.debates);
+        communication.setResource(R.drawable.communication);
         communication.setBgColor(Color.alpha(R.color.color_white));
         communication.setDividerColor(Color.alpha(R.color.color_white));
 
@@ -120,7 +120,7 @@ public class Campaign extends Fragment implements retrieveCamp {
         watersupply.setDividerColor(Color.alpha(R.color.color_white));
 
         MenuObject land = new MenuObject("Lands, Agriculture");
-        land.setResource(R.drawable.ecology);
+        land.setResource(R.drawable.land);
         land.setBgColor(Color.alpha(R.color.color_white));
         land.setDividerColor(Color.alpha(R.color.color_white));
 
@@ -135,7 +135,7 @@ public class Campaign extends Fragment implements retrieveCamp {
         environ.setDividerColor(Color.alpha(R.color.color_white));
 
         MenuObject market = new MenuObject("Tourism, Art and Culture");
-        market.setResource(R.drawable.market);
+        market.setResource(R.drawable.tourism);
         market.setBgColor(Color.alpha(R.color.color_white));
         market.setDividerColor(Color.alpha(R.color.color_white));
 

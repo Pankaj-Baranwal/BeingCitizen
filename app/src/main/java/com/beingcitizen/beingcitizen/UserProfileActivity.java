@@ -1,5 +1,6 @@
 package com.beingcitizen.beingcitizen;
 
+import android.app.Dialog;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Color;
@@ -13,16 +14,18 @@ import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
+import android.view.Window;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.beingcitizen.R;
+import com.beingcitizen.retrieveals.RetrieveConstitutency;
 import com.beingcitizen.retrieveals.RetrieveUserProfile;
 import com.beingcitizen.retrieveals.SendUserFollow;
 import com.beingcitizen.retrieveals.SendUserUnfollow;
@@ -40,7 +43,7 @@ public class UserProfileActivity extends AppCompatActivity {
     TextView nameview,emailview;
     ImageView profile;
     SharedPreferences sharedpreferences;
-    String uid = "16", uid_viewing = "16";
+    String uid = "16", uid_viewer = "16";
     TextView follow_button;
     boolean followed = false;
 
@@ -50,25 +53,29 @@ public class UserProfileActivity extends AppCompatActivity {
         setContentView(R.layout.userprofile_layout1);
         sharedpreferences = PreferenceManager.getDefaultSharedPreferences(this);
         follow_button = (TextView) findViewById(R.id.follow_button);
-        uid = sharedpreferences.getString("id", "16");
+        uid_viewer = sharedpreferences.getString("id", "16");
         if (getIntent().getExtras()!=null) {
-            uid_viewing = getIntent().getExtras().getString("uid");
-            if (uid_viewing.contentEquals(uid)){
+            uid = getIntent().getExtras().getString("uid");
+            if (uid.contentEquals(uid_viewer)){
                 follow_button.setVisibility(View.GONE);
-            }else
-                uid = uid_viewing;
+            }
+        }else{
+            uid = uid_viewer;
+            follow_button.setVisibility(View.GONE);
         }
         follow_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (!followed){
+                    followed = true;
                     follow_button.setText("  FOLLOWED    ");
                     SendUserFollow userFollow = new SendUserFollow(UserProfileActivity.this);
-                    userFollow.execute(uid, uid_viewing);
+                    userFollow.execute(uid_viewer, uid);
                 }else{
+                    followed = false;
                     follow_button.setText("+ FOLLOW      ");
                     SendUserUnfollow userUnfollow = new SendUserUnfollow(UserProfileActivity.this);
-                    userUnfollow.execute(uid, uid_viewing);
+                    userUnfollow.execute(uid_viewer, uid);
                 }
             }
         });
@@ -76,13 +83,35 @@ public class UserProfileActivity extends AppCompatActivity {
         emailview=(TextView)findViewById(R.id.email);
         toolbar = (Toolbar) findViewById(R.id.tool_bar);
         profile = (ImageView)findViewById(R.id.profile_picture);
-
+        profile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final Dialog dialogLogout = new Dialog(UserProfileActivity.this);
+                dialogLogout.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                dialogLogout.setContentView(R.layout.dialog_changepic);
+                final EditText pin_txt = (EditText) dialogLogout.findViewById(R.id.pin_txt);
+                Button update = (Button) dialogLogout.findViewById(R.id.update);
+                update.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (pin_txt.getText().toString().length() != 6) {
+                            Toast.makeText(signUp.this, "Wrong Pincode", Toast.LENGTH_SHORT).show();
+                        } else {
+                            RetrieveConstitutency rcc = new RetrieveConstitutency(signUp.this, signUp.this);
+                            dialogLogout.dismiss();
+                            rcc.execute(pin_txt.getText().toString());
+                        }
+                    }
+                });
+                dialogLogout.show();
+            }
+        });
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Profile");
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         RetrieveUserProfile rup = new RetrieveUserProfile(this);
-        rup.execute(uid);
+        rup.execute(uid_viewer, uid);
     }
 
     @Override
@@ -141,32 +170,12 @@ public class UserProfileActivity extends AppCompatActivity {
             createUIForFollowed(campsFollowed);
             nameview.setText(name);
             emailview.setText(email);
-            final ScrollView parent_scroll = (ScrollView) findViewById(R.id.parent_scroll);
-            parent_scroll.setOnTouchListener(new View.OnTouchListener() {
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    findViewById(R.id.scroll_content).getParent().requestDisallowInterceptTouchEvent(true);
-                    return false;
-                }
-            });
-            ScrollView scrollView = (ScrollView) findViewById(R.id.scroll_content);
             TextView const_view = (TextView)findViewById(R.id.consti);
             TextView numCamps = (TextView)findViewById(R.id.num_campaigns);
             TextView numConnect = (TextView)findViewById(R.id.num_connections);
             TextView hash = (TextView) findViewById(R.id.feed);
-            if (obj.getJSONArray("feed").length()>0){
-                scrollView.setVisibility(View.VISIBLE);
-                scrollView.setOnTouchListener(new View.OnTouchListener() {
-                    @Override
-                    public boolean onTouch(View v, MotionEvent event) {
-                        findViewById(R.id.scroll_content).getParent().requestDisallowInterceptTouchEvent(true);
-                        return false;
-                    }
-                });
-                for (int i=0; i<obj.getJSONArray("feed").length(); i++){
-                    hash.setText(hash.getText().toString()+obj.getJSONArray("feed").getJSONObject(i).getString("content")+"\n\n");
-                }
-            }
+            if (obj.getJSONArray("feed").length()>0)
+                hash.setText(obj.getJSONArray("feed").getJSONObject(0).getString("content"));
             //hash.setText(obj.getJSONArray("feed").getJSONObject(0).getString("content"));
             if (const_view != null) {
                 const_view.setText(constituency);

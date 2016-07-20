@@ -133,25 +133,25 @@ public class CommentActivity extends Activity implements callUserProfile {
                 s.getJSONArray("against").getJSONObject(i).put("which", "against");
                 total.put(s.getJSONArray("against").getJSONObject(i));
             }
-            Log.e("TOTAL_UPDATED", total.toString());
+//            Log.e("TOTAL_UPDATED", total.toString());
             for (int j = 0; j<array_dates.length; j++) {
                 for (int k = 0; k < array_dates.length; k++){
                     if (array_dates[j].getTime() < array_dates[k].getTime()) {
                         Date buffer = array_dates[j];
                         JSONObject buffer_json = total.getJSONObject(j);
                         array_dates[j] = array_dates[k];
-                        Log.e("BUFFER_JSON", buffer_json.toString());
-                        Log.e("TOTAL_J", total.get(j).toString());
-                        Log.e("TOTAL_K", total.get(k).toString());
+//                        Log.e("BUFFER_JSON", buffer_json.toString());
+//                        Log.e("TOTAL_J", total.get(j).toString());
+//                        Log.e("TOTAL_K", total.get(k).toString());
                         total.put(j, total.get(k));
                         total.put(k, buffer_json);
-                        Log.e("TOTAL_J", total.get(j).toString());
-                        Log.e("TOTAL_K", total.get(k).toString());
+//                        Log.e("TOTAL_J", total.get(j).toString());
+//                        Log.e("TOTAL_K", total.get(k).toString());
                         array_dates[k] = buffer;
                     }
                 }
             }
-            Log.e("TOTAL_UPDATED", total.toString());
+//            Log.e("TOTAL_UPDATED", total.toString());
             s.put("total_sorted", total);
         } catch (JSONException e) {
             e.printStackTrace();
@@ -176,7 +176,7 @@ public class CommentActivity extends Activity implements callUserProfile {
         }else{
             cca.categorynam = s;
             cca.notifyDataSetChanged();
-            Log.e("DATASET", "Changed");
+//            Log.e("DATASET", "Changed");
         }
     }
 

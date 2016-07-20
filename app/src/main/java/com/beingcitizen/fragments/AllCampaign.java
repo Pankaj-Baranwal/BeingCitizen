@@ -25,7 +25,6 @@ import com.beingcitizen.adapters.CampaignAdapter;
 import com.beingcitizen.beingcitizen.CreateCampaign;
 import com.beingcitizen.interfaces.adapterUpdate;
 import com.beingcitizen.interfaces.retrieveCamp;
-import com.beingcitizen.interfaces.retrieveCampaign;
 import com.beingcitizen.retrieveals.RetrieveCampaign;
 import com.beingcitizen.retrieveals.SendHashTag;
 import com.facebook.FacebookSdk;
@@ -40,11 +39,10 @@ import org.json.JSONObject;
 /**
  * Created by saransh on 22-06-2015.
  */
-public class AllCampaign extends Fragment implements retrieveCampaign, retrieveCamp, adapterUpdate {
+public class AllCampaign extends Fragment implements retrieveCamp, adapterUpdate {
     private ListView userList;
     View rootView;
     String uid = "16", pinCode= "110007";
-
     String consti="New Delhi";
     CampaignAdapter cA;
 
@@ -135,17 +133,6 @@ public class AllCampaign extends Fragment implements retrieveCampaign, retrieveC
         super.onResume();
     }
 
-    @Override
-    public void constituency(JSONObject s) {
-        JSONArray namearray;
-        try {
-            namearray = s.getJSONObject("const").names();
-            consti = namearray.getString(0);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
     public void functions_tag(JSONObject s) {
         Toast.makeText(getContext(), "Feed sent", Toast.LENGTH_SHORT).show();
     }
@@ -159,6 +146,8 @@ public class AllCampaign extends Fragment implements retrieveCampaign, retrieveC
                     JSONArray jASorted = new JSONArray();
                     JSONArray jAExtra = new JSONArray();
                     jA = param.getJSONArray("campaigns");
+                    SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getContext());
+                    consti = sp.getString("constituency", "Burari");
                     for (int i = 0; i < jA.length(); i++) {
                         if (jA.getJSONObject(i).getString("cconstituency").contentEquals(consti)) {
                             jASorted.put(jA.getJSONObject(i));

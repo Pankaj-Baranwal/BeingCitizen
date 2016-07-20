@@ -154,7 +154,7 @@ public class CampaignExpanded extends AppCompatActivity implements CampaignRelat
                     uid_creator = s.getJSONArray("campDetails").getJSONObject(0).getString("started_by");
                     //campaign_id = s.getJSONArray("campDetails").getJSONObject(0).getString("campaign_id");
                     CircleImageView user_pic = (CircleImageView) findViewById(R.id.user_pic);
-                    CircleImageView level_img = (CircleImageView) findViewById(R.id.game_img);
+                    ImageView level_img = (ImageView) findViewById(R.id.game_img);
                     title.setText(s.getJSONArray("campDetails").getJSONObject(0).getString("cname"));
                     username.setText(s.getJSONArray("campDetails").getJSONObject(0).getString("name"));
                     time_posted.setText("Posted at " + s.getJSONArray("campDetails").getJSONObject(0).getString("created_at"));
