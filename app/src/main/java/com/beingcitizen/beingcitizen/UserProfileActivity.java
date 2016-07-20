@@ -1,15 +1,25 @@
 package com.beingcitizen.beingcitizen;
 
 import android.app.Dialog;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Matrix;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.InputFilter;
+import android.util.Base64;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.Menu;
@@ -17,23 +27,37 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.beingcitizen.R;
-import com.beingcitizen.retrieveals.RetrieveConstitutency;
 import com.beingcitizen.retrieveals.RetrieveUserProfile;
 import com.beingcitizen.retrieveals.SendUserFollow;
 import com.beingcitizen.retrieveals.SendUserUnfollow;
+import com.github.clans.fab.FloatingActionButton;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by saransh on 12-07-2015.
@@ -46,6 +70,8 @@ public class UserProfileActivity extends AppCompatActivity {
     String uid = "16", uid_viewer = "16";
     TextView follow_button;
     boolean followed = false;
+    Bitmap bitmap=null;
+    String iname;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,17 +115,34 @@ public class UserProfileActivity extends AppCompatActivity {
                 final Dialog dialogLogout = new Dialog(UserProfileActivity.this);
                 dialogLogout.requestWindowFeature(Window.FEATURE_NO_TITLE);
                 dialogLogout.setContentView(R.layout.dialog_changepic);
-                final EditText pin_txt = (EditText) dialogLogout.findViewById(R.id.pin_txt);
-                Button update = (Button) dialogLogout.findViewById(R.id.update);
+                FloatingActionButton fab_camera = (FloatingActionButton) dialogLogout.findViewById(R.id.fab_camera);
+                FloatingActionButton fab_gallery = (FloatingActionButton) dialogLogout.findViewById(R.id.fab_gallery);
+                fab_camera.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                        File f = new File(Environment.getExternalStorageDirectory(), "temp.jpg");
+                        intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(f));
+                        startActivityForResult(intent, 1);
+                        dialogLogout.dismiss();
+                    }
+                });
+                fab_gallery.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                        startActivityForResult(intent, 2);
+                        dialogLogout.dismiss();
+                    }
+                });
+                Button update = (Button)dialogLogout.findViewById(R.id.update);
                 update.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if (pin_txt.getText().toString().length() != 6) {
-                            Toast.makeText(signUp.this, "Wrong Pincode", Toast.LENGTH_SHORT).show();
-                        } else {
-                            RetrieveConstitutency rcc = new RetrieveConstitutency(signUp.this, signUp.this);
-                            dialogLogout.dismiss();
-                            rcc.execute(pin_txt.getText().toString());
+                        if (bitmap!=null){
+                            sendUserImage();
+                        }else{
+                            Toast.makeText(UserProfileActivity.this, "Choose Image first!", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -185,6 +228,13 @@ public class UserProfileActivity extends AppCompatActivity {
             }
             if (numCamps != null) {
                 numCamps.setText(campsFollowed.length()+"");
+            }
+            JSONArray following = obj.getJSONArray("followed");
+            for (int i=0; i<following.length(); i++){
+                if (following.getJSONObject(i).getString("user_id").contentEquals(uid_viewer)){
+                    followed = true;
+                    follow_button.setText("  FOLLOWED    ");
+                }
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -325,4 +375,161 @@ public class UserProfileActivity extends AppCompatActivity {
             }
         }
     }
+
+    void sendUserImage(){
+        final Dialog dialog = new Dialog(UserProfileActivity.this);
+        dialog.setContentView(R.layout.dialog_progress);
+        dialog.setTitle("Updating Index");
+        dialog.show();
+        StringRequest myReq = new StringRequest(Request.Method.POST,
+                "http://beingcitizen.com/bc/index.php/main/editPhoto",
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        dialog.dismiss();
+                        finish();
+                        Log.e("RESPONSE", response);
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(UserProfileActivity.this, "Error Uploading", Toast.LENGTH_SHORT).show();
+                        dialog.dismiss();
+                        finish();
+                        Log.e("RESPONSE", "ERROR!");
+                    }
+                }) {
+            protected Map<String, String> getParams() throws com.android.volley.AuthFailureError {
+                SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(UserProfileActivity.this);
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("uid", sp.getString("id", "17"));
+                params.put("iname", iname);
+                params.put("image", getStringImage(bitmap));
+                params.put("ext", ".JPG");
+                return params;
+            };
+        };
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(myReq);
+    }
+
+    public String getStringImage(Bitmap bmp){
+        int width = bmp.getWidth();
+        int height = bmp.getHeight();
+        float scaleWidth = (float) 0.25;
+        float scaleHeight = (float) 0.25;
+        // CREATE A MATRIX FOR THE MANIPULATION
+        Matrix matrix = new Matrix();
+        // RESIZE THE BIT MAP
+        matrix.postScale(scaleWidth, scaleHeight);
+
+        // "RECREATE" THE NEW BITMAP
+        Bitmap resizedBitmap = Bitmap.createBitmap(
+                bmp, 0, 0, width, height, matrix, false);
+        bmp = resizedBitmap;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bmp.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        byte[] imageBytes = baos.toByteArray();
+        return Base64.encodeToString(imageBytes, Base64.DEFAULT);
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        //dialogLogout.dismiss();
+        if (resultCode == RESULT_OK) {
+            if (requestCode == 1) {
+                File f = new File(Environment.getExternalStorageDirectory().toString());
+                for (File temp : f.listFiles()) {
+                    if (temp.getName().equals("temp.jpg")) {
+                        f = temp;
+                        break;
+                    }
+                }
+                try {
+                    BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
+                    bitmapOptions.inJustDecodeBounds = true;
+                    BitmapFactory.decodeFile(f.getAbsolutePath(),
+                            bitmapOptions);
+                    bitmapOptions.inSampleSize = calculateInSampleSize(bitmapOptions, 256, 256);
+                    bitmapOptions.inJustDecodeBounds = false;
+                    bitmap = BitmapFactory.decodeFile(f.getAbsolutePath(),
+                            bitmapOptions);
+
+                    profile.setImageBitmap(bitmap);
+
+                    String path = Environment
+                            .getExternalStorageDirectory()
+                            + File.separator
+                            + "Phoenix" + File.separator + "default";
+                    f.delete();
+                    OutputStream outFile = null;
+                    iname = String.valueOf(System.currentTimeMillis());
+                    File file = new File(path, iname + ".jpg");
+                    try {
+                        outFile = new FileOutputStream(file);
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 85, outFile);
+                        outFile.flush();
+                        outFile.close();
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } else if (requestCode == 2) {
+
+                Uri selectedImage = data.getData();
+                String[] filePath = {MediaStore.Images.Media.DATA};
+                Cursor c = getContentResolver().query(selectedImage, filePath, null, null, null);
+                c.moveToFirst();
+                int columnIndex = c.getColumnIndex(filePath[0]);
+                String picturePath = c.getString(columnIndex);
+                Log.e("PICTURE", picturePath);
+                c.close();
+                BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
+                bitmapOptions.inJustDecodeBounds = true;
+                BitmapFactory.decodeFile(picturePath, bitmapOptions);
+                bitmapOptions.inSampleSize = calculateInSampleSize(bitmapOptions, 256, 256);
+                bitmapOptions.inJustDecodeBounds = false;
+                bitmap = BitmapFactory.decodeFile(picturePath, bitmapOptions);
+                Log.e("path of image", picturePath + "");
+                iname = picturePath;
+                profile.setImageBitmap(bitmap);
+            }
+        }
+        Log.e("Picture Path", iname);
+    }
+
+    public static int calculateInSampleSize(
+            BitmapFactory.Options options, int reqWidth, int reqHeight) {
+        // Raw height and width of image
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampleSize = 1;
+
+        if (height > reqHeight || width > reqWidth) {
+
+            final int halfHeight = height / 2;
+            final int halfWidth = width / 2;
+
+            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+            // height and width larger than the requested height and width.
+            while ((halfHeight / inSampleSize) > reqHeight
+                    && (halfWidth / inSampleSize) > reqWidth) {
+                inSampleSize *= 2;
+            }
+        }
+
+        return inSampleSize;
+    }
+
+
 }

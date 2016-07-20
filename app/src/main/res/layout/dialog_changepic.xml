@@ -1,6 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
+    <TextView
+        android:id="@+id/dialog_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="User Image"
+        android:textColor="#FFFFFF"
+        android:textSize="25sp"
+        android:background="#FDA626"
+        android:paddingLeft="6dp"
+        />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Choose an option:"
+        android:textColor="#000000"
+        android:textSize="18sp"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        />
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:orientation="horizontal"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        >
+    <com.github.clans.fab.FloatingActionButton
+        android:id="@+id/fab_gallery"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:src="@mipmap/gallery"
+        fab:fab_label="Gallery"
+        fab:fab_size="normal"
+        fab:fab_colorNormal="#000000"
+        fab:fab_colorPressed="#FDA626"
+        fab:fab_colorRipple="#99FFFFFF"/>
+
+    <com.github.clans.fab.FloatingActionButton
+        android:id="@+id/fab_camera"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:src="@mipmap/camera"
+        fab:fab_label="Camera"
+        fab:fab_size="normal"
+        fab:fab_colorNormal="#000000"
+        fab:fab_colorPressed="#E55101"
+        fab:fab_colorRipple="#99FFFFFF"/>
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/update"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#FDA626"
+        android:text="Update"
+        android:textColor="@color/white"
+        android:textStyle="bold"
+        android:textSize="15sp"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        />
 
 </LinearLayout>
