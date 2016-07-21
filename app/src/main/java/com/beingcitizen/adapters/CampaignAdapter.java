@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.CardView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,25 +14,26 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.beingcitizen.R;
 import com.beingcitizen.beingcitizen.CampaignExpanded;
 import com.beingcitizen.beingcitizen.CommentActivity;
 import com.beingcitizen.fragments.AllCampaign;
-import com.beingcitizen.interfaces.CampaignRelated;
+import com.beingcitizen.retrieveals.SendFollowCampaign;
+import com.beingcitizen.retrieveals.SendUnfollowCampaign;
+import com.beingcitizen.retrieveals.SendUnvolunteerCampaign;
+import com.beingcitizen.retrieveals.SendVolunteerCampaign;
 import com.rey.material.widget.ProgressView;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * Created by saransh on 23-06-2015.
  */
-public class CampaignAdapter extends BaseAdapter implements CampaignRelated{
+public class CampaignAdapter extends BaseAdapter{
     private Context mContext;
     public JSONArray categorynam;
     String campaign_id="30", uid = "16";
@@ -111,14 +113,14 @@ public class CampaignAdapter extends BaseAdapter implements CampaignRelated{
 
                 }
             });
-            if (categorynam.getJSONObject(position).getString("c_id").contentEquals(campaign_id+"")){
+            if (categorynam.getJSONObject(position).getString("c_id").contentEquals(uid)){
                 likeable = true;
                 like.setBackgroundResource(R.drawable.like_on);
             }else {
                 likeable = false;
                 like.setBackgroundResource(R.drawable.like);
             }
-            if (categorynam.getJSONObject(position).getString("camid").contentEquals(campaign_id+"")){
+            if (categorynam.getJSONObject(position).getString("camid").contentEquals(uid)){
                 volunteerable = true;
                 volunteer.setBackgroundResource(R.drawable.volunteer_on);
             }else {
@@ -144,6 +146,21 @@ public class CampaignAdapter extends BaseAdapter implements CampaignRelated{
             }
             foll = categorynam.getJSONObject(position).getString("c_id");
             volun =categorynam.getJSONObject(position).getString("camid");
+            if (foll.contentEquals(uid)){
+                likeable = false;
+                like.setBackgroundResource(R.drawable.like_on);
+            }else{
+                likeable = true;
+                like.setBackgroundResource(R.drawable.like);
+            }
+            if (volun.contentEquals(uid)){
+                volunteerable = false;
+                volunteer.setBackgroundResource(R.drawable.volunteer_on);
+            }else{
+                volunteerable = true;
+                volunteer.setBackgroundResource(R.drawable.volunteer);
+            }
+
             campaign_id = categorynam.getJSONObject(position).getString("campaign_id");
             title.setText(categorynam.getJSONObject(position).getString("cname"));
             city_name.setText(categorynam.getJSONObject(position).getString("cconstituency"));
@@ -153,6 +170,7 @@ public class CampaignAdapter extends BaseAdapter implements CampaignRelated{
             info_campaign.setText(campaign_text);
             String cat = categorynam.getJSONObject(position).getString("category");
             category.setText(cat.length()<22?cat:cat.substring(0, 22)+"...");
+            Log.e("Categ", cat);
             switch (cat){
                 case "Law and Order":
                     category_img.setImageResource(R.drawable.public_law_and_order_black);
@@ -192,24 +210,45 @@ public class CampaignAdapter extends BaseAdapter implements CampaignRelated{
         like.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                try {
+                    campaign_id = categorynam.getJSONObject(position).getString("campaign_id");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                Log.e("LIKE", likeable+" "+ uid+" "+ campaign_id);
                 if (likeable){
                     like.setImageResource(R.drawable.like_on);
                     likeable = false;
+                    SendFollowCampaign sfc = new SendFollowCampaign();
+                    sfc.execute(uid, campaign_id);
+
                 }else{
                     like.setImageResource(R.drawable.like);
                     likeable = true;
+                    SendUnfollowCampaign sendUnfollowCampaign = new SendUnfollowCampaign();
+                    sendUnfollowCampaign.execute(uid, campaign_id);
                 }
             }
         });
         volunteer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                try {
+                    campaign_id = categorynam.getJSONObject(position).getString("campaign_id");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                Log.e("VOLUNTEER", volunteerable+" "+ uid+" "+ campaign_id);
                 if (volunteerable){
                     volunteer.setImageResource(R.drawable.volunteer_on);
                     volunteerable = false;
+                    SendVolunteerCampaign svc = new SendVolunteerCampaign();
+                    svc.execute(uid, campaign_id);
                 }else{
                     volunteer.setImageResource(R.drawable.volunteer);
                     volunteerable = true;
+                    SendUnvolunteerCampaign svc = new SendUnvolunteerCampaign();
+                    svc.execute(uid, campaign_id);
                 }
             }
         });
@@ -232,6 +271,11 @@ public class CampaignAdapter extends BaseAdapter implements CampaignRelated{
             @Override
             public void onClick(View v) {
                 // TODO Auto-generated method stub
+                try {
+                    campaign_id = categorynam.getJSONObject(position).getString("campaign_id");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
                 Intent i = new Intent(mContext, CommentActivity.class);
                 i.putExtra("campaign_id", campaign_id);
                 mContext.startActivity(i);
@@ -239,58 +283,5 @@ public class CampaignAdapter extends BaseAdapter implements CampaignRelated{
         });
 
         return rowView;
-    }
-
-    public void follow_function(JSONObject param) {
-        if (param.has("status")){
-            try {
-                if (param.getString("status").contentEquals("true")) {
-                    Toast.makeText(mContext, "Followed", Toast.LENGTH_SHORT).show();
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }else{
-            Toast.makeText(mContext, "Unable to process", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    public void volunteer_function(JSONObject param) {
-        if (param.has("status")){
-            try {
-                if (param.getString("status").contentEquals("true")) {
-                    Toast.makeText(mContext, "Volunteered", Toast.LENGTH_SHORT).show();
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }else
-            Toast.makeText(mContext, "Unable to process", Toast.LENGTH_SHORT).show();
-    }
-
-    public void unfollow_function(JSONObject param) {
-        if (param.has("status")){
-            try {
-                if (param.getString("status").contentEquals("true")) {
-                    Toast.makeText(mContext, "UnFollowed", Toast.LENGTH_SHORT).show();
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }else
-            Toast.makeText(mContext, "Unable to process", Toast.LENGTH_SHORT).show();
-    }
-
-    public void unvolunteer_function(JSONObject param) {
-        if (param.has("status")){
-            try {
-                if (param.getString("status").contentEquals("true")) {
-
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }else
-            Toast.makeText(mContext, "Unable to process", Toast.LENGTH_SHORT).show();
     }
 }

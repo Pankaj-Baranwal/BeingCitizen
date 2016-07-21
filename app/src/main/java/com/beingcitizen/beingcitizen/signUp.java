@@ -226,7 +226,6 @@ public class signUp extends Activity implements retrieveCampaign, signUp_interfa
         }else{
             edit.putString("mla_id", "No_mla_id");
             edit.apply();
-            Toast.makeText(signUp.this, "No MLA found!", Toast.LENGTH_SHORT).show();
         }
     }
 

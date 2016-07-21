@@ -112,41 +112,42 @@ public class UserProfileActivity extends AppCompatActivity {
         profile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final Dialog dialogLogout = new Dialog(UserProfileActivity.this);
-                dialogLogout.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                dialogLogout.setContentView(R.layout.dialog_changepic);
-                FloatingActionButton fab_camera = (FloatingActionButton) dialogLogout.findViewById(R.id.fab_camera);
-                FloatingActionButton fab_gallery = (FloatingActionButton) dialogLogout.findViewById(R.id.fab_gallery);
-                fab_camera.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                        File f = new File(Environment.getExternalStorageDirectory(), "temp.jpg");
-                        intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(f));
-                        startActivityForResult(intent, 1);
-                        dialogLogout.dismiss();
-                    }
-                });
-                fab_gallery.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                        startActivityForResult(intent, 2);
-                        dialogLogout.dismiss();
-                    }
-                });
-                Button update = (Button)dialogLogout.findViewById(R.id.update);
-                update.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (bitmap!=null){
-                            sendUserImage();
-                        }else{
-                            Toast.makeText(UserProfileActivity.this, "Choose Image first!", Toast.LENGTH_SHORT).show();
+                if (uid.contentEquals(uid_viewer)) {
+                    final Dialog dialogLogout = new Dialog(UserProfileActivity.this);
+                    dialogLogout.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                    dialogLogout.setContentView(R.layout.dialog_changepic);
+                    FloatingActionButton fab_camera = (FloatingActionButton) dialogLogout.findViewById(R.id.fab_camera);
+                    FloatingActionButton fab_gallery = (FloatingActionButton) dialogLogout.findViewById(R.id.fab_gallery);
+                    fab_camera.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                            File f = new File(Environment.getExternalStorageDirectory(), "temp.jpg");
+                            intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(f));
+                            startActivityForResult(intent, 1);
                         }
-                    }
-                });
-                dialogLogout.show();
+                    });
+                    fab_gallery.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                            startActivityForResult(intent, 2);
+                        }
+                    });
+                    Button update = (Button) dialogLogout.findViewById(R.id.update);
+                    update.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            if (bitmap != null) {
+                                sendUserImage();
+                                dialogLogout.dismiss();
+                            } else {
+                                Toast.makeText(UserProfileActivity.this, "Choose Image first!", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+                    dialogLogout.show();
+                }
             }
         });
         setSupportActionBar(toolbar);
@@ -217,8 +218,11 @@ public class UserProfileActivity extends AppCompatActivity {
             TextView numCamps = (TextView)findViewById(R.id.num_campaigns);
             TextView numConnect = (TextView)findViewById(R.id.num_connections);
             TextView hash = (TextView) findViewById(R.id.feed);
-            if (obj.getJSONArray("feed").length()>0)
+            TextView hash_tag = (TextView) findViewById(R.id.hash_tag);
+            if (obj.getJSONArray("feed").length()>0) {
                 hash.setText(obj.getJSONArray("feed").getJSONObject(0).getString("content"));
+                hash_tag.setText(obj.getJSONArray("feed").getJSONObject(0).getString("tag"));
+            }
             //hash.setText(obj.getJSONArray("feed").getJSONObject(0).getString("content"));
             if (const_view != null) {
                 const_view.setText(constituency);
@@ -229,12 +233,9 @@ public class UserProfileActivity extends AppCompatActivity {
             if (numCamps != null) {
                 numCamps.setText(campsFollowed.length()+"");
             }
-            JSONArray following = obj.getJSONArray("followed");
-            for (int i=0; i<following.length(); i++){
-                if (following.getJSONObject(i).getString("user_id").contentEquals(uid_viewer)){
-                    followed = true;
-                    follow_button.setText("  FOLLOWED    ");
-                }
+            if (obj.getString("follow").contentEquals("true")) {
+                followed = true;
+                follow_button.setText("  FOLLOWED    ");
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -387,7 +388,6 @@ public class UserProfileActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(String response) {
                         dialog.dismiss();
-                        finish();
                         Log.e("RESPONSE", response);
                     }
                 },
@@ -396,7 +396,6 @@ public class UserProfileActivity extends AppCompatActivity {
                     public void onErrorResponse(VolleyError error) {
                         Toast.makeText(UserProfileActivity.this, "Error Uploading", Toast.LENGTH_SHORT).show();
                         dialog.dismiss();
-                        finish();
                         Log.e("RESPONSE", "ERROR!");
                     }
                 }) {
@@ -404,9 +403,9 @@ public class UserProfileActivity extends AppCompatActivity {
                 SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(UserProfileActivity.this);
                 Map<String, String> params = new HashMap<String, String>();
                 params.put("uid", sp.getString("id", "17"));
-                params.put("iname", iname);
+                params.put("iname", uid_viewer);
                 params.put("image", getStringImage(bitmap));
-                params.put("ext", ".JPG");
+                params.put("ext", ".jpg");
                 return params;
             };
         };
@@ -485,13 +484,14 @@ public class UserProfileActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
             } else if (requestCode == 2) {
-
                 Uri selectedImage = data.getData();
                 String[] filePath = {MediaStore.Images.Media.DATA};
                 Cursor c = getContentResolver().query(selectedImage, filePath, null, null, null);
                 c.moveToFirst();
                 int columnIndex = c.getColumnIndex(filePath[0]);
                 String picturePath = c.getString(columnIndex);
+                File f = new File(picturePath);
+                iname = f.getName();
                 Log.e("PICTURE", picturePath);
                 c.close();
                 BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
@@ -501,7 +501,6 @@ public class UserProfileActivity extends AppCompatActivity {
                 bitmapOptions.inJustDecodeBounds = false;
                 bitmap = BitmapFactory.decodeFile(picturePath, bitmapOptions);
                 Log.e("path of image", picturePath + "");
-                iname = picturePath;
                 profile.setImageBitmap(bitmap);
             }
         }

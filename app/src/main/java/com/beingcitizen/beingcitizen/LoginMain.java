@@ -76,7 +76,7 @@ public class LoginMain extends Activity implements GoogleApiClient.ConnectionCal
     private LoginButton fb_signin;
     private static final int RC_SIGN_IN = 0;
     private static final String TAG = LoginMain.class.getSimpleName();
-    private String facebook_id,f_name, m_name, l_name, profile_image, full_name, email_id;
+    private String facebook_id,f_name, m_name, l_name, profile_image, full_name, email_id="No_Email_ID";
     private boolean mIntentInProgress;
     private boolean mSignInClicked;
     private ConnectionResult mConnectionResult;
@@ -85,13 +85,13 @@ public class LoginMain extends Activity implements GoogleApiClient.ConnectionCal
     CallbackManager callbackManager;
     private static final int PROFILE_PIC_SIZE = 120;
     ArrayAdapter<String> adapter;
-    String name, password, email="No_Email_ID", gender, uid = "16";
+    String name, password, gender, uid = "16";
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        sharedpreferences = PreferenceManager.getDefaultSharedPreferences(LoginMain.this);
 
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -246,9 +246,10 @@ When the request is completed, a callback is called to handle the success condit
                         try {
                             //JSONArray namearray = json_object.names();
                             if (json_object.has("email")) {
+                                Log.e("email_fb", json_object.getString("email"));
                                 email_id = json_object.getString("email");
                             } else {
-                                email_id = json_object.getString("id");
+                                email_id = json_object.getString("name");
                             }
                             gender = json_object.getString("gender");
                             name = json_object.getString("name");
@@ -310,14 +311,11 @@ When the request is completed, a callback is called to handle the success condit
                     if (content[0].contentEquals("err")){
                         Toast.makeText(LoginMain.this, "Choose constituency", Toast.LENGTH_SHORT).show();
                     }else {
-                        SharedPreferences sharedpreferences = PreferenceManager.getDefaultSharedPreferences(LoginMain.this);
                         SharedPreferences.Editor edit = sharedpreferences.edit();
                         edit.putString("constituency", content[0]);
                         edit.apply();
                         RetrieveMlaID rmlaid = new RetrieveMlaID(LoginMain.this, LoginMain.this);
                         rmlaid.execute(content[0]);
-                        RetrieveSignUp rsup = new RetrieveSignUp(LoginMain.this, LoginMain.this);
-                        rsup.execute(name.replace(" ", "%20"), email, password.replace(" ", "%20"), gender, content[0].replace(" ", "%20"));
                         dialogLogout.dismiss();
                     }
                 }
@@ -352,7 +350,7 @@ When the request is completed, a callback is called to handle the success condit
             try {
                 if (obj.getString("status").contentEquals("Already used email")) {
                     RetrieveFeedTask rft = new RetrieveFeedTask(this);
-                    rft.execute(email, "password");
+                    rft.execute(email_id, "password");
                 }else{
                     Toast.makeText(LoginMain.this, "Error Signing in", Toast.LENGTH_SHORT).show();
                 }
@@ -607,7 +605,7 @@ getProfileInfo();
 
         name = currentPerson.getDisplayName();
         String personPhotoUrl = currentPerson.getImage().getUrl();
-        email = Plus.AccountApi.getAccountName(googleApiClient);
+        email_id = Plus.AccountApi.getAccountName(googleApiClient);
         gender = currentPerson.getGender()==2?"Female":"Male";
         password = "password";
         final Dialog dialogLogout = new Dialog(LoginMain.this);
@@ -646,9 +644,10 @@ getProfileInfo();
             edit.putString("mla_id", mlaID);
         }else{
             edit.putString("mla_id", "No_mla_id");
-            Toast.makeText(LoginMain.this, "No MLA found!", Toast.LENGTH_SHORT).show();
         }
         edit.apply();
+        RetrieveSignUp rsup = new RetrieveSignUp(LoginMain.this, LoginMain.this);
+        rsup.execute(name.replace(" ", "%20"), email_id, password.replace(" ", "%20"), gender, sharedpreferences.getString("constituency", "").replace(" ", "%20"));
     }
 
     @Override
@@ -667,9 +666,6 @@ getProfileInfo();
                 e.printStackTrace();
                 Log.e("ERROR", "Error in storing to shared prefs");
             }
-            Intent i = new Intent(getBaseContext(), MainActivity.class);
-            startActivity(i);
-            finish();
         } else {
             Toast.makeText(this, "Incorrect details", Toast.LENGTH_SHORT).show();
         }

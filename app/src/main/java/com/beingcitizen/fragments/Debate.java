@@ -4,6 +4,7 @@ package com.beingcitizen.fragments;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,7 +17,6 @@ import com.beingcitizen.R;
 import com.beingcitizen.adapters.DebateAdapter;
 import com.beingcitizen.retrieveals.RetrieveAllDebates;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
@@ -27,16 +27,23 @@ public class Debate extends Fragment {
     String uid = "16";
     //String TITLES[] = {"Public Law & Order","Police","Public Health & Sanitation","Local Government","Communications – Roads & Bridges"
       //      ,"Water Supplies","Industries","Markets & Fairs","Trade & Commerce (within State)","State Taxes (Electricity, Land, Roads, Toll)"};
+
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        SharedPreferences sharedpreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        if (sharedpreferences.contains("id"))
+            uid = sharedpreferences.getString("id", "16");
+        else
+            Toast.makeText(getContext(), "No UID stored", Toast.LENGTH_SHORT).show();
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.alldebates, container, false);
         userList = (ListView) rootView.findViewById(R.id.debate_listview);
-        SharedPreferences sharedpreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-        if (sharedpreferences.contains("id"))
-        uid = sharedpreferences.getString("id", "16");
-        else
-            Toast.makeText(getContext(), "No UID stored", Toast.LENGTH_SHORT).show();
         setHasOptionsMenu(true);
         RetrieveAllDebates radb = new RetrieveAllDebates(Debate.this);
         radb.execute(uid);

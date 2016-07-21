@@ -42,7 +42,7 @@ public class RetrieveMlaProfile extends AsyncTask<String, Void, String> {
             JSONObject obj = new JSONObject(s);
             context.functions(obj);
         } catch (JSONException e) {
-            Log.e("MLA", "Retrieval failed");
+            Log.getStackTraceString(e);
             Toast.makeText(context, "Error retrieving data", Toast.LENGTH_SHORT).show();
             e.printStackTrace();
         }

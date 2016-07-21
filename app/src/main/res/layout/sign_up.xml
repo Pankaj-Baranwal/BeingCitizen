@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="#000000"
     android:gravity="center_horizontal"
     android:orientation="vertical">
@@ -163,19 +164,22 @@
             android:layout_gravity="center_horizontal">
 
 
-            <Button
+            <com.rey.material.widget.Button
                 android:id="@+id/button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
                 android:background="#EE7E1B"
-                android:onClick="onClickSign"
                 android:padding="5dp"
                 android:text="Sign up"
-                android:textAllCaps="false"
                 android:textColor="#FFFFFF"
+                android:textAllCaps="false"
                 android:textSize="17dp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                app:rd_enable = "true"
+                app:rd_style = "@style/Material.Drawable.Ripple.Wave"
+                app:rd_rippleType = "wave"
+                />
 
 
             </LinearLayout>

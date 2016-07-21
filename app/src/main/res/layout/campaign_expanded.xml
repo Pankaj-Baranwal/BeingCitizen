@@ -286,7 +286,7 @@
                             android:layout_gravity="bottom"
                             android:padding="14dp"
                             android:gravity="bottom"
-                            android:text="View all comments"
+                            android:text="Comment on this"
                             />
 
 

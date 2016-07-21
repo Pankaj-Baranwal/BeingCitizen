@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.CardView;
 import android.util.Log;
@@ -39,20 +40,10 @@ public class Polls  extends Fragment {
     TextView poll_title;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        //setHasOptionsMenu(true);
-        rootView = inflater.inflate(R.layout.allpolls_listcell, container, false);
-
-        cardView=(CardView) rootView.findViewById(R.id.CardView_allpolls);
-        cardView.setRadius(16.0f);
-        cardView.setCardElevation(16.0f);
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
         SharedPreferences sharedpreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
         final String uid =  sharedpreferences.getString("id", "16");
-        pieChart = (PieChart) rootView.findViewById(R.id.piechart);
-        yes = (LinearLayout) rootView.findViewById(R.id.btn_yes);
-        other = (LinearLayout) rootView.findViewById(R.id.btn_other);
-        no = (LinearLayout) rootView.findViewById(R.id.btn_no);
         getDetails();
         yes.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -103,6 +94,22 @@ public class Polls  extends Fragment {
                 }
             }
         });
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        //setHasOptionsMenu(true);
+        rootView = inflater.inflate(R.layout.allpolls_listcell, container, false);
+
+        cardView=(CardView) rootView.findViewById(R.id.CardView_allpolls);
+        cardView.setRadius(16.0f);
+        cardView.setCardElevation(16.0f);
+
+        pieChart = (PieChart) rootView.findViewById(R.id.piechart);
+        yes = (LinearLayout) rootView.findViewById(R.id.btn_yes);
+        other = (LinearLayout) rootView.findViewById(R.id.btn_other);
+        no = (LinearLayout) rootView.findViewById(R.id.btn_no);
 
         return rootView;
     }

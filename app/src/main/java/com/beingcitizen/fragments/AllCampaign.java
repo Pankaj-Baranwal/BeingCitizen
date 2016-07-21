@@ -1,6 +1,7 @@
 package com.beingcitizen.fragments;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -46,10 +47,10 @@ public class AllCampaign extends Fragment implements retrieveCamp, adapterUpdate
     String consti="New Delhi";
     CampaignAdapter cA;
 
+
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        facebookSDKInitialize();
+    public void onAttach(Context context) {
+        super.onAttach(context);
         userList = (ListView) rootView.findViewById(R.id.allcampaign_listview);
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
         uid = sp.getString("id", "16");
@@ -112,6 +113,12 @@ public class AllCampaign extends Fragment implements retrieveCamp, adapterUpdate
         fab_menu.setClosedOnTouchOutside(true);
     }
 
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        facebookSDKInitialize();
+    }
+
     protected void facebookSDKInitialize() {
 
         FacebookSdk.sdkInitialize(getActivity().getApplicationContext());
@@ -146,7 +153,7 @@ public class AllCampaign extends Fragment implements retrieveCamp, adapterUpdate
                     JSONArray jASorted = new JSONArray();
                     JSONArray jAExtra = new JSONArray();
                     jA = param.getJSONArray("campaigns");
-                    SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getContext());
+                    SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
                     consti = sp.getString("constituency", "Burari");
                     for (int i = 0; i < jA.length(); i++) {
                         if (jA.getJSONObject(i).getString("cconstituency").contentEquals(consti)) {

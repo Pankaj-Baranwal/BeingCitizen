@@ -1,13 +1,17 @@
 package com.beingcitizen.beingcitizen;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -16,6 +20,7 @@ import com.beingcitizen.R;
 import com.beingcitizen.retrieveals.RetrieveSingleDebate;
 import com.facebook.share.model.ShareLinkContent;
 import com.facebook.share.widget.ShareDialog;
+import com.github.clans.fab.FloatingActionButton;
 import com.rey.material.widget.ProgressView;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
@@ -26,6 +31,8 @@ import com.twitter.sdk.android.tweetcomposer.TweetComposer;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+
 import io.fabric.sdk.android.Fabric;
 
 
@@ -35,7 +42,7 @@ public class DebateExpanded extends AppCompatActivity{
     CardView cardView;
     String uid = "16", debate_id = "10";
     String nature="yes";
-    String url_img = "";
+    String url_img = "", title="", content="";
     ProgressView image_loading;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,8 +95,43 @@ public class DebateExpanded extends AppCompatActivity{
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
-        finish();
+        if (item.getItemId()==R.id.share){
+            final Dialog dialogLogout = new Dialog(this);
+            dialogLogout.requestWindowFeature(Window.FEATURE_NO_TITLE);
+            dialogLogout.setContentView(R.layout.dialog_share);
+            FloatingActionButton fb = (FloatingActionButton)dialogLogout.findViewById(R.id.fab_fb);
+            FloatingActionButton whatsapp = (FloatingActionButton)dialogLogout.findViewById(R.id.fab_whatsapp);
+            fb.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    shareOnFacebook(url_img, content, title);
+                    dialogLogout.dismiss();
+                }
+            });
+            whatsapp.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    shareOnWhatsapp(Uri.parse(url_img), content);
+                    dialogLogout.dismiss();
+                }
+            });
+            Button update = (Button) dialogLogout.findViewById(R.id.update);
+            update.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    dialogLogout.dismiss();
+                }
+            });
+            dialogLogout.show();
+        }else
+            finish();
         return true;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.share, menu);
+        return super.onCreateOptionsMenu(menu);
 
     }
 
@@ -102,9 +144,10 @@ public class DebateExpanded extends AppCompatActivity{
         TextView viewComments = (TextView) findViewById(R.id.viewComments);
         //userName.setText(s.getJSONArray("debDetails"));
         try {
+            title = s.getJSONArray("debDetails").getJSONObject(0).getString("name");
+            content =s.getJSONArray("debDetails").getJSONObject(0).getString("debate_text");
             debate_title.setText(s.getJSONArray("debDetails").getJSONObject(0).getString("name"));
             debate_content.setText(s.getJSONArray("debDetails").getJSONObject(0).getString("debate_text"));
-            viewComments.setText("View all "+s.getJSONArray("debDetails").getJSONObject(0).getString("total")+" comments");
             Float dv1 = Float.parseFloat(s.getJSONArray("debDetails").getJSONObject(0).getString("fore"));
             Float dv2 = Float.parseFloat(s.getJSONArray("debDetails").getJSONObject(0).getString("against"));
             Float per1 = dv1/(dv1+dv2);
@@ -135,11 +178,10 @@ public class DebateExpanded extends AppCompatActivity{
         }
     }
 
-    private void shareOnWhatsapp(String picture_text){
+    private void shareOnWhatsapp(Uri imageUri, String picture_text){
         /**
          * Show share dialog BOTH image and text
          */
-        Uri imageUri = Uri.parse(url_img);
         Intent shareIntent = new Intent();
         shareIntent.setAction(Intent.ACTION_SEND);
         //Target whatsapp:
@@ -157,17 +199,18 @@ public class DebateExpanded extends AppCompatActivity{
         }
     }
 
-    private void shareOnTwitter(String picture_text){
+    private void shareOnTwitter(File pictureFile, String picture_text){
         TweetComposer.Builder builder = new TweetComposer.Builder(this)
                 .text(picture_text)
-                .image(Uri.parse(url_img));
+                .image(Uri.fromFile(pictureFile));
         builder.show();
     }
 
-    private void shareOnFacebook(String text){
+    private void shareOnFacebook(String pictureFile, String text, String title){
         ShareLinkContent content = new ShareLinkContent.Builder()
-                .setContentUrl(Uri.parse("http://beingcitizen.com/Main/viewCampaign/"+debate_id))
-                .setImageUrl(Uri.parse(url_img))
+                .setContentTitle(title)
+                .setContentUrl(Uri.parse("http://beingcitizen.com/Main/viewDebate/"+debate_id))
+                .setImageUrl(Uri.parse(pictureFile))
                 .setContentDescription(text)
                 .build();
         ShareDialog.show(DebateExpanded.this, content);

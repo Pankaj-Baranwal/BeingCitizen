@@ -74,7 +74,6 @@ public class CommentAdapter extends BaseAdapter{
         try {
             if (total > 0) {
                 if (categorynam.getJSONArray("total_sorted").getJSONObject(position).getString("which").contentEquals("for")) {
-//                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT))
                     which = "for";
                     rL_user.setBackgroundColor(0xB111FF1D);
                     rL_user_against.setVisibility(View.GONE);

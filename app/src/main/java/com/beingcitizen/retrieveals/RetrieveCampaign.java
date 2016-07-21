@@ -1,12 +1,9 @@
 package com.beingcitizen.retrieveals;
 
-import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
 import com.beingcitizen.Http;
-import com.beingcitizen.beingcitizen.signUp;
-import com.beingcitizen.fragments.AllCampaign;
 import com.beingcitizen.interfaces.retrieveCamp;
 
 import org.json.JSONException;
@@ -30,7 +27,7 @@ public class RetrieveCampaign extends AsyncTask<String, Void, JSONObject> {
         JSONObject bool = null;
         Http http = new Http();
         try {
-            bool = new JSONObject(http.read("http://beingcitizen.com/bc/index.php/main/campaign?uid="+params[0]));
+            bool = new JSONObject(http.read("http://beingcitizen.com/bc/index.php/main/campaign?id="+params[0]));
 
         } catch (IOException e) {
             e.printStackTrace();

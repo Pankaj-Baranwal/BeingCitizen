@@ -33,7 +33,7 @@
                     android:layout_marginLeft="5dp"
                     android:fontFamily="sans-serif-light"
                     android:padding="15dp"
-                    android:text=""
+                    android:text="Cartoon"
                     android:textColor="#000000"
                     android:textSize="17dp"
                     android:textStyle="bold" />
