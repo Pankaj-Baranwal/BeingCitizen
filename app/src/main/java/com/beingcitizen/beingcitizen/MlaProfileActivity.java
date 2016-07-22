@@ -54,7 +54,7 @@ public class MlaProfileActivity extends AppCompatActivity {
         num_camps = (TextView)findViewById(R.id.num_camps);
         mla_gender = (TextView)findViewById(R.id.mla_gender);
         RetrieveMlaProfile rup = new RetrieveMlaProfile(this);
-        rup.execute(mla_id);
+        rup.execute(mla_id, sp.getString("id", "16"));
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
@@ -229,8 +229,6 @@ public class MlaProfileActivity extends AppCompatActivity {
             if (ll_consti_camps != null) {
                 ll_consti_camps.addView(rL);
             }
-
-
         }
     }
 }

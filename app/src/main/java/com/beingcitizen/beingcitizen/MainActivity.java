@@ -25,7 +25,6 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -290,8 +289,8 @@ public class MainActivity extends AppCompatActivity implements OnMenuItemClickLi
         dialogLogout.setContentView(R.layout.dialog_for_logout_click);
         TextView msg = (TextView) dialogLogout.findViewById(R.id.txt_for_logout);
         msg.setText("Are you sure you want to logout?");
-        Button no = (Button) dialogLogout.findViewById(R.id.btn_no);
-        Button yes = (Button) dialogLogout.findViewById(R.id.btn_yes);
+        android.widget.Button no = (android.widget.Button) dialogLogout.findViewById(R.id.btn_no);
+        android.widget.Button yes = (android.widget.Button) dialogLogout.findViewById(R.id.btn_yes);
 
         no.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -305,9 +304,11 @@ public class MainActivity extends AppCompatActivity implements OnMenuItemClickLi
             public void onClick(View v) {
                 editor.clear();
                 editor.apply();
+                dialogLogout.dismiss();
 //                LoginManager.getInstance().logOut();
                 Intent i = new Intent(MainActivity.this, LoginMain.class);
                 MainActivity.this.startActivity(i);
+                finish();
             }
         });
 

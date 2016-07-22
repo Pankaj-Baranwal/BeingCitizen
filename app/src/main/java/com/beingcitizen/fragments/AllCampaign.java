@@ -1,7 +1,6 @@
 package com.beingcitizen.fragments;
 
 import android.app.Dialog;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -10,12 +9,12 @@ import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
@@ -31,10 +30,13 @@ import com.beingcitizen.retrieveals.SendHashTag;
 import com.facebook.FacebookSdk;
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
+import com.rey.material.widget.Button;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.lang.reflect.Field;
 
 
 /**
@@ -42,81 +44,82 @@ import org.json.JSONObject;
  */
 public class AllCampaign extends Fragment implements retrieveCamp, adapterUpdate {
     private ListView userList;
-    View rootView;
+    View rootView = null;
     String uid = "16", pinCode= "110007";
     String consti="New Delhi";
     CampaignAdapter cA;
-
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        userList = (ListView) rootView.findViewById(R.id.allcampaign_listview);
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        uid = sp.getString("id", "16");
-        RetrieveCampaign rtC = new RetrieveCampaign(AllCampaign.this);
-        rtC.execute(uid);
-        final FloatingActionMenu fab_menu = (FloatingActionMenu) rootView.findViewById(R.id.fab_main);
-        FloatingActionButton fab_create_campaign = (FloatingActionButton) rootView.findViewById(R.id.fab_create_campaign);
-        fab_create_campaign.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(getActivity(), CreateCampaign.class);
-                startActivity(i);
-                fab_menu.close(true);
-            }
-        });
-
-        FloatingActionButton fab_add_hash = (FloatingActionButton) rootView.findViewById(R.id.fab_hash);
-        fab_add_hash.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final Dialog dialogLogout = new Dialog(getActivity());
-                dialogLogout.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                dialogLogout.setContentView(R.layout.addhash);
-                Spinner tags = (Spinner) dialogLogout.findViewById(R.id.tags_spinner);
-                final String[] feed_tag = {""};
-                tags.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                    @Override
-                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                        if (position!=0){
-                            feed_tag[0] = parent.getItemAtPosition(position).toString();
-                        }
-                    }
-
-                    @Override
-                    public void onNothingSelected(AdapterView<?> parent) {
-
-                    }
-                });
-                final EditText feed = (EditText)dialogLogout.findViewById(R.id.feed);
-                Button update = (Button) dialogLogout.findViewById(R.id.hash_update);
-                update.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        String tag_txt = feed.getText().toString();
-                        String feed_txt = feed_tag[0];
-                        if (tag_txt.length()==0 || feed_txt.length()==0){
-                            Toast.makeText(getContext(), "INVALID ENTRIES", Toast.LENGTH_SHORT).show();
-                        }else {
-                            SendHashTag sht = new SendHashTag(AllCampaign.this);
-                            sht.execute(uid, tag_txt, feed_txt);
-                            dialogLogout.cancel();
-                            fab_menu.close(true);
-                        }
-                    }
-                });
-                dialogLogout.show();
-            }
-        });
-
-        fab_menu.setClosedOnTouchOutside(true);
-    }
+    boolean rooted = false;
+    SharedPreferences sp;
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         facebookSDKInitialize();
+
+        sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        uid = sp.getString("id", "16");
+        if (rootView!=null){
+            Log.e("TAG_Allcampaign", "Not null on attached");
+            rooted = true;
+            RetrieveCampaign rtC = new RetrieveCampaign(AllCampaign.this);
+            rtC.execute(uid);
+            userList = (ListView) rootView.findViewById(R.id.allcampaign_listview);
+            final FloatingActionMenu fab_menu = (FloatingActionMenu) rootView.findViewById(R.id.fab_main);
+            FloatingActionButton fab_create_campaign = (FloatingActionButton) rootView.findViewById(R.id.fab_create_campaign);
+            fab_create_campaign.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent i = new Intent(getActivity(), CreateCampaign.class);
+                    startActivity(i);
+                    fab_menu.close(true);
+                }
+            });
+
+            FloatingActionButton fab_add_hash = (FloatingActionButton) rootView.findViewById(R.id.fab_hash);
+            fab_add_hash.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    final Dialog dialogLogout = new Dialog(getActivity());
+                    dialogLogout.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                    dialogLogout.setContentView(R.layout.addhash);
+                    Spinner tags = (Spinner) dialogLogout.findViewById(R.id.tags_spinner);
+                    final String[] feed_tag = {""};
+                    tags.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                        @Override
+                        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                            if (position!=0){
+                                feed_tag[0] = parent.getItemAtPosition(position).toString();
+                            }
+                        }
+
+                        @Override
+                        public void onNothingSelected(AdapterView<?> parent) {
+
+                        }
+                    });
+                    final EditText feed = (EditText)dialogLogout.findViewById(R.id.feed);
+                    Button update = (Button) dialogLogout.findViewById(R.id.hash_update);
+                    update.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            String tag_txt = feed.getText().toString();
+                            String feed_txt = feed_tag[0];
+                            if (tag_txt.length()==0){
+                                Toast.makeText(getContext(), "INVALID ENTRIES", Toast.LENGTH_SHORT).show();
+                            }else {
+                                SendHashTag sht = new SendHashTag(AllCampaign.this);
+                                sht.execute(uid, tag_txt, feed_txt.length()>0?feed_txt:"");
+                                dialogLogout.cancel();
+                                fab_menu.close(true);
+                            }
+                        }
+                    });
+                    dialogLogout.show();
+                }
+            });
+
+            fab_menu.setClosedOnTouchOutside(true);
+        }
     }
 
     protected void facebookSDKInitialize() {
@@ -132,6 +135,8 @@ public class AllCampaign extends Fragment implements retrieveCamp, adapterUpdate
         rootView = inflater.inflate(R.layout.allcampaigns, container, false);
         return rootView;
     }
+
+
 
     @Override
     public void onResume() {
@@ -153,7 +158,6 @@ public class AllCampaign extends Fragment implements retrieveCamp, adapterUpdate
                     JSONArray jASorted = new JSONArray();
                     JSONArray jAExtra = new JSONArray();
                     jA = param.getJSONArray("campaigns");
-                    SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
                     consti = sp.getString("constituency", "Burari");
                     for (int i = 0; i < jA.length(); i++) {
                         if (jA.getJSONObject(i).getString("cconstituency").contentEquals(consti)) {
@@ -207,6 +211,21 @@ public class AllCampaign extends Fragment implements retrieveCamp, adapterUpdate
                     locationAddress = null;
             }
             pinCode = locationAddress;
+        }
+    }
+
+    public void onDetach() {
+        super.onDetach();
+
+        try {
+            Field childFragmentManager = Fragment.class.getDeclaredField("mChildFragmentManager");
+            childFragmentManager.setAccessible(true);
+            childFragmentManager.set(this, null);
+
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
         }
     }
 }

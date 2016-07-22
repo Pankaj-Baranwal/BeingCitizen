@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.beingcitizen.R;
@@ -91,14 +92,18 @@ public class DebateAdapter extends BaseAdapter{
         TextView content_debate = (TextView)rowView.findViewById(R.id.content_debate);
         TextView num_for = (TextView)rowView.findViewById(R.id.num_for);
         TextView num_against = (TextView)rowView.findViewById(R.id.num_against);
+        TextView yes_txt = (TextView)rowView.findViewById(R.id.yes_txt);
+        TextView no_txt = (TextView)rowView.findViewById(R.id.no_txt);
         if (!nulling) {
             try {
                 String url_img = ("http://beingcitizen.com/uploads/debates/" + categorynam.getJSONObject(position).getString("dimage") + categorynam.getJSONObject(position).getString("dext"));
+                final LinearLayout ll_debate_adapter = (LinearLayout) rowView.findViewById(R.id.ll_adapter_debate);
                 Picasso.with(mContext).load(url_img).resize(256, 256).into(image_debate, new Callback() {
                     @Override
                     public void onSuccess() {
                         image_debate.setVisibility(View.VISIBLE);
                         imageLoading.setVisibility(View.GONE);
+                        ll_debate_adapter.setVisibility(View.VISIBLE);
                     }
 
                     @Override
@@ -110,8 +115,23 @@ public class DebateAdapter extends BaseAdapter{
 
                 title_debate.setText(categorynam.getJSONObject(position).getString("name"));
                 content_debate.setText(categorynam.getJSONObject(position).getString("debate_text"));
-                num_for.setText(categorynam.getJSONObject(position).getString("fore") + " in favour");
-                num_against.setText(categorynam.getJSONObject(position).getString("against") + " against");
+                String for_val, against_val;
+                if (categorynam.getJSONObject(position).getString("fore")!=null)
+                    for_val =  categorynam.getJSONObject(position).getString("fore");
+                else
+                    for_val = "0";
+                if (categorynam.getJSONObject(position).getString("against")!=null)
+                    against_val =  categorynam.getJSONObject(position).getString("against");
+                else
+                    against_val = "0";
+                num_for.setText(for_val + " in favour");
+                num_against.setText(against_val + " against");
+                Float dv1 = Float.parseFloat(for_val);
+                Float dv2 = Float.parseFloat(against_val);
+                Float per1 = dv1/(dv1+dv2);
+                Float per2 = dv2/(dv1+dv2);
+                yes_txt.setText(Math.round(per1*100)+" % in favour");
+                no_txt.setText(Math.round(per2*100)+" % against");
                 debate_id = categorynam.getJSONObject(position).getString("debate_id");
             } catch (JSONException e) {
                 e.printStackTrace();

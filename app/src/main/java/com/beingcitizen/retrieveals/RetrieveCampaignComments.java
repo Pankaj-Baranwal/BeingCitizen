@@ -40,6 +40,5 @@ public class RetrieveCampaignComments extends AsyncTask<String, Void, JSONObject
     protected void onPostExecute(JSONObject s) {
         super.onPostExecute(s);
         context.functions_campaign(s);
-
     }
 }

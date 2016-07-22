@@ -8,13 +8,13 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.beingcitizen.R;
 import com.beingcitizen.retrieveals.RetrieveFeedTask;
+import com.rey.material.widget.Button;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -44,6 +44,12 @@ public class LoginActivity extends Activity implements com.beingcitizen.interfac
             welocomeback = (TextView) findViewById(R.id.textView);
             citizen = (TextView) findViewById(R.id.textView1);
             login = (Button) findViewById(R.id.button);
+            login.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onClicklogIn(v);
+                }
+            });
             email = (EditText) findViewById(R.id.editText);
             password = (EditText) findViewById(R.id.editText2);
             forgotPassword = (TextView) findViewById(R.id.textView5);

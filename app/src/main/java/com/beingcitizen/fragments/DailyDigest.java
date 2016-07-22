@@ -1,7 +1,10 @@
 package com.beingcitizen.fragments;
 
 import android.app.ActionBar;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -28,12 +31,19 @@ public class DailyDigest extends Fragment implements ActionBar.TabListener {
     View view;
 
     @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getContext());
+        RetrieveDailyDigest rdd = new RetrieveDailyDigest(this);
+        uid = sp.getString("uid", "16");
+        rdd.execute(uid);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
         view = inflater.inflate(R.layout.viewpager_main1, container, false);
-        RetrieveDailyDigest rdd = new RetrieveDailyDigest(this);
-        rdd.execute(uid);
         //mTabs.setCustomTabView(R.layout.custom_tab_view, R.id.tabText);
 
         /*mTabs.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
@@ -55,7 +65,6 @@ public class DailyDigest extends Fragment implements ActionBar.TabListener {
 
         setHasOptionsMenu(true);
         mTabs.setViewPager(mViewPager);
-
         return view;
     }
 
@@ -80,21 +89,6 @@ public class DailyDigest extends Fragment implements ActionBar.TabListener {
         Polls.function(s);
         Blogs.function(s);
         Cartoons.function(s);
-
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getChildFragmentManager());
-
-        // Set up the ViewPager with the sections adapter.
-        mViewPager = (ViewPager) view.findViewById(R.id.pager);
-        mViewPager.setAdapter(mSectionsPagerAdapter);
-        mTabs = (SlidingTabLayout) view.findViewById(R.id.tabs);
-        mTabs.setDistributeEvenly(true);
-
-        //set tab strip backgroung color (grey)
-        mTabs.setBackgroundColor(0xFF009688);
-
-        setHasOptionsMenu(true);
-        mTabs.setViewPager(mViewPager);
-
     }
 
 

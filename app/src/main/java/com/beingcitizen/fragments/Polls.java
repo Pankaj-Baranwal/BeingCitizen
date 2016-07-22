@@ -34,7 +34,7 @@ public class Polls  extends Fragment {
     String pid="1";
     View rootView;
     PieChart pieChart;
-
+    String uid = "16";
     LinearLayout yes, no, other;
     boolean pollable = true;
     TextView poll_title;
@@ -43,7 +43,7 @@ public class Polls  extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         SharedPreferences sharedpreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-        final String uid =  sharedpreferences.getString("id", "16");
+        uid =  sharedpreferences.getString("id", "16");
         getDetails();
         yes.setOnClickListener(new View.OnClickListener() {
             @Override

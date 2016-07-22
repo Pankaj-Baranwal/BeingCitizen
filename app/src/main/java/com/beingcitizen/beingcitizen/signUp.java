@@ -1,21 +1,17 @@
 package com.beingcitizen.beingcitizen;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -27,6 +23,7 @@ import com.beingcitizen.interfaces.signUp_interface;
 import com.beingcitizen.retrieveals.RetrieveConstitutency;
 import com.beingcitizen.retrieveals.RetrieveMlaID;
 import com.beingcitizen.retrieveals.RetrieveSignUp;
+import com.rey.material.widget.Button;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -230,25 +227,25 @@ public class signUp extends Activity implements retrieveCampaign, signUp_interfa
     }
 
 
-    public void showSettingsAlert() {
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(
-                signUp.this);
-        alertDialog.setTitle("SETTINGS");
-        alertDialog.setMessage("Enable Location Provider! Go to settings menu?");
-        alertDialog.setPositiveButton("Settings",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        Intent intent = new Intent(
-                                Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                        signUp.this.startActivity(intent);
-                    }
-                });
-        alertDialog.setNegativeButton("Cancel",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                });
-        alertDialog.show();
-    }
+//    public void showSettingsAlert() {
+//        AlertDialog.Builder alertDialog = new AlertDialog.Builder(
+//                signUp.this);
+//        alertDialog.setTitle("SETTINGS");
+//        alertDialog.setMessage("Enable Location Provider! Go to settings menu?");
+//        alertDialog.setPositiveButton("Settings",
+//                new DialogInterface.OnClickListener() {
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        Intent intent = new Intent(
+//                                Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+//                        signUp.this.startActivity(intent);
+//                    }
+//                });
+//        alertDialog.setNegativeButton("Cancel",
+//                new DialogInterface.OnClickListener() {
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        dialog.cancel();
+//                    }
+//                });
+//        alertDialog.show();
+//    }
 }

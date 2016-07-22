@@ -84,18 +84,16 @@ public class CommentActivity extends Activity implements callUserProfile {
                         String comm = comment.getText().toString();
                         comm = comm.replace("\n", "\\n");
                         comm = comm.replace(" ", "%20");
-                        Log.e("deb_id", debate_id+" " + "uid = " + uid+ " comment"+ comm);
                         sdc.execute(uid, debate_id, nature, comm);
                         comment.setText("");
                     }
                     }else {
                         SendCampaignComment sdc = new SendCampaignComment(CommentActivity.this);
-                    String comm = comment.getText().toString();
-                    comm = comm.replace("\n", "\\n");
-                    comm = comm.replace(" ", "%20");
-                    Log.e("camp_id", debate_id+" " + "uid = " + uid+ " comment"+ comm);
+                        String comm = comment.getText().toString();
+                        comm = comm.replace("\n", "\\n");
+                        comm = comm.replace(" ", "%20");
                         sdc.execute(uid, debate_id, comm);
-                    comment.setText("");
+                        comment.setText("");
                     }
                 }
         });
@@ -133,25 +131,18 @@ public class CommentActivity extends Activity implements callUserProfile {
                 s.getJSONArray("against").getJSONObject(i).put("which", "against");
                 total.put(s.getJSONArray("against").getJSONObject(i));
             }
-//            Log.e("TOTAL_UPDATED", total.toString());
             for (int j = 0; j<array_dates.length; j++) {
                 for (int k = 0; k < array_dates.length; k++){
                     if (array_dates[j].getTime() < array_dates[k].getTime()) {
                         Date buffer = array_dates[j];
                         JSONObject buffer_json = total.getJSONObject(j);
                         array_dates[j] = array_dates[k];
-//                        Log.e("BUFFER_JSON", buffer_json.toString());
-//                        Log.e("TOTAL_J", total.get(j).toString());
-//                        Log.e("TOTAL_K", total.get(k).toString());
                         total.put(j, total.get(k));
                         total.put(k, buffer_json);
-//                        Log.e("TOTAL_J", total.get(j).toString());
-//                        Log.e("TOTAL_K", total.get(k).toString());
                         array_dates[k] = buffer;
                     }
                 }
             }
-//            Log.e("TOTAL_UPDATED", total.toString());
             s.put("total_sorted", total);
         } catch (JSONException e) {
             e.printStackTrace();
@@ -163,7 +154,7 @@ public class CommentActivity extends Activity implements callUserProfile {
             commentList.setAdapter(ca);
             first_time = false;
         }else{
-            ca.categorynam = s;
+            ca.updating(s);
             ca.notifyDataSetChanged();
         }
     }
@@ -174,16 +165,16 @@ public class CommentActivity extends Activity implements callUserProfile {
             commentList.setAdapter(cca);
             first_time = false;
         }else{
-            cca.categorynam = s;
+            cca.updating(s);
             cca.notifyDataSetChanged();
-//            Log.e("DATASET", "Changed");
+            Log.e("DATASET", "Changed");
         }
     }
 
     public void functions(JSONObject s) {
         if (s.has("status")){
             try {
-                if (s.getString("status").contentEquals("sucsess")||s.getString("status").contentEquals("success")){
+                if (s.getString("status").contains("suc")){
                     Toast.makeText(this, "Comment updated", Toast.LENGTH_SHORT).show();
                     if (calling!=null) {
                         RetrieveDebateComments rsd = new RetrieveDebateComments(CommentActivity.this);
@@ -195,7 +186,6 @@ public class CommentActivity extends Activity implements callUserProfile {
                     }
                 }else
                     Toast.makeText(this, "Error uploading comment", Toast.LENGTH_SHORT).show();
-                //
             } catch (JSONException e) {
                 e.printStackTrace();
             }

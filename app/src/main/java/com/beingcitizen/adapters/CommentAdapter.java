@@ -40,6 +40,18 @@ public class CommentAdapter extends BaseAdapter{
         }
 
     }
+
+    public void updating(JSONObject s){
+        categorynam = s;
+        try {
+            total = categorynam.getJSONArray("total_sorted").length();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
     @Override
     public int getCount() {
         return total;

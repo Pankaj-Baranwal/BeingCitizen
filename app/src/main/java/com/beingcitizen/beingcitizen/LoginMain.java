@@ -3,26 +3,26 @@ package com.beingcitizen.beingcitizen;
 import android.Manifest;
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Typeface;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -41,7 +41,7 @@ import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
-import com.facebook.Profile;
+import com.facebook.ProfileTracker;
 import com.facebook.appevents.AppEventsLogger;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
@@ -57,6 +57,8 @@ import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
+import com.rey.material.widget.Button;
+import com.rey.material.widget.ProgressView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -76,7 +78,7 @@ public class LoginMain extends Activity implements GoogleApiClient.ConnectionCal
     private LoginButton fb_signin;
     private static final int RC_SIGN_IN = 0;
     private static final String TAG = LoginMain.class.getSimpleName();
-    private String facebook_id,f_name, m_name, l_name, profile_image, full_name, email_id="No_Email_ID";
+    private String email_id="No_Email_ID";
     private boolean mIntentInProgress;
     private boolean mSignInClicked;
     private ConnectionResult mConnectionResult;
@@ -86,6 +88,9 @@ public class LoginMain extends Activity implements GoogleApiClient.ConnectionCal
     private static final int PROFILE_PIC_SIZE = 120;
     ArrayAdapter<String> adapter;
     String name, password, gender, uid = "16";
+    ProfileTracker mProfileTracker;
+    RelativeLayout rl_progress;
+    ProgressView progress;
 
 
     @Override
@@ -93,43 +98,44 @@ public class LoginMain extends Activity implements GoogleApiClient.ConnectionCal
         super.onCreate(savedInstanceState);
         sharedpreferences = PreferenceManager.getDefaultSharedPreferences(LoginMain.this);
 
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        //hideSystemUI();
-        if(Build.VERSION.SDK_INT > 11 && Build.VERSION.SDK_INT < 19) { // lower api
-            View v = this.getWindow().getDecorView();
-            v.setSystemUiVisibility(View.GONE);
-        } else if(Build.VERSION.SDK_INT >= 19) {
-            //for new api versions.
-            View decorView = getWindow().getDecorView();
-            int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
-            decorView.setSystemUiVisibility(uiOptions);
-        }
+//        requestWindowFeature(Window.FEATURE_NO_TITLE);
+//        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+//        //hideSystemUI();
+//        if(Build.VERSION.SDK_INT > 11 && Build.VERSION.SDK_INT < 19) { // lower api
+//            View v = this.getWindow().getDecorView();
+//            v.setSystemUiVisibility(View.GONE);
+//        } else if(Build.VERSION.SDK_INT >= 19) {
+//            //for new api versions.
+//            View decorView = getWindow().getDecorView();
+//            int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+//            decorView.setSystemUiVisibility(uiOptions);
+//        }
         facebookSDKInitialize();
         setContentView(R.layout.login);
+        googleApiClient = new GoogleApiClient.Builder(this).addConnectionCallbacks(this).
+                addOnConnectionFailedListener(this).addApi(Plus.API, Plus.PlusOptions.builder().
+                build()).addScope(Plus.SCOPE_PLUS_PROFILE).addApi(AppIndex.API).build();
+        checkPermissions();
+    }
 
-
-
-
-
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.GET_ACCOUNTS) != PackageManager.PERMISSION_GRANTED ) {
-            Log.e("PLAYGROUND", "Permission is not granted, requesting");
-            ActivityCompat.requestPermissions(this,new String[]{
-                    Manifest.permission.GET_ACCOUNTS,
-            },10);
-        }
-
-
-
-
-
-
-
+    private void creation(){
         login=(Button)findViewById(R.id.login);
         signup=(Button)findViewById(R.id.signup);
-
+        login.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onClicklogIn(v);
+            }
+        });
+        signup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onClicksignUp(v);
+            }
+        });
         text=(TextView)findViewById(R.id.text);
-
+        rl_progress = (RelativeLayout)findViewById(R.id.rl_progress);
+        progress = (ProgressView)findViewById(R.id.progress_imageLoading);
 
         gplus_signin = (SignInButton) findViewById(R.id.google_signin);
         gplus_signin.setOnClickListener(onLoginListener());
@@ -143,13 +149,6 @@ public class LoginMain extends Activity implements GoogleApiClient.ConnectionCal
                 getLoginDetails(fb_signin);
             }
         });
-        //initializing google api client when start
-        // ATTENTION: This "addApi(AppIndex.API)"was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        googleApiClient = new GoogleApiClient.Builder(this).addConnectionCallbacks(this).
-                addOnConnectionFailedListener(this).addApi(Plus.API, Plus.PlusOptions.builder().
-                build()).addScope(Plus.SCOPE_PLUS_PROFILE).addApi(AppIndex.API).build();
-
 
         // Font path
         String fontPath = "fonts/GOTHICB_0.TTF";
@@ -182,39 +181,9 @@ And then callback manager will handle the login responses.
         login_button.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult login_result) {
-                Profile profile = Profile.getCurrentProfile();
-                //TODO: get more details from FB as well as Gmail.
-                if (profile != null) {
-                    facebook_id=profile.getId();
-                    f_name=profile.getFirstName();
-                    m_name=profile.getMiddleName();
-                    l_name=profile.getLastName();
-                    full_name=profile.getName();
-                    Log.e("FB_PROFILE", facebook_id+" "+ full_name);
-                    profile_image=profile.getProfilePictureUri(400, 400).toString();
-                }else{
-                    Log.e("PROFILE", "NULL");
-                }
                 getUserInfo(login_result);
 //                Toast.makeText(LoginMain.this,full_name,Toast.LENGTH_SHORT).show();
-                final Dialog dialogLogout = new Dialog(LoginMain.this);
-                dialogLogout.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                dialogLogout.setContentView(R.layout.dialog_pincode);
-                final EditText pin_txt = (EditText)dialogLogout.findViewById(R.id.pin_txt);
-                Button update = (Button) dialogLogout.findViewById(R.id.update);
-                update.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (pin_txt.getText().toString().length()!=6){
-                            Toast.makeText(LoginMain.this, "Wrong Pincode", Toast.LENGTH_SHORT).show();
-                        }else{
-                            RetrieveConstitutency rcc = new RetrieveConstitutency(LoginMain.this, LoginMain.this);
-                            dialogLogout.cancel();
-                            rcc.execute(pin_txt.getText().toString());
-                        }
-                    }
-                });
-                dialogLogout.show();
+
             }
 
             @Override
@@ -244,16 +213,19 @@ When the request is completed, a callback is called to handle the success condit
                             JSONObject json_object,
                             GraphResponse response) {
                         try {
+                            rl_progress.setVisibility(View.VISIBLE);
                             //JSONArray namearray = json_object.names();
                             if (json_object.has("email")) {
-                                Log.e("email_fb", json_object.getString("email"));
                                 email_id = json_object.getString("email");
                             } else {
-                                email_id = json_object.getString("name");
+                                email_id = json_object.getString("id");
                             }
                             gender = json_object.getString("gender");
                             name = json_object.getString("name");
-                            password = "password";
+                            password = "extra_farjiwork";
+                            Log.e("ID", json_object.getString("id"));
+                            RetrieveFeedTask rft = new RetrieveFeedTask(LoginMain.this);
+                            rft.execute(email_id, "extra_farjiwork");
                         } catch (JSONException e) {
                             e.printStackTrace();
                             Log.e("TAG_EMAIL", "ERROR");
@@ -281,6 +253,7 @@ When the request is completed, a callback is called to handle the success condit
                 obj.add(namearray.getString(i));
             adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, obj);
             final String[] mlaID = new String[1];
+            rl_progress.setVisibility(View.GONE);
             final Dialog dialogLogout = new Dialog(this);
             dialogLogout.requestWindowFeature(Window.FEATURE_NO_TITLE);
             dialogLogout.setContentView(R.layout.dialog_pincode);
@@ -314,6 +287,7 @@ When the request is completed, a callback is called to handle the success condit
                         SharedPreferences.Editor edit = sharedpreferences.edit();
                         edit.putString("constituency", content[0]);
                         edit.apply();
+                        rl_progress.setVisibility(View.VISIBLE);
                         RetrieveMlaID rmlaid = new RetrieveMlaID(LoginMain.this, LoginMain.this);
                         rmlaid.execute(content[0]);
                         dialogLogout.dismiss();
@@ -329,6 +303,7 @@ When the request is completed, a callback is called to handle the success condit
 
     @Override
     public void result(JSONObject obj) {
+        rl_progress.setVisibility(View.GONE);
         if (obj.has("user_id")) {
             SharedPreferences sharedpreferences = PreferenceManager.getDefaultSharedPreferences(this);
             SharedPreferences.Editor edit = sharedpreferences.edit();
@@ -346,18 +321,99 @@ When the request is completed, a callback is called to handle the success condit
                 Log.e("TAG_function", "JSONERROR");
                 e.printStackTrace();
             }
-        }else if (obj.has("status")){
+        }else{
+            RetrieveFeedTask rft = new RetrieveFeedTask(LoginMain.this);
+            rft.execute(email_id, "extra_farjiwork");
+        }
+    }
+
+    @Override
+    public void mla_ids(String mlaID) {
+        rl_progress.setVisibility(View.GONE);
+        SharedPreferences sharedpreferences = PreferenceManager.getDefaultSharedPreferences(LoginMain.this);
+        SharedPreferences.Editor edit = sharedpreferences.edit();
+        if (!mlaID.contentEquals("null")) {
+            edit.putString("mla_id", mlaID);
+        }else{
+            edit.putString("mla_id", "No_mla_id");
+        }
+        edit.apply();
+        RetrieveSignUp rsup = new RetrieveSignUp(LoginMain.this, LoginMain.this);
+        rl_progress.setVisibility(View.VISIBLE);
+        rsup.execute(name.replace(" ", "%20"), email_id, password.replace(" ", "%20"), gender, sharedpreferences.getString("constituency", "").replace(" ", "%20"));
+    }
+
+    @Override
+    public void login_feed(JSONObject s) {
+        if (s.has("id")) {
+            SharedPreferences.Editor edit = sharedpreferences.edit();
             try {
-                if (obj.getString("status").contentEquals("Already used email")) {
-                    RetrieveFeedTask rft = new RetrieveFeedTask(this);
-                    rft.execute(email_id, "password");
-                }else{
-                    Toast.makeText(LoginMain.this, "Error Signing in", Toast.LENGTH_SHORT).show();
-                }
+                uid = s.getString("id");
+                edit.putString("id", s.getString("id"));
+                edit.putString("name", s.getString("name"));
+                edit.putString("email", s.getString("email"));
+                edit.putString("sex", s.getString("sex"));
+                edit.putString("const", s.getString("const"));
+                edit.apply();
+                Intent i = new Intent(getBaseContext(), MainActivity.class);
+                rl_progress.setVisibility(View.GONE);
+                startActivity(i);
+                finish();
             } catch (JSONException e) {
                 e.printStackTrace();
+                Log.e("ERROR", "Error in storing to shared prefs");
             }
+        } else if(s.has("user_id")) {
+            SharedPreferences.Editor edit = sharedpreferences.edit();
+            try {
+                uid = s.getString("user_id");
+                edit.putString("id", s.getString("id"));
+                edit.putString("name", s.getString("name"));
+                edit.putString("email", s.getString("email"));
+                edit.putString("sex", s.getString("sex"));
+                edit.putString("const", s.getString("const"));
+                edit.apply();
+                Intent i = new Intent(getBaseContext(), MainActivity.class);
+                rl_progress.setVisibility(View.GONE);
+                startActivity(i);
+                finish();
+            } catch (JSONException e) {
+                e.printStackTrace();
+                Log.e("ERROR", "Error in storing to shared prefs");
+            }
+        }else{
+            rl_progress.setVisibility(View.GONE);
+            final Dialog dialogLogout = new Dialog(LoginMain.this);
+            dialogLogout.requestWindowFeature(Window.FEATURE_NO_TITLE);
+            dialogLogout.setContentView(R.layout.dialog_pincode);
+            final EditText pin_txt = (EditText)dialogLogout.findViewById(R.id.pin_txt);
+            Button update = (Button) dialogLogout.findViewById(R.id.update);
+            update.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (pin_txt.getText().toString().length()!=6){
+                        Toast.makeText(LoginMain.this, "Wrong Pincode", Toast.LENGTH_SHORT).show();
+                    }else{
+                        RetrieveConstitutency rcc = new RetrieveConstitutency(LoginMain.this, LoginMain.this);
+                        dialogLogout.cancel();
+                        rl_progress.setVisibility(View.VISIBLE);
+                        rcc.execute(pin_txt.getText().toString());
+                    }
+                }
+            });
+            dialogLogout.show();
         }
+    }
+
+    private void setPersonalInfo(Person currentPerson){
+        rl_progress.setVisibility(View.VISIBLE);
+        name = currentPerson.getDisplayName();
+        String personPhotoUrl = currentPerson.getImage().getUrl();
+        email_id = Plus.AccountApi.getAccountName(googleApiClient);
+        gender = currentPerson.getGender()==2?"Female":"Male";
+        password = "extra_farjiwork";
+        RetrieveFeedTask rft = new RetrieveFeedTask(LoginMain.this);
+        rft.execute(email_id, "extra_farjiwork");
     }
 
     private void custimizeSignBtn(){
@@ -392,10 +448,16 @@ When the request is completed, a callback is called to handle the success condit
     }
 
     protected void onStart() {
-
         super.onStart();
         LoginManager.getInstance().logOut();
-        googleApiClient.connect();
+        if (googleApiClient!=null) {
+            googleApiClient.connect();
+        }else{
+            googleApiClient = new GoogleApiClient.Builder(this).addConnectionCallbacks(this).
+                    addOnConnectionFailedListener(this).addApi(Plus.API, Plus.PlusOptions.builder().
+                    build()).addScope(Plus.SCOPE_PLUS_PROFILE).addApi(AppIndex.API).build();
+            googleApiClient.connect();
+        }
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         Action viewAction = Action.newAction(
@@ -503,10 +565,11 @@ getProfileInfo();
     public void onConnected(Bundle arg0) {
         mSignInClicked = false;
         //Toast.makeText(this, "User is connected!", Toast.LENGTH_LONG).show();
+        rl_progress.setVisibility(View.VISIBLE);
         getProfileInfo();
 //        Intent i = new Intent(getBaseContext(), MainActivity.class);
 //        startActivity(i);
-        finish();
+//        finish();
     }
 
 
@@ -601,73 +664,67 @@ getProfileInfo();
     }
 
 
-    private void setPersonalInfo(Person currentPerson){
+    private void checkPermissions() {
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.GET_ACCOUNTS)
+                != PackageManager.PERMISSION_GRANTED) {
 
-        name = currentPerson.getDisplayName();
-        String personPhotoUrl = currentPerson.getImage().getUrl();
-        email_id = Plus.AccountApi.getAccountName(googleApiClient);
-        gender = currentPerson.getGender()==2?"Female":"Male";
-        password = "password";
-        final Dialog dialogLogout = new Dialog(LoginMain.this);
-        dialogLogout.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialogLogout.setContentView(R.layout.dialog_pincode);
-        final EditText pin_txt = (EditText)dialogLogout.findViewById(R.id.pin_txt);
-        Button update = (Button) dialogLogout.findViewById(R.id.update);
-        update.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (pin_txt.getText().toString().length()!=6){
-                    Toast.makeText(LoginMain.this, "Wrong Pincode", Toast.LENGTH_SHORT).show();
-                }else{
-                    RetrieveConstitutency rcc = new RetrieveConstitutency(LoginMain.this, LoginMain.this);
-                    dialogLogout.cancel();
-                    rcc.execute(pin_txt.getText().toString());
-                }
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.GET_ACCOUNTS)) {
+                showMessageOKCancel("You need to allow access to INTERNET",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                if (Math.abs(which) == 1) {
+                                    ActivityCompat.requestPermissions(LoginMain.this,
+                                            new String[]{Manifest.permission.GET_ACCOUNTS},
+                                            1);
+                                }else{
+                                    finish();
+                                }
+                            }
+                        }
+                );
+                // Show an expanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+
+            } else {
+
+                // No explanation needed, we can request the permission.
+
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.GET_ACCOUNTS},
+                        1);
+
+                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
+                // app-defined int constant. The callback method gets the
+                // result of the request.
             }
-        });
-        dialogLogout.show();
-//        setProfilePic(personPhotoUrl);
-    }
-    private void setProfilePic(String profile_pic){
-        profile_pic = profile_pic.substring(0,
-                profile_pic.length() - 2)
-                + PROFILE_PIC_SIZE;
-        ImageView user_picture = (ImageView)findViewById(R.id.profile_picture);
-    }
-
-
-    @Override
-    public void mla_ids(String mlaID) {
-        SharedPreferences sharedpreferences = PreferenceManager.getDefaultSharedPreferences(LoginMain.this);
-        SharedPreferences.Editor edit = sharedpreferences.edit();
-        if (!mlaID.contentEquals("null")) {
-            edit.putString("mla_id", mlaID);
         }else{
-            edit.putString("mla_id", "No_mla_id");
+            creation();
         }
-        edit.apply();
-        RetrieveSignUp rsup = new RetrieveSignUp(LoginMain.this, LoginMain.this);
-        rsup.execute(name.replace(" ", "%20"), email_id, password.replace(" ", "%20"), gender, sharedpreferences.getString("constituency", "").replace(" ", "%20"));
+    }
+
+    private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) {
+        new AlertDialog.Builder(LoginMain.this)
+                .setMessage(message)
+                .setPositiveButton("OK", okListener)
+                .setNegativeButton("Cancel", okListener)
+                .create()
+                .show();
     }
 
     @Override
-    public void login_feed(JSONObject s) {
-        if (s.has("id")) {
-            SharedPreferences.Editor edit = sharedpreferences.edit();
-            try {
-                uid = s.getString("id");
-                edit.putString("id", s.getString("id"));
-                edit.putString("name", s.getString("name"));
-                edit.putString("email", s.getString("email"));
-                edit.putString("sex", s.getString("sex"));
-                edit.putString("const", s.getString("const"));
-                edit.apply();
-            } catch (JSONException e) {
-                e.printStackTrace();
-                Log.e("ERROR", "Error in storing to shared prefs");
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 1){
+            if (grantResults[0]==PackageManager.PERMISSION_GRANTED){
+                creation();
             }
-        } else {
-            Toast.makeText(this, "Incorrect details", Toast.LENGTH_SHORT).show();
+        }else{
+            finish();
         }
     }
 }

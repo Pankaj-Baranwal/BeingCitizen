@@ -2,8 +2,10 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#000000">
-
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="#000000"
+    tools:context=".beingcitizen.LoginMain">
     <ImageView
         android:id="@+id/imageView3"
         android:layout_width="300dp"
@@ -14,8 +16,7 @@
         android:layout_above="@+id/signup"
         android:layout_marginBottom="@dimen/activity_vertical_margin"
         />
-
-    <Button
+    <com.rey.material.widget.Button
         android:id="@+id/signup"
         android:layout_width="160dp"
         android:layout_height="wrap_content"
@@ -24,14 +25,15 @@
         android:textSize="15dp"
         android:background="@drawable/signupbackground"
         android:text="Sign Up"
-        android:onClick="onClicksignUp"
         android:textAllCaps="false"
         android:textColor="#ffffff"
         android:layout_above="@+id/login"
         android:layout_centerHorizontal="true"
+        app:rd_enable = "true"
+        app:rd_style = "@style/Material.Drawable.Ripple.Wave"
+        app:rd_rippleType = "wave"
         />
-
-    <Button
+    <com.rey.material.widget.Button
         android:id="@+id/login"
         android:layout_width="160dp"
         android:layout_height="wrap_content"
@@ -42,9 +44,11 @@
         android:textSize="15dp"
         android:textAllCaps="false"
         android:textColor="#ffffff"
-        android:onClick="onClicklogIn"
         android:layout_above="@+id/grid_externalLogin"
         android:layout_centerHorizontal="true"
+        app:rd_enable = "true"
+        app:rd_style = "@style/Material.Drawable.Ripple.Wave"
+        app:rd_rippleType = "wave"
         />
 
     <GridLayout
@@ -122,5 +126,21 @@
                     </LinearLayout>
         </LinearLayout>
     </GridLayout>
-
+    <RelativeLayout
+        android:id="@+id/rl_progress"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#88ffffff"
+        android:visibility="gone"
+        >
+        <com.rey.material.widget.ProgressView
+            android:id="@+id/progress_imageLoading"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_centerInParent="true"
+            app:pv_autostart="true"
+            app:pv_circular="true"
+            app:pv_progressStyle="@style/Material.Drawable.CircularProgress"
+            app:pv_progressMode="indeterminate"/>
+    </RelativeLayout>
 </RelativeLayout>

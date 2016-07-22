@@ -39,9 +39,6 @@ public class CampaignAdapter extends BaseAdapter{
     String campaign_id="30", uid = "16";
     AllCampaign alc;
     boolean nulling = false;
-    CardView cardView;
-    String foll="null", volun="null";
-    boolean volunteerable = true, likeable = true, vols = true, fols = true;
 
     public CampaignAdapter(Context context, JSONArray categoryname, AllCampaign alc) {
         if (context!=null) {
@@ -81,6 +78,11 @@ public class CampaignAdapter extends BaseAdapter{
         inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View rowView = inflater.inflate(R.layout.allcampaigns_listcell, parent, false);
         String url_img="";
+        CardView cardView;
+        final boolean[] volunteerable = {true};
+        final boolean[] likeable = { true };
+        boolean vols = true;
+        boolean fols = true;
         cardView=(CardView) rowView.findViewById(R.id.CardView_allcampaign);
         cardView.setRadius(16.0f);
         cardView.setCardElevation(16.0f);
@@ -95,7 +97,7 @@ public class CampaignAdapter extends BaseAdapter{
         final ImageView comment = (ImageView) rowView.findViewById(R.id.comment);
         TextView city_name=(TextView)rowView.findViewById(R.id.city_name);
         TextView info_campaign=(TextView)rowView.findViewById(R.id.info_campaign);
-        TextView category=(TextView)rowView.findViewById(R.id.category);
+        final TextView category=(TextView)rowView.findViewById(R.id.category);
         ImageView category_img = (ImageView) rowView.findViewById(R.id.category_img);
 //        CircleImageView civ = (CircleImageView) rowView.findViewById(R.id.circleImageView);
         if (!nulling)
@@ -113,18 +115,18 @@ public class CampaignAdapter extends BaseAdapter{
 
                 }
             });
-            if (categorynam.getJSONObject(position).getString("c_id").contentEquals(uid)){
-                likeable = true;
+            if (categorynam.getJSONObject(position).getString("us_id").contentEquals(uid)){
+                likeable[0] = false;
                 like.setBackgroundResource(R.drawable.like_on);
             }else {
-                likeable = false;
+                likeable[0] = true;
                 like.setBackgroundResource(R.drawable.like);
             }
-            if (categorynam.getJSONObject(position).getString("camid").contentEquals(uid)){
-                volunteerable = true;
+            if (categorynam.getJSONObject(position).getString("usid").contentEquals(uid)){
+                volunteerable[0] = false;
                 volunteer.setBackgroundResource(R.drawable.volunteer_on);
             }else {
-                volunteerable = true;
+                volunteerable[0] = true;
                 volunteer.setBackgroundResource(R.drawable.volunteer);
             }
             String status = categorynam.getJSONObject(position).getString("status");
@@ -136,31 +138,18 @@ public class CampaignAdapter extends BaseAdapter{
             else{
                 verification.setBackgroundColor(0xB111FF1D);
             }
-            fols = categorynam.getJSONObject(position).getString("followable").contentEquals("1")?true:false;
-            vols = categorynam.getJSONObject(position).getString("volunteerable").contentEquals("1")?true:false;
+            fols = categorynam.getJSONObject(position).getString("followable").contentEquals("1");
+            vols = categorynam.getJSONObject(position).getString("volunteerable").contentEquals("1");
             if (!fols){
                 like.setVisibility(View.GONE);
+            }else{
+                like.setVisibility(View.VISIBLE);
             }
             if (!vols){
                 volunteer.setVisibility(View.GONE);
-            }
-            foll = categorynam.getJSONObject(position).getString("c_id");
-            volun =categorynam.getJSONObject(position).getString("camid");
-            if (foll.contentEquals(uid)){
-                likeable = false;
-                like.setBackgroundResource(R.drawable.like_on);
             }else{
-                likeable = true;
-                like.setBackgroundResource(R.drawable.like);
+                volunteer.setVisibility(View.VISIBLE);
             }
-            if (volun.contentEquals(uid)){
-                volunteerable = false;
-                volunteer.setBackgroundResource(R.drawable.volunteer_on);
-            }else{
-                volunteerable = true;
-                volunteer.setBackgroundResource(R.drawable.volunteer);
-            }
-
             campaign_id = categorynam.getJSONObject(position).getString("campaign_id");
             title.setText(categorynam.getJSONObject(position).getString("cname"));
             city_name.setText(categorynam.getJSONObject(position).getString("cconstituency"));
@@ -170,7 +159,6 @@ public class CampaignAdapter extends BaseAdapter{
             info_campaign.setText(campaign_text);
             String cat = categorynam.getJSONObject(position).getString("category");
             category.setText(cat.length()<22?cat:cat.substring(0, 22)+"...");
-            Log.e("Categ", cat);
             switch (cat){
                 case "Law and Order":
                     category_img.setImageResource(R.drawable.public_law_and_order_black);
@@ -188,10 +176,10 @@ public class CampaignAdapter extends BaseAdapter{
                     category_img.setImageResource(R.drawable.land_black);
                     break;
                 case "Trade,Commerce,Employment":
-                    category_img.setImageResource(R.drawable.market);
+                    category_img.setImageResource(R.drawable.market_black);
                     break;
                 case "Environment and Holticulture":
-                    category_img.setImageResource(R.drawable.ecology);
+                    category_img.setImageResource(R.drawable.ecology_black);
                     break;
                 case "Tourism, Art and Culture":
                     category_img.setImageResource(R.drawable.tourism_black);
@@ -212,19 +200,30 @@ public class CampaignAdapter extends BaseAdapter{
             public void onClick(View v) {
                 try {
                     campaign_id = categorynam.getJSONObject(position).getString("campaign_id");
+                    likeable[0] = !categorynam.getJSONObject(position).getString("us_id").contentEquals(uid);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                Log.e("LIKE", likeable+" "+ uid+" "+ campaign_id);
-                if (likeable){
-                    like.setImageResource(R.drawable.like_on);
-                    likeable = false;
+                Log.e("LIKE", likeable[0] +" "+ uid+" "+ campaign_id);
+                if (likeable[0]){
+                    like.setBackgroundResource(R.drawable.like_on);
+                    try {
+                        categorynam.getJSONObject(position).remove("us_id");
+                        categorynam.getJSONObject(position).put("us_id", uid);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                     SendFollowCampaign sfc = new SendFollowCampaign();
                     sfc.execute(uid, campaign_id);
 
                 }else{
-                    like.setImageResource(R.drawable.like);
-                    likeable = true;
+                    like.setBackgroundResource(R.drawable.like);
+                    try {
+                        categorynam.getJSONObject(position).remove("us_id");
+                        categorynam.getJSONObject(position).put("us_id", "null");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                     SendUnfollowCampaign sendUnfollowCampaign = new SendUnfollowCampaign();
                     sendUnfollowCampaign.execute(uid, campaign_id);
                 }
@@ -235,18 +234,29 @@ public class CampaignAdapter extends BaseAdapter{
             public void onClick(View v) {
                 try {
                     campaign_id = categorynam.getJSONObject(position).getString("campaign_id");
+                    volunteerable[0] = !categorynam.getJSONObject(position).getString("usid").contentEquals(uid);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                Log.e("VOLUNTEER", volunteerable+" "+ uid+" "+ campaign_id);
-                if (volunteerable){
-                    volunteer.setImageResource(R.drawable.volunteer_on);
-                    volunteerable = false;
+                Log.e("VOLUNTEER", volunteerable[0] +" "+ uid+" "+ campaign_id);
+                if (volunteerable[0]){
+                    volunteer.setBackgroundResource(R.drawable.volunteer_on);
+                    try {
+                        categorynam.getJSONObject(position).remove("usid");
+                        categorynam.getJSONObject(position).put("usid", uid);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                     SendVolunteerCampaign svc = new SendVolunteerCampaign();
                     svc.execute(uid, campaign_id);
                 }else{
-                    volunteer.setImageResource(R.drawable.volunteer);
-                    volunteerable = true;
+                    volunteer.setBackgroundResource(R.drawable.volunteer);
+                    try {
+                        categorynam.getJSONObject(position).remove("usid");
+                        categorynam.getJSONObject(position).put("usid", "null");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                     SendUnvolunteerCampaign svc = new SendUnvolunteerCampaign();
                     svc.execute(uid, campaign_id);
                 }

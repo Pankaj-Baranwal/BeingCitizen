@@ -21,7 +21,6 @@ public class SendFollowCampaign extends AsyncTask<String, Void, Void> {
         Http http = new Http();
         try {
             bool = new JSONObject(http.read("http://beingcitizen.com/bc/index.php/main/followcampaign?uid="+params[0]+"&campaign_id="+params[1]));
-
         } catch (IOException e) {
             e.printStackTrace();
             Log.e("TAG_ERROR", "ERROR");

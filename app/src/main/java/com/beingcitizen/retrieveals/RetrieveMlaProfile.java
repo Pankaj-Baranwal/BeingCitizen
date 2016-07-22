@@ -27,7 +27,8 @@ public class RetrieveMlaProfile extends AsyncTask<String, Void, String> {
         String bool = "";
         Http http = new Http();
         try {
-            bool = http.read("http://beingcitizen.com/bc/index.php/main/mlaprofile?id="+params[0]);
+            bool = http.read("http://beingcitizen.com/bc/index.php/main/mlaprofile?id="+params[0]+"&user_id="+params[1]);
+            Log.e(" MLA", params[0]);
         } catch (IOException e) {
             e.printStackTrace();
             Log.e("TAG_ERROR", "ERROR");
@@ -44,7 +45,6 @@ public class RetrieveMlaProfile extends AsyncTask<String, Void, String> {
         } catch (JSONException e) {
             Log.getStackTraceString(e);
             Toast.makeText(context, "Error retrieving data", Toast.LENGTH_SHORT).show();
-            e.printStackTrace();
         }
     }
 }

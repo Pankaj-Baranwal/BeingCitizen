@@ -31,7 +31,7 @@ public class Draweradapter extends RecyclerView.Adapter<Draweradapter.ViewHolder
 
     private String mNavTitles[]; // String Array to store the passed titles Value from MainActivity.java
     private int mIcons[];       // Int Array to store the passed icons resource value from MainActivity.java
-int image=R.drawable.ic_profile2;
+    int image=R.drawable.ic_profile2;
     private String name;        //String Resource for header View Name
     private int profileid;        //int Resource for header view profile picture
     private String email, mlaName, mlaConsti;       //String Resource for header view email
@@ -52,7 +52,7 @@ int image=R.drawable.ic_profile2;
         ProfilePictureView profile;
 
         CircleImageView profile1;
-        TextView Name, email;
+        TextView Name;
 
         public ViewHolder(final View itemView,int ViewType) {                 // Creating ViewHolder Constructor with View and viewType As a parameter
             super(itemView);
@@ -75,7 +75,6 @@ int image=R.drawable.ic_profile2;
             }
             else{
                 Name = (TextView) itemView.findViewById(R.id.username);         // Creating Text View object from header.xml for name
-                email = (TextView) itemView.findViewById(R.id.email);       // Creating Text View object from header.xml for email
                 mla_name = (TextView) itemView.findViewById(R.id.mla_name);
                 mla_consti = (TextView) itemView.findViewById(R.id.mla_constituency);
                 mla_image = (CircleImageView) itemView.findViewById(R.id.mlaImage);
@@ -91,10 +90,7 @@ int image=R.drawable.ic_profile2;
                 Holderid = 0;                                                // Setting holder id = 0 as the object being populated are of type header view
             }
         }
-
-
     }
-
 
 
     public Draweradapter(String Titles[], int Icons[], String Name, String Email, String mla_name_txt, String mla_consti_txt, int Profile){ // Draweradapter Constructor with titles and icons parameter
@@ -173,7 +169,6 @@ int image=R.drawable.ic_profile2;
 
            // holder.profile.setImageResource(image);           // Similarly we set the resources for header view
             holder.Name.setText(name);
-            holder.email.setText(email);
             if (mlaExists)
             mla_consti.setText(mlaConsti);
         }

@@ -1,10 +1,11 @@
 package com.beingcitizen.beingcitizen;
 
-import android.app.Dialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
@@ -12,8 +13,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -26,7 +25,6 @@ import com.beingcitizen.retrieveals.SendUnfollowCampaign;
 import com.beingcitizen.retrieveals.SendUnvolunteerCampaign;
 import com.beingcitizen.retrieveals.SendVolunteerCampaign;
 import com.facebook.share.model.ShareLinkContent;
-import com.github.clans.fab.FloatingActionButton;
 import com.rey.material.widget.ProgressView;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
@@ -35,8 +33,9 @@ import com.twitter.sdk.android.tweetcomposer.TweetComposer;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -138,37 +137,64 @@ public class CampaignExpanded extends AppCompatActivity{
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
         if (item.getItemId()==R.id.share){
-            final Dialog dialogLogout = new Dialog(this);
-            dialogLogout.requestWindowFeature(Window.FEATURE_NO_TITLE);
-            dialogLogout.setContentView(R.layout.dialog_share);
-            FloatingActionButton fb = (FloatingActionButton)dialogLogout.findViewById(R.id.fab_fb);
-            FloatingActionButton whatsapp = (FloatingActionButton)dialogLogout.findViewById(R.id.fab_whatsapp);
-            fb.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    shareOnFacebook(url_img, campaign_txt.getText().toString(), title.getText().toString());
-                    dialogLogout.dismiss();
+                    Intent intent=new Intent(android.content.Intent.ACTION_SEND);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
+                    intent.setType("text/plain");
+                    intent.putExtra(Intent.EXTRA_SUBJECT, title.getText().toString());
+                    intent.putExtra(Intent.EXTRA_TITLE, title.getText().toString());
+// Add data to the intent, the receiving app will decide what to do with it.
+//            Uri uri = Uri.parse(url_img);
+//            intent.putExtra(Intent.EXTRA_STREAM, uri);
+//            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    intent.putExtra(Intent.EXTRA_TEXT, "http://beingcitizen.com/Main/viewCampaign/"+campaign_id);
+                    startActivity(Intent.createChooser(intent, "Share via:"));
                 }
-            });
-            whatsapp.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    shareOnWhatsapp(Uri.parse(url_img), campaign_txt.getText().toString());
-                    dialogLogout.dismiss();
-                }
-            });
-            Button update = (Button) dialogLogout.findViewById(R.id.update);
-            update.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    dialogLogout.dismiss();
-                }
-            });
-            dialogLogout.show();
-        }else
+
+
+//            final Dialog dialogLogout = new Dialog(this);
+//            dialogLogout.requestWindowFeature(Window.FEATURE_NO_TITLE);
+//            dialogLogout.setContentView(R.layout.dialog_share);
+//            FloatingActionButton fb = (FloatingActionButton)dialogLogout.findViewById(R.id.fab_fb);
+//            FloatingActionButton whatsapp = (FloatingActionButton)dialogLogout.findViewById(R.id.fab_whatsapp);
+//            fb.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    shareOnFacebook(url_img, campaign_txt.getText().toString(), title.getText().toString());
+//                    dialogLogout.dismiss();
+//                }
+//            });
+//            whatsapp.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    shareOnWhatsapp(Uri.parse(url_img), campaign_txt.getText().toString());
+//                    dialogLogout.dismiss();
+//                }
+//            });
+//            Button update = (Button) dialogLogout.findViewById(R.id.update);
+//            update.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    dialogLogout.dismiss();
+//                }
+//            });
+//            dialogLogout.show();
+        else
             finish();
         return true;
+    }
 
+    public Uri getLocalBitmapUri(Bitmap bmp) {
+        Uri bmpUri = null;
+        try {
+            File file =  new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), "share_image_" + System.currentTimeMillis() + ".png");
+            FileOutputStream out = new FileOutputStream(file);
+            bmp.compress(Bitmap.CompressFormat.JPEG, 90, out);
+            out.close();
+            bmpUri = Uri.fromFile(file);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return bmpUri;
     }
 
     public void functions(JSONObject s) {
@@ -338,17 +364,6 @@ public class CampaignExpanded extends AppCompatActivity{
         builder.show();
     }
 
-    void share(String pictureFile)
-    {
-
-        Intent share = new Intent(Intent.ACTION_SEND);
-        share.setType("image/jpeg");
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        Uri imageUri = Uri.parse(pictureFile);
-        share.putExtra(Intent.EXTRA_STREAM, imageUri);
-        startActivity(Intent.createChooser(share, "Share via"));
-
-    }
     private void shareOnFacebook(String pictureFile, String text, String title){
         ShareLinkContent content = new ShareLinkContent.Builder()
                 .setContentTitle(title)
@@ -359,21 +374,3 @@ public class CampaignExpanded extends AppCompatActivity{
 //        ShareDialog.show(CampaignExpanded.this, content);
     }
 }
-
-/*
-<com.rey.material.widget.Button
-        android:id="@+id/time_stamp"
-        android:layout_width="240dp"
-        android:layout_height="100dp"
-        android:text="Time stamp"
-        android:textColor="#FFFFFF"
-        android:textSize="25sp"
-        android:background="#1CBC9D"
-        android:layout_centerInParent="true"
-        app:rd_enable = "true"
-        app:rd_style = "@style/Material.Drawable.Ripple.Wave"
-        app:rd_rippleType = "wave"
-
-        />
-
- */

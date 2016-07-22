@@ -40,10 +40,20 @@ public class CommentCampaignAdapter extends BaseAdapter {
         }else{
             nulling = true;
         }
-
         // this.icons = icons;
 
     }
+
+    public void updating(JSONObject s){
+        categorynam = s;
+        try {
+            total = categorynam.getJSONArray("comment").length();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+    }
+
     @Override
     public int getCount() {
         return total;

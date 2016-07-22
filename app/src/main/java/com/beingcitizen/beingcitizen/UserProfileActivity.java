@@ -1,8 +1,11 @@
 package com.beingcitizen.beingcitizen;
 
+import android.Manifest;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -15,6 +18,9 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.InputFilter;
@@ -26,7 +32,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -44,6 +49,7 @@ import com.beingcitizen.retrieveals.RetrieveUserProfile;
 import com.beingcitizen.retrieveals.SendUserFollow;
 import com.beingcitizen.retrieveals.SendUserUnfollow;
 import com.github.clans.fab.FloatingActionButton;
+import com.rey.material.widget.Button;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
@@ -56,7 +62,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -77,76 +85,12 @@ public class UserProfileActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.userprofile_layout1);
-        sharedpreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        follow_button = (TextView) findViewById(R.id.follow_button);
-        uid_viewer = sharedpreferences.getString("id", "16");
-        if (getIntent().getExtras()!=null) {
-            uid = getIntent().getExtras().getString("uid");
-            if (uid.contentEquals(uid_viewer)){
-                follow_button.setVisibility(View.GONE);
-            }
-        }else{
-            uid = uid_viewer;
-            follow_button.setVisibility(View.GONE);
-        }
-        follow_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!followed){
-                    followed = true;
-                    follow_button.setText("  FOLLOWED    ");
-                    SendUserFollow userFollow = new SendUserFollow(UserProfileActivity.this);
-                    userFollow.execute(uid_viewer, uid);
-                }else{
-                    followed = false;
-                    follow_button.setText("+ FOLLOW      ");
-                    SendUserUnfollow userUnfollow = new SendUserUnfollow(UserProfileActivity.this);
-                    userUnfollow.execute(uid_viewer, uid);
-                }
-            }
-        });
-        nameview=(TextView)findViewById(R.id.name);
-        emailview=(TextView)findViewById(R.id.email);
-        toolbar = (Toolbar) findViewById(R.id.tool_bar);
-        profile = (ImageView)findViewById(R.id.profile_picture);
+        init();
         profile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (uid.contentEquals(uid_viewer)) {
-                    final Dialog dialogLogout = new Dialog(UserProfileActivity.this);
-                    dialogLogout.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                    dialogLogout.setContentView(R.layout.dialog_changepic);
-                    FloatingActionButton fab_camera = (FloatingActionButton) dialogLogout.findViewById(R.id.fab_camera);
-                    FloatingActionButton fab_gallery = (FloatingActionButton) dialogLogout.findViewById(R.id.fab_gallery);
-                    fab_camera.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                            File f = new File(Environment.getExternalStorageDirectory(), "temp.jpg");
-                            intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(f));
-                            startActivityForResult(intent, 1);
-                        }
-                    });
-                    fab_gallery.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                            startActivityForResult(intent, 2);
-                        }
-                    });
-                    Button update = (Button) dialogLogout.findViewById(R.id.update);
-                    update.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            if (bitmap != null) {
-                                sendUserImage();
-                                dialogLogout.dismiss();
-                            } else {
-                                Toast.makeText(UserProfileActivity.this, "Choose Image first!", Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    });
-                    dialogLogout.show();
+                    insertDummyContactWrapper();
                 }
             }
         });
@@ -471,6 +415,7 @@ public class UserProfileActivity extends AppCompatActivity {
                     try {
                         outFile = new FileOutputStream(file);
                         bitmap.compress(Bitmap.CompressFormat.JPEG, 85, outFile);
+                        profile.setImageBitmap(bitmap);
                         outFile.flush();
                         outFile.close();
                     } catch (FileNotFoundException e) {
@@ -500,11 +445,14 @@ public class UserProfileActivity extends AppCompatActivity {
                 bitmapOptions.inSampleSize = calculateInSampleSize(bitmapOptions, 256, 256);
                 bitmapOptions.inJustDecodeBounds = false;
                 bitmap = BitmapFactory.decodeFile(picturePath, bitmapOptions);
-                Log.e("path of image", picturePath + "");
                 profile.setImageBitmap(bitmap);
             }
+            if (bitmap != null) {
+                sendUserImage();
+            } else {
+                Toast.makeText(UserProfileActivity.this, "Choose Image first!", Toast.LENGTH_SHORT).show();
+            }
         }
-        Log.e("Picture Path", iname);
     }
 
     public static int calculateInSampleSize(
@@ -530,5 +478,172 @@ public class UserProfileActivity extends AppCompatActivity {
         return inSampleSize;
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (bitmap!=null)
+            if (!bitmap.isRecycled())
+                bitmap.recycle();
+    }
 
+    private void insertDummyContact() {
+        final Dialog dialogLogout = new Dialog(UserProfileActivity.this);
+        dialogLogout.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialogLogout.setContentView(R.layout.dialog_changepic);
+        FloatingActionButton fab_camera = (FloatingActionButton) dialogLogout.findViewById(R.id.fab_camera);
+        FloatingActionButton fab_gallery = (FloatingActionButton) dialogLogout.findViewById(R.id.fab_gallery);
+        fab_camera.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                File f = new File(Environment.getExternalStorageDirectory(), "temp.jpg");
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(f));
+                startActivityForResult(intent, 1);
+                dialogLogout.dismiss();
+            }
+        });
+        fab_gallery.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(intent, 2);
+                dialogLogout.dismiss();
+            }
+        });
+        final Button cancel = (Button) dialogLogout.findViewById(R.id.update);
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialogLogout.dismiss();
+            }
+        });
+        dialogLogout.show();
+    }
+
+    private void init(){
+        sharedpreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        follow_button = (TextView) findViewById(R.id.follow_button);
+        uid_viewer = sharedpreferences.getString("id", "16");
+        if (getIntent().getExtras()!=null) {
+            uid = getIntent().getExtras().getString("uid");
+            if (uid.contentEquals(uid_viewer)){
+                follow_button.setVisibility(View.GONE);
+            }
+        }else{
+            uid = uid_viewer;
+            follow_button.setVisibility(View.GONE);
+        }
+        follow_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!followed){
+                    followed = true;
+                    follow_button.setText("  FOLLOWED    ");
+                    SendUserFollow userFollow = new SendUserFollow(UserProfileActivity.this);
+                    userFollow.execute(uid_viewer, uid);
+                }else{
+                    followed = false;
+                    follow_button.setText("+ FOLLOW      ");
+                    SendUserUnfollow userUnfollow = new SendUserUnfollow(UserProfileActivity.this);
+                    userUnfollow.execute(uid_viewer, uid);
+                }
+            }
+        });
+        nameview=(TextView)findViewById(R.id.name);
+        emailview=(TextView)findViewById(R.id.email);
+        toolbar = (Toolbar) findViewById(R.id.tool_bar);
+        profile = (ImageView)findViewById(R.id.profile_picture);
+    }
+
+    final private int REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS = 124;
+
+    private void insertDummyContactWrapper() {
+        List<String> permissionsNeeded = new ArrayList<String>();
+
+        final List<String> permissionsList = new ArrayList<String>();
+        if (!addPermission(permissionsList, Manifest.permission.CAMERA))
+            permissionsNeeded.add("CAMERA");
+        if (!addPermission(permissionsList, Manifest.permission.WRITE_EXTERNAL_STORAGE))
+            permissionsNeeded.add("WRITE EXTERNAL STORAGE");
+//        if (!addPermission(permissionsList, Manifest.permission.READ_EXTERNAL_STORAGE))
+//            permissionsNeeded.add("READ EXTERNAL STORAGE");
+
+        if (permissionsList.size() > 0) {
+            if (permissionsNeeded.size() > 0) {
+                // Need Rationale
+                String message = "You need to grant access to " + permissionsNeeded.get(0);
+                for (int i = 1; i < permissionsNeeded.size(); i++)
+                    message = message + ", " + permissionsNeeded.get(i);
+                showMessageOKCancel(message,
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                ActivityCompat.requestPermissions(UserProfileActivity.this, permissionsList.toArray(new String[permissionsList.size()]),
+                                        REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS);
+                            }
+                        });
+                return;
+            }
+            ActivityCompat.requestPermissions(this, permissionsList.toArray(new String[permissionsList.size()]),
+                    REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS);
+            return;
+        }
+
+        insertDummyContact();
+    }
+
+    private boolean addPermission(List<String> permissionsList, String permission) {
+        if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+            permissionsList.add(permission);
+            // Check for Rationale Option
+            if (!ActivityCompat.shouldShowRequestPermissionRationale(this, permission))
+                return false;
+        }
+        return true;
+    }
+
+    private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) {
+        new AlertDialog.Builder(UserProfileActivity.this)
+                .setMessage(message)
+                .setPositiveButton("OK", okListener)
+                .setNegativeButton("Cancel", okListener)
+                .create()
+                .show();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS:
+            {
+                Map<String, Integer> perms = new HashMap<String, Integer>();
+                // Initial
+                perms.put(Manifest.permission.CAMERA, PackageManager.PERMISSION_GRANTED);
+                perms.put(Manifest.permission.WRITE_EXTERNAL_STORAGE, PackageManager.PERMISSION_GRANTED);
+//                perms.put(Manifest.permission.READ_EXTERNAL_STORAGE, PackageManager.PERMISSION_GRANTED);
+                // Fill with results
+                for (int i = 0; i < permissions.length; i++)
+                    perms.put(permissions[i], grantResults[i]);
+                // Check for ACCESS_FINE_LOCATION
+                if (perms.get(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
+                        && perms.get(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                    // All Permissions Granted
+                    insertDummyContact();
+                } else {
+                    // Permission Denied
+                    Toast.makeText(UserProfileActivity.this, "Some Permission is Denied", Toast.LENGTH_SHORT)
+                            .show();
+                }
+            }
+            break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
 }
+
+
+
+/*
+
+ */
