@@ -19,8 +19,8 @@ public class CampaignCategory  extends Fragment {
     private ListView userList;
 
     Drawable drawable;
-    String TITLES[] = {"Law and Order", "Public Health and Sanitation","Communication"
-    ,"Water Supplies","Lands, Agriculture", "Trade,Commerce,Employment","Environment and Holticulture", "Tourism, Art and Culture", "Power", "Corruption/Vigillance"};
+    String TITLES[] = {"Law and Order", "Public health and Sanitation","Communication"
+    ,"Water Supplies","Lands, Agriculture", "Trade,Commerce,Employment","Environment and Horticulture", "Tourism, Art and Culture", "Power", "Corruption/Vigillance"};
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {

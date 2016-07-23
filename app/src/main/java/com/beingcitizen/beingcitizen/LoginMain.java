@@ -43,6 +43,7 @@ import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.ProfileTracker;
 import com.facebook.appevents.AppEventsLogger;
+import com.facebook.login.LoginBehavior;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
@@ -112,6 +113,7 @@ public class LoginMain extends Activity implements GoogleApiClient.ConnectionCal
 //        }
         facebookSDKInitialize();
         setContentView(R.layout.login);
+
         googleApiClient = new GoogleApiClient.Builder(this).addConnectionCallbacks(this).
                 addOnConnectionFailedListener(this).addApi(Plus.API, Plus.PlusOptions.builder().
                 build()).addScope(Plus.SCOPE_PLUS_PROFILE).addApi(AppIndex.API).build();
@@ -142,10 +144,11 @@ public class LoginMain extends Activity implements GoogleApiClient.ConnectionCal
 
         fb_signin=(LoginButton)findViewById(R.id.fb_signin);
         fb_signin.setReadPermissions(Arrays.asList("public_profile", "email", "user_birthday"));
-
+        fb_signin.setLoginBehavior(LoginBehavior.WEB_ONLY);
         fb_signin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                LoginManager.getInstance().logOut();
                 getLoginDetails(fb_signin);
             }
         });
@@ -169,6 +172,7 @@ And then callback manager will handle the login responses.
 
         FacebookSdk.sdkInitialize(getApplicationContext());
         callbackManager = CallbackManager.Factory.create();
+        LoginManager.getInstance().logOut();
     }
 
      /*
@@ -183,17 +187,18 @@ And then callback manager will handle the login responses.
             public void onSuccess(LoginResult login_result) {
                 getUserInfo(login_result);
 //                Toast.makeText(LoginMain.this,full_name,Toast.LENGTH_SHORT).show();
-
             }
 
             @Override
             public void onCancel() {
+                Toast.makeText(LoginMain.this, "Cannot launch Facebook!", Toast.LENGTH_SHORT).show();
                 // code for cancellation
             }
 
             @Override
             public void onError(FacebookException exception) {
-                //  code to handle error
+                Toast.makeText(LoginMain.this, "Cannot launch Facebook!", Toast.LENGTH_SHORT).show();
+                Log.getStackTraceString(exception);
             }
         });
     }
@@ -234,7 +239,7 @@ When the request is completed, a callback is called to handle the success condit
                 });
 
         Bundle permission_param = new Bundle();
-        permission_param.putString("fields", "id,name,email,gender,picture.width(120).height(120)");
+        permission_param.putString("fields", "id,name,email,gender");
         data_request.setParameters(permission_param);
         data_request.executeAsync();
     }
@@ -449,7 +454,6 @@ When the request is completed, a callback is called to handle the success condit
 
     protected void onStart() {
         super.onStart();
-        LoginManager.getInstance().logOut();
         if (googleApiClient!=null) {
             googleApiClient.connect();
         }else{

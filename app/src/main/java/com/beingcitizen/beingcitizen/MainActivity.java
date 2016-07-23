@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements OnMenuItemClickLi
     //And we also create a int resource for profile picture in the header view
 
     String user,email;
-    String NAME_i, EMAIL_i, MLA_name, consti;
+    String NAME_i, EMAIL_i, MLA_name="No_mla_id", consti;
     String selected="";
 
     JSONObject response, profile_pic_data, profile_pic_url;

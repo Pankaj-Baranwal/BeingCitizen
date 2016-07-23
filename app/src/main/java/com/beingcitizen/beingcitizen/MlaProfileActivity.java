@@ -48,6 +48,7 @@ public class MlaProfileActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
         mla_id = sp.getString("mla_id", "m001");
+        Log.e("mla_id", mla_id+"");
         img_mla = (ImageView)findViewById(R.id.profile_picture);
         mla_consti = (TextView)findViewById(R.id.mla_consti);
         mla_name = (TextView)findViewById(R.id.mla_name);
@@ -72,7 +73,7 @@ public class MlaProfileActivity extends AppCompatActivity {
                 Log.e("LENGTH", num_camp + "");
                 consti = info.getJSONObject(0).getString("constituency");
                 gender = info.getJSONObject(0).getString("gender");
-                String image_loc = "http://beingcitizen.com/uploads/    mla/display/" + info.getJSONObject(0).getString("mlaimage") + info.getJSONObject(0).getString("mlaext");
+                String image_loc = "http://beingcitizen.com/uploads/mla/display/" + info.getJSONObject(0).getString("mlaimage") + info.getJSONObject(0).getString("mlaext");
                 Picasso.with(this).load(image_loc).resize(150, 150).into(img_mla);
                 JSONArray jA = new JSONArray();
                 for (int i = 0; i < obj.getJSONArray("new").length(); i++) {

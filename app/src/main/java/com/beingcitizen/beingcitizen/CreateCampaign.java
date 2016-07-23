@@ -64,9 +64,9 @@ import java.util.Map;
  * Created by saransh on 12-07-2015.
  */
 public class CreateCampaign extends AppCompatActivity {
-    Spinner consti_spinner, category_spinner, tag_spinner;
+    Spinner consti_spinner, category_spinner, tag_spinner, followable, volunteerable;
     EditText title_create, text_create;
-    String category="err", tag="err", consti="err", text="", tags = "", name = "", iname = "";
+    String category="err", tag="err", consti="err", text="", tags = "", name = "", iname = "", followable_val = "err", volunteerable_val = "err";
     Bitmap bitmap = null;
     boolean camera = false;
     FloatingActionMenu fab_menu;
@@ -90,6 +90,8 @@ public class CreateCampaign extends AppCompatActivity {
         rac.execute();
         tag_spinner = (Spinner)findViewById(R.id.tag_spinner);
         category_spinner = (Spinner)findViewById(R.id.category_spinner);
+        volunteerable = (Spinner)findViewById(R.id.volunteerable_spinner);
+        followable = (Spinner)findViewById(R.id.followable_spinner);
 
         category_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -138,6 +140,36 @@ public class CreateCampaign extends AppCompatActivity {
             }
         });
 
+        followable.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (position==0)
+                    followable_val = "err";
+                else
+                    followable_val = (position==1?1:0)+"";
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        volunteerable.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (position==0)
+                    volunteerable_val = "err";
+                else
+                    volunteerable_val = (position==1?1:0)+"";
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
         fab_menu = (FloatingActionMenu) findViewById(R.id.fab_main);
         fab_menu.setClosedOnTouchOutside(true);
         //ImageView buttonLoadImage = (ImageView) findViewById(R.id.buttonLoadPicture);
@@ -176,6 +208,8 @@ public class CreateCampaign extends AppCompatActivity {
                     Toast.makeText(CreateCampaign.this, "Enter correct Tag", Toast.LENGTH_SHORT).show();
                 }else if (bitmap==null){
                     Toast.makeText(CreateCampaign.this, "Upload an image", Toast.LENGTH_SHORT).show();
+                }else if (followable_val.contentEquals("err") || volunteerable_val.contentEquals("err")){
+                    Toast.makeText(CreateCampaign.this, "Fill up all options!", Toast.LENGTH_SHORT).show();
                 }else {
                     makeCampaign();
                     fab_menu.close(true);
@@ -219,6 +253,8 @@ public class CreateCampaign extends AppCompatActivity {
                 params.put("category", category);
                 params.put("tags", tags);
                 params.put("ext", ".JPG");
+                params.put("volunteerable", volunteerable_val);
+                params.put("followable", followable_val);
                 bitmap.recycle();
                 return params;
             };
@@ -285,7 +321,7 @@ public class CreateCampaign extends AppCompatActivity {
                     File file = new File(path, iname + ".jpg");
                     try {
                         outFile = new FileOutputStream(file);
-                        bitmap.compress(Bitmap.CompressFormat.JPEG, 85, outFile);
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outFile);
                         outFile.flush();
                         outFile.close();
                     } catch (FileNotFoundException e) {
@@ -423,8 +459,6 @@ public class CreateCampaign extends AppCompatActivity {
             permissionsNeeded.add("CAMERA");
         if (!addPermission(permissionsList, Manifest.permission.WRITE_EXTERNAL_STORAGE))
             permissionsNeeded.add("WRITE EXTERNAL STORAGE");
-        if (!addPermission(permissionsList, Manifest.permission.READ_EXTERNAL_STORAGE))
-            permissionsNeeded.add("READ EXTERNAL STORAGE");
 
         if (permissionsList.size() > 0) {
             if (permissionsNeeded.size() > 0) {
@@ -478,14 +512,12 @@ public class CreateCampaign extends AppCompatActivity {
                 // Initial
                 perms.put(Manifest.permission.CAMERA, PackageManager.PERMISSION_GRANTED);
                 perms.put(Manifest.permission.WRITE_EXTERNAL_STORAGE, PackageManager.PERMISSION_GRANTED);
-                perms.put(Manifest.permission.READ_EXTERNAL_STORAGE, PackageManager.PERMISSION_GRANTED);
                 // Fill with results
                 for (int i = 0; i < permissions.length; i++)
                     perms.put(permissions[i], grantResults[i]);
                 // Check for ACCESS_FINE_LOCATION
                 if (perms.get(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
-                        && perms.get(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
-                        && perms.get(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                        && perms.get(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
                     // All Permissions Granted
                     insertDummyContact();
                 } else {

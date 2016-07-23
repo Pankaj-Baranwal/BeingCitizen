@@ -39,7 +39,7 @@ public class signUp extends Activity implements retrieveCampaign, signUp_interfa
     private EditText name;
     private EditText password;
     private EditText email;
-    private String gender_text = "";
+    private String gender_text = "", constit="";
 
     ArrayAdapter<String> adapter;
 
@@ -167,10 +167,9 @@ public class signUp extends Activity implements retrieveCampaign, signUp_interfa
                         edit.putString("constituency", content[0]);
                         edit.apply();
                         RetrieveMlaID rmlaid = new RetrieveMlaID(signUp.this, signUp.this);
+                        constit = content[0];
                         rmlaid.execute(content[0]);
-                        RetrieveSignUp rsup = new RetrieveSignUp(signUp.this, signUp.this);
                         dialogLogout.cancel();
-                        rsup.execute(name.getText().toString(), email.getText().toString(), password.getText().toString(), gender_text, content[0]);
                     }
                 }
             });
@@ -224,6 +223,8 @@ public class signUp extends Activity implements retrieveCampaign, signUp_interfa
             edit.putString("mla_id", "No_mla_id");
             edit.apply();
         }
+        RetrieveSignUp rsup = new RetrieveSignUp(signUp.this, signUp.this);
+        rsup.execute(name.getText().toString(), email.getText().toString(), password.getText().toString(), gender_text, constit);
     }
 
 

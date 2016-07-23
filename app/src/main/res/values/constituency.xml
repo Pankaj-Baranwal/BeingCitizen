@@ -13,6 +13,16 @@
         <item>upvote</item>
         <item>downvote</item>
     </string-array>
+    <string-array name="followable">
+        <item>--Select your choice--</item>
+        <item>Followable</item>
+        <item>Not Followable</item>
+    </string-array>
+    <string-array name="volunteerable">
+        <item>--Select your choice--</item>
+        <item>Volunteerable</item>
+        <item>Not Volunteerable</item>
+    </string-array>
     <string-array name="category">
         <item>--Select your choice--</item>
         <item>Law and Order</item>

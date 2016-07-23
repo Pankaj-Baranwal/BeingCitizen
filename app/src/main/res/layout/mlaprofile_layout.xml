@@ -39,6 +39,7 @@
                             android:layout_width="105dp"
                             android:layout_height="105dp"
                             android:layout_gravity="center"
+                            android:src="@drawable/mla"
                             />
 
                         <ImageView

@@ -153,7 +153,7 @@ public class UserProfileActivity extends AppCompatActivity {
             JSONArray campsFollowed = obj.getJSONArray("fcamp");
             String constituency = info.getString("constituency");
             String image_loc = "http://beingcitizen.com/uploads/display/"+info.getString("uimage")+info.getString("uext");
-            Picasso.with(this).load(image_loc).resize(150, 150).into(profile);
+            Picasso.with(this).load(image_loc).resize(256, 256).into(profile);
             createUIForCreated(campsStarted);
             createUIForFollowed(campsFollowed);
             nameview.setText(name);
@@ -414,7 +414,7 @@ public class UserProfileActivity extends AppCompatActivity {
                     File file = new File(path, iname + ".jpg");
                     try {
                         outFile = new FileOutputStream(file);
-                        bitmap.compress(Bitmap.CompressFormat.JPEG, 85, outFile);
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outFile);
                         profile.setImageBitmap(bitmap);
                         outFile.flush();
                         outFile.close();

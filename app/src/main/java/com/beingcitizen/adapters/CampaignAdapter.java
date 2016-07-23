@@ -159,12 +159,13 @@ public class CampaignAdapter extends BaseAdapter{
             info_campaign.setText(campaign_text);
             String cat = categorynam.getJSONObject(position).getString("category");
             category.setText(cat.length()<22?cat:cat.substring(0, 22)+"...");
+            Log.e("cate", cat);
             switch (cat){
                 case "Law and Order":
                     category_img.setImageResource(R.drawable.public_law_and_order_black);
                     break;
-                case "Public Health and Sanitation":
-                    category_img.setImageResource(R.drawable.public_health_and_sanitation_black);
+                case "Public health and Sanitation":
+                    category_img.setImageResource(R.drawable.public_black);
                     break;
                 case "Communication":
                     category_img.setImageResource(R.drawable.communication_black);
@@ -178,7 +179,8 @@ public class CampaignAdapter extends BaseAdapter{
                 case "Trade,Commerce,Employment":
                     category_img.setImageResource(R.drawable.market_black);
                     break;
-                case "Environment and Holticulture":
+                case "Environment and Horticulture":
+                    Log.e("Environ", "setImage");
                     category_img.setImageResource(R.drawable.ecology_black);
                     break;
                 case "Tourism, Art and Culture":
@@ -193,7 +195,7 @@ public class CampaignAdapter extends BaseAdapter{
             }
         } catch (JSONException e) {
             //Log.e("ERROR", "YEES");
-            e.printStackTrace();
+            Log.getStackTraceString(e);
         }
         like.setOnClickListener(new View.OnClickListener() {
             @Override

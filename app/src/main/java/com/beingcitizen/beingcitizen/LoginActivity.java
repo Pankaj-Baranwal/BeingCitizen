@@ -13,7 +13,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.beingcitizen.R;
+import com.beingcitizen.interfaces.mla_id;
 import com.beingcitizen.retrieveals.RetrieveFeedTask;
+import com.beingcitizen.retrieveals.RetrieveMlaID;
 import com.rey.material.widget.Button;
 
 import org.json.JSONException;
@@ -22,7 +24,7 @@ import org.json.JSONObject;
 /**
  * Created by saransh on 14-06-2015.
  */
-public class LoginActivity extends Activity implements com.beingcitizen.interfaces.login {
+public class LoginActivity extends Activity implements com.beingcitizen.interfaces.login, mla_id {
 
     public TextView welocomeback, citizen, forgotPassword;
     public Button login;
@@ -116,11 +118,25 @@ public class LoginActivity extends Activity implements com.beingcitizen.interfac
                 e.printStackTrace();
                 Log.e("ERROR", "Error in storing to shared prefs");
             }
-            Intent i = new Intent(getBaseContext(), MainActivity.class);
-            startActivity(i);
-            finish();
+            RetrieveMlaID rmlaid = new RetrieveMlaID(LoginActivity.this, LoginActivity.this);
+            rmlaid.execute(sharedpreferences.getString("const", "Burari"));
         } else {
             Toast.makeText(this, "Incorrect details", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    @Override
+    public void mla_ids(String mlaID) {
+        SharedPreferences.Editor edit = sharedpreferences.edit();
+        if (!mlaID.contentEquals("null")) {
+            edit.putString("mla_id", mlaID);
+            edit.apply();
+        }else{
+            edit.putString("mla_id", "No_mla_id");
+            edit.apply();
+        }
+        Intent i = new Intent(getBaseContext(), MainActivity.class);
+        startActivity(i);
+        finish();
     }
 }
