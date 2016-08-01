@@ -25,7 +25,7 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
-import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,8 +36,11 @@ import com.beingcitizen.fragments.DailyDigest;
 import com.beingcitizen.fragments.Debate;
 import com.beingcitizen.fragments.TermsCondition;
 import com.beingcitizen.interfaces.adapterUpdate;
+import com.beingcitizen.interfaces.getUserProfile;
 import com.beingcitizen.interfaces.retrieveCamp;
 import com.beingcitizen.retrieveals.RetrieveCampaign;
+import com.beingcitizen.retrieveals.RetrieveUserProfile;
+import com.squareup.picasso.Picasso;
 import com.yalantis.contextmenu.lib.interfaces.OnMenuItemClickListener;
 
 import org.json.JSONArray;
@@ -51,7 +54,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 
-public class MainActivity extends AppCompatActivity implements OnMenuItemClickListener, retrieveCamp {
+public class MainActivity extends AppCompatActivity implements OnMenuItemClickListener, retrieveCamp, getUserProfile {
 
     //First We Declare Titles And Icons For Our Navigation Drawer List View
     //This Icons And Titles Are holded in an Array as you can see
@@ -63,7 +66,6 @@ public class MainActivity extends AppCompatActivity implements OnMenuItemClickLi
     //Similarly we Create a String Resource for the name and email in the header view
     //And we also create a int resource for profile picture in the header view
 
-    String user,email;
     String NAME_i, EMAIL_i, MLA_name="No_mla_id", consti;
     String selected="";
 
@@ -74,7 +76,6 @@ public class MainActivity extends AppCompatActivity implements OnMenuItemClickLi
     Fragment dailydigest = new DailyDigest();
     Fragment terms = new TermsCondition();
     private Toolbar toolbar;     // Declaring the Toolbar Object
-    ImageView profile_pic;
     RecyclerView mRecyclerView;                           // Declaring RecyclerView
     RecyclerView.Adapter mAdapter;                        // Declaring Adapter For Recycler View
     RecyclerView.LayoutManager mLayoutManager;            // Declaring Layout Manager as a linear layout manager
@@ -84,19 +85,14 @@ public class MainActivity extends AppCompatActivity implements OnMenuItemClickLi
     ActionBarDrawerToggle mDrawerToggle;                  // Declaring Action Bar Drawer Toggle
     SharedPreferences sharedpreferences;
     SharedPreferences.Editor editor;
+    public RelativeLayout rl;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //Intent intent = getIntent();
-        //String jsondata = intent.getStringExtra("jsondata");
-
-    profile_pic=(ImageView)findViewById(R.id.profile_picture);
-        //setUserProfile(jsondata);  // call setUserProfile Method.
-
-
+        rl = (RelativeLayout)findViewById(R.id.progress_imageLoading);
         try {
             PackageInfo info = getPackageManager().getPackageInfo(
                     "com.beingcitizen.beingcitizen",
@@ -136,7 +132,8 @@ public class MainActivity extends AppCompatActivity implements OnMenuItemClickLi
         // And passing the titles,icons,header view name, header view email,
         // and header view profile picture
         mRecyclerView.setAdapter(mAdapter);                              // Setting the adapter to RecyclerView
-
+        RetrieveUserProfile userProfile = new RetrieveUserProfile(this);
+        userProfile.execute(sharedpreferences.getString("id", "17"), sharedpreferences.getString("id", "17"));
         final GestureDetector mGestureDetector = new GestureDetector(MainActivity.this, new GestureDetector.SimpleOnGestureListener() {
 
             @Override
@@ -180,8 +177,6 @@ public class MainActivity extends AppCompatActivity implements OnMenuItemClickLi
                             recyclerView.getAdapter().notifyDataSetChanged();
                             getSupportActionBar().setTitle("Campaign");
                             ft.replace(R.id.content_frame, campaign);
-                           // textView.setTypeface(null, Typeface.BOLD);
-                            //textView.setTextColor(Color.parseColor(""));
                             break;
                         case 2:
                             Draweradapter.mSelectedPosition=2;
@@ -205,7 +200,7 @@ public class MainActivity extends AppCompatActivity implements OnMenuItemClickLi
                             Draweradapter.mSelectedPosition=5;
                             recyclerView.getAdapter().notifyDataSetChanged();
                             //TODO: HELP...
-                            Toast.makeText(MainActivity.this, "Coming Soon" + recyclerView.getChildAdapterPosition(child), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MainActivity.this, "COMING SOON", Toast.LENGTH_SHORT).show();
                             break;
                         case 6:
                             Draweradapter.mSelectedPosition=6;
@@ -371,5 +366,18 @@ public class MainActivity extends AppCompatActivity implements OnMenuItemClickLi
         }catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Draweradapter.mSelectedPosition=1;
+    }
+
+    @Override
+    public void getImage(String img) {
+        String image_loc = "http://beingcitizen.com/uploads/display/"+img;
+        if (Draweradapter.profile!=null)
+        Picasso.with(this).load(image_loc).resize(256, 256).into(Draweradapter.profile);
     }
 }

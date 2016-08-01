@@ -17,6 +17,7 @@ import com.beingcitizen.interfaces.mla_id;
 import com.beingcitizen.retrieveals.RetrieveFeedTask;
 import com.beingcitizen.retrieveals.RetrieveMlaID;
 import com.rey.material.widget.Button;
+import com.rey.material.widget.ProgressView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,6 +32,7 @@ public class LoginActivity extends Activity implements com.beingcitizen.interfac
     public EditText email, password;
     String uid = "16";
     SharedPreferences sharedpreferences;
+    ProgressView loading;
 
 
     @Override
@@ -43,6 +45,7 @@ public class LoginActivity extends Activity implements com.beingcitizen.interfac
             finish();
         } else {
             setContentView(R.layout.login1);
+            loading = (ProgressView)findViewById(R.id.progress_imageLoading);
             welocomeback = (TextView) findViewById(R.id.textView);
             citizen = (TextView) findViewById(R.id.textView1);
             login = (Button) findViewById(R.id.button);
@@ -85,6 +88,7 @@ public class LoginActivity extends Activity implements com.beingcitizen.interfac
         String email_edit = email.getText().toString();
         String pass_edit = password.getText().toString();
         if (email_edit.length() > 0 && pass_edit.length() > 0) {
+            loading.setVisibility(View.VISIBLE);
             RetrieveFeedTask rft = new RetrieveFeedTask(this);
             rft.execute(email_edit, pass_edit);
         } else {
@@ -121,6 +125,7 @@ public class LoginActivity extends Activity implements com.beingcitizen.interfac
             RetrieveMlaID rmlaid = new RetrieveMlaID(LoginActivity.this, LoginActivity.this);
             rmlaid.execute(sharedpreferences.getString("const", "Burari"));
         } else {
+            loading.setVisibility(View.GONE);
             Toast.makeText(this, "Incorrect details", Toast.LENGTH_SHORT).show();
         }
     }
@@ -136,6 +141,7 @@ public class LoginActivity extends Activity implements com.beingcitizen.interfac
             edit.apply();
         }
         Intent i = new Intent(getBaseContext(), MainActivity.class);
+        loading.setVisibility(View.GONE);
         startActivity(i);
         finish();
     }

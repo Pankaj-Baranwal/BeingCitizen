@@ -3,6 +3,7 @@ package com.beingcitizen.adapters;
 /**
  * Created by saransh on 14-06-2015.
  */
+
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -14,14 +15,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.beingcitizen.R;
-import com.facebook.login.widget.ProfilePictureView;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
  * Created by hp1 on 28-12-2014.
  */
-public class Draweradapter extends RecyclerView.Adapter<Draweradapter.ViewHolder> {
+public class Draweradapter extends RecyclerView.Adapter<Draweradapter.ViewHolder>{
 
 
     public static int mSelectedPosition = 1;
@@ -37,38 +37,28 @@ public class Draweradapter extends RecyclerView.Adapter<Draweradapter.ViewHolder
     private String email, mlaName, mlaConsti;       //String Resource for header view email
     public static boolean mlaExists = true;
     static ImageView arrows;
-    static CircleImageView mla_image;
+    public static CircleImageView mla_image, profile;
     static TextView mla_name;
     static TextView mla_consti;
 
     // Creating a ViewHolder which extends the RecyclerView View Holder
     // ViewHolder are used to to store the inflated views in order to recycle them
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder{
         int Holderid;
         Context c;
         TextView textView;
         ImageView imageView;
-        ProfilePictureView profile;
-
-        CircleImageView profile1;
         TextView Name;
 
         public ViewHolder(final View itemView,int ViewType) {                 // Creating ViewHolder Constructor with View and viewType As a parameter
             super(itemView);
 
             itemView.setClickable(true);
-
-
-
-
-
-
-
             // Bundle extras = this.getIntent().getExtras();
-        // Here we set the appropriate view in accordance with the the view type as passed when the holder object is created
+            // Here we set the appropriate view in accordance with the the view type as passed when the holder object is created
 
-            if(ViewType == TYPE_ITEM) {
+            if (ViewType == TYPE_ITEM) {
                 textView = (TextView) itemView.findViewById(R.id.rowText); // Creating TextView object with the id of textView from item_row.xml
                 imageView = (ImageView) itemView.findViewById(R.id.rowIcon);// Creating ImageView object with the id of ImageView from item_row.xml
                 Holderid = 1;                                               // setting holder id as 1 as the object being populated are of type item row
@@ -85,8 +75,7 @@ public class Draweradapter extends RecyclerView.Adapter<Draweradapter.ViewHolder
                     mla_image.setVisibility(View.GONE);
                     mla_name.setVisibility(View.GONE);
                 }
-                profile = (ProfilePictureView)itemView.findViewById(R.id.profile_picture);
-                profile.setCropped(true);
+                profile = (CircleImageView)itemView.findViewById(R.id.profile_picture);
                 Holderid = 0;                                                // Setting holder id = 0 as the object being populated are of type header view
             }
         }

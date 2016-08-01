@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.beingcitizen.R;
+import com.beingcitizen.beingcitizen.MainActivity;
 import com.beingcitizen.retrieveals.RetrieveDailyDigest;
 import com.beingcitizen.tab.SlidingTabLayout;
 
@@ -29,11 +30,13 @@ public class DailyDigest extends Fragment implements ActionBar.TabListener {
     String uid = "16";
     static boolean called = false;
     View view;
+    MainActivity parent;
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getContext());
+        parent.rl.setVisibility(View.VISIBLE);
         RetrieveDailyDigest rdd = new RetrieveDailyDigest(this);
         uid = sp.getString("uid", "16");
         rdd.execute(uid);
@@ -53,18 +56,15 @@ public class DailyDigest extends Fragment implements ActionBar.TabListener {
             }
         });*/
         mSectionsPagerAdapter = new SectionsPagerAdapter(getChildFragmentManager());
-
+        parent = (MainActivity)getActivity() ;
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) view.findViewById(R.id.pager);
-        mViewPager.setAdapter(mSectionsPagerAdapter);
         mTabs = (SlidingTabLayout) view.findViewById(R.id.tabs);
         mTabs.setDistributeEvenly(true);
 
         //set tab strip backgroung color (grey)
         mTabs.setBackgroundColor(0xFF009688);
-
         setHasOptionsMenu(true);
-        mTabs.setViewPager(mViewPager);
         return view;
     }
 
@@ -89,6 +89,9 @@ public class DailyDigest extends Fragment implements ActionBar.TabListener {
         Polls.function(s);
         Blogs.function(s);
         Cartoons.function(s);
+        mViewPager.setAdapter(mSectionsPagerAdapter);
+        mTabs.setViewPager(mViewPager);
+        parent.rl.setVisibility(View.GONE);
     }
 
 

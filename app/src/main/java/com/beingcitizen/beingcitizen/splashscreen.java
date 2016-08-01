@@ -98,6 +98,13 @@ public class splashscreen extends Activity {
                 startActivity(i);
             }
             finish();
+        }else{
+            showMessageOKCancel("You do not have Internet Connection.", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    finish();
+                }
+            });
         }
     }
 

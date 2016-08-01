@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    android:id="@+id/main_parent_view"
+<RelativeLayout android:id="@+id/main_parent_view"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 <android.support.v4.widget.DrawerLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/DrawerLayout"
@@ -45,4 +45,20 @@
     </android.support.v7.widget.RecyclerView>
 
 </android.support.v4.widget.DrawerLayout>
-    </LinearLayout>
+    <RelativeLayout
+        android:id="@+id/progress_imageLoading"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#88ffffff"
+        android:visibility="gone">
+        <com.rey.material.widget.ProgressView
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_centerInParent="true"
+            app:pv_autostart="true"
+            app:pv_circular="true"
+            app:pv_progressStyle="@style/Material.Drawable.CircularProgress"
+            app:pv_progressMode="indeterminate"
+            />
+    </RelativeLayout>
+    </RelativeLayout>

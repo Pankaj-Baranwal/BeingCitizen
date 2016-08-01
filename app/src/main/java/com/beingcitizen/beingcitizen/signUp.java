@@ -24,6 +24,7 @@ import com.beingcitizen.retrieveals.RetrieveConstitutency;
 import com.beingcitizen.retrieveals.RetrieveMlaID;
 import com.beingcitizen.retrieveals.RetrieveSignUp;
 import com.rey.material.widget.Button;
+import com.rey.material.widget.ProgressView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -42,18 +43,24 @@ public class signUp extends Activity implements retrieveCampaign, signUp_interfa
     private String gender_text = "", constit="";
 
     ArrayAdapter<String> adapter;
+    ProgressView loading;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.sign_up);
-
+        loading = (ProgressView) findViewById(R.id.progress_imageLoading);
         name = (EditText) findViewById(R.id.editText);
         password = (EditText) findViewById(R.id.editText3);
         email = (EditText) findViewById(R.id.editText2);
         Spinner gender = (Spinner) findViewById(R.id.gender_spinner);
         Button signup = (Button) findViewById(R.id.button);
-
+        signup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onClickSign(v);
+            }
+        });
         //ArrayAdapter adapter1=ArrayAdapter.createFromResource(this,R.array.constituency_array,R.layout.spinner_item);
         // TODO: Implement constituency using location service
         final ArrayAdapter adapter1 = ArrayAdapter.createFromResource(this, R.array.gender, R.layout.spinner_item);
@@ -101,6 +108,7 @@ public class signUp extends Activity implements retrieveCampaign, signUp_interfa
                     if (pin_txt.getText().toString().length() != 6) {
                         Toast.makeText(signUp.this, "Wrong Pincode", Toast.LENGTH_SHORT).show();
                     } else {
+                        loading.setVisibility(View.VISIBLE);
                         RetrieveConstitutency rcc = new RetrieveConstitutency(signUp.this, signUp.this);
                         dialogLogout.dismiss();
                         rcc.execute(pin_txt.getText().toString());
@@ -132,6 +140,7 @@ public class signUp extends Activity implements retrieveCampaign, signUp_interfa
             for (int i = 0; i < namearray.length(); i++)
                 obj.add(namearray.getString(i));
             adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, obj);
+            loading.setVisibility(View.GONE);
             final Dialog dialogLogout = new Dialog(this);
             dialogLogout.requestWindowFeature(Window.FEATURE_NO_TITLE);
             dialogLogout.setContentView(R.layout.dialog_pincode);
@@ -162,6 +171,7 @@ public class signUp extends Activity implements retrieveCampaign, signUp_interfa
                     if (content[0].contentEquals("err")){
                         Toast.makeText(signUp.this, "Choose constituency", Toast.LENGTH_SHORT).show();
                     }else {
+                        loading.setVisibility(View.VISIBLE);
                         SharedPreferences sharedpreferences = PreferenceManager.getDefaultSharedPreferences(signUp.this);
                         SharedPreferences.Editor edit = sharedpreferences.edit();
                         edit.putString("constituency", content[0]);
@@ -182,6 +192,7 @@ public class signUp extends Activity implements retrieveCampaign, signUp_interfa
 
     @Override
     public void result(JSONObject obj) {
+        loading.setVisibility(View.GONE);
         if (obj.has("user_id")) {
             SharedPreferences sharedpreferences = PreferenceManager.getDefaultSharedPreferences(this);
             SharedPreferences.Editor edit = sharedpreferences.edit();
@@ -209,6 +220,8 @@ public class signUp extends Activity implements retrieveCampaign, signUp_interfa
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+        }else{
+            Toast.makeText(signUp.this, "Something went wrong!", Toast.LENGTH_SHORT).show();
         }
     }
 

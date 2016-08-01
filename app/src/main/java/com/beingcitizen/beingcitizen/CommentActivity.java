@@ -143,6 +143,9 @@ public class CommentActivity extends Activity implements callUserProfile {
                     }
                 }
             }
+            for (int i=0; i<total.length(); i++){
+                Log.e("TOTAL"+i, total.getJSONObject(i).getString("created_at"));
+            }
             s.put("total_sorted", total);
         } catch (JSONException e) {
             e.printStackTrace();
@@ -160,6 +163,19 @@ public class CommentActivity extends Activity implements callUserProfile {
     }
 
     public void functions_campaign(JSONObject s) {
+        JSONArray comm = new JSONArray();
+        try {
+            if (s.getJSONArray("comment").length()>0){
+                for (int i=s.getJSONArray("comment").length()-1; i>=0; i--){
+                    comm.put(s.getJSONArray("comment").get(i));
+                }
+                for (int i = 0; i<comm.length(); i++){
+                    s.getJSONArray("comment").put(i, comm.get(i));
+                }
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         if (first_time) {
             cca = new CommentCampaignAdapter(this, s, CommentActivity.this);
             commentList.setAdapter(cca);

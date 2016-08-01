@@ -80,6 +80,7 @@ public class UserProfileActivity extends AppCompatActivity {
     boolean followed = false;
     Bitmap bitmap=null;
     String iname;
+    RelativeLayout rl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -146,6 +147,7 @@ public class UserProfileActivity extends AppCompatActivity {
 
     public void functions(JSONObject obj) {
         try {
+            rl.setVisibility(View.GONE);
             JSONObject info = obj.getJSONArray("info").getJSONObject(0);
             String name = info.getString("name");
             String email = info.getString("email");
@@ -153,7 +155,7 @@ public class UserProfileActivity extends AppCompatActivity {
             JSONArray campsFollowed = obj.getJSONArray("fcamp");
             String constituency = info.getString("constituency");
             String image_loc = "http://beingcitizen.com/uploads/display/"+info.getString("uimage")+info.getString("uext");
-            Picasso.with(this).load(image_loc).resize(256, 256).into(profile);
+            Picasso.with(this).load(image_loc).resize(256, 256).error(R.drawable.ic_profile).into(profile);
             createUIForCreated(campsStarted);
             createUIForFollowed(campsFollowed);
             nameview.setText(name);
@@ -216,7 +218,18 @@ public class UserProfileActivity extends AppCompatActivity {
             }
             rlp_ll.addRule(RelativeLayout.ALIGN_BOTTOM, img.getId());
             LinearLayout lL = new LinearLayout(this);
-            lL.setBackgroundColor(0xB111FF1D);
+            try {
+                String status = campStarted.getJSONObject(i).getString("status");
+                if (status.contentEquals("1")){
+                    lL.setBackgroundColor(0xB1FF0000);
+                }else if (status.contentEquals("2")){
+                    lL.setBackgroundColor(0xB10000FF);
+                }else{
+                    lL.setBackgroundColor(0xB111FF1D);
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
             lL.setGravity(Gravity.BOTTOM);
             rlp_ll.setMargins(px, 0, px, 0);
             lL.setLayoutParams(rlp_ll);
@@ -283,7 +296,18 @@ public class UserProfileActivity extends AppCompatActivity {
             }
             rlp_ll.addRule(RelativeLayout.ALIGN_BOTTOM, img.getId());
             LinearLayout lL = new LinearLayout(this);
-            lL.setBackgroundColor(0xB111FF1D);
+            try {
+                String status = campStarted.getJSONObject(i).getString("status");
+                if (status.contentEquals("1")){
+                    lL.setBackgroundColor(0xB1FF0000);
+                }else if (status.contentEquals("2")){
+                    lL.setBackgroundColor(0xB10000FF);
+                }else{
+                    lL.setBackgroundColor(0xB111FF1D);
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
             lL.setGravity(Gravity.BOTTOM);
             rlp_ll.setMargins(px, 0, px, 0);
             lL.setLayoutParams(rlp_ll);
@@ -324,7 +348,7 @@ public class UserProfileActivity extends AppCompatActivity {
     void sendUserImage(){
         final Dialog dialog = new Dialog(UserProfileActivity.this);
         dialog.setContentView(R.layout.dialog_progress);
-        dialog.setTitle("Updating Index");
+        dialog.setTitle("Updating Index\nChanges will take effect on app restart");
         dialog.show();
         StringRequest myReq = new StringRequest(Request.Method.POST,
                 "http://beingcitizen.com/bc/index.php/main/editPhoto",
@@ -521,6 +545,8 @@ public class UserProfileActivity extends AppCompatActivity {
     }
 
     private void init(){
+        rl = (RelativeLayout)findViewById(R.id.progress_imageLoading);
+        rl.setVisibility(View.VISIBLE);
         sharedpreferences = PreferenceManager.getDefaultSharedPreferences(this);
         follow_button = (TextView) findViewById(R.id.follow_button);
         uid_viewer = sharedpreferences.getString("id", "16");

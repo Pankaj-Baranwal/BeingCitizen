@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.CardView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,7 +37,6 @@ public class BlogsAdapter extends BaseAdapter implements View.OnClickListener {
     public BlogsAdapter(Context c, JSONArray categoryname) {
         this.mContext = c;
         this.categorynam = categoryname;
-
     }
     @Override
     public int getCount() {
@@ -82,15 +82,18 @@ public class BlogsAdapter extends BaseAdapter implements View.OnClickListener {
 
                 @Override
                 public void onError() {
-
+                    blog_img.setVisibility(View.GONE);
+                    image_loading.setVisibility(View.GONE);
                 }
             });
             blog_id = categorynam.getJSONObject(position).getString("blog_id");
             blog_text.setText(categorynam.getJSONObject(position).getString("title"));
             user_name.setText(categorynam.getJSONObject(position).getString("author"));
             posted_at.setText(categorynam.getJSONObject(position).getString("created_at"));
+            Log.e("blog", categorynam.getJSONObject(position).getString("title"));
 
         } catch (JSONException e) {
+            Log.e("error_blog", "sdfg");
             e.printStackTrace();
         }
 

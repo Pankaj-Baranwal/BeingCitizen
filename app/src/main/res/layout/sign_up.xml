@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="#000000"
     android:gravity="center_horizontal"
-    android:orientation="vertical">
+    >
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:gravity="center_horizontal"
             android:orientation="vertical"
             >
@@ -65,10 +65,11 @@
                     android:ems="10"
                     android:gravity="center"
                     android:hint="Name"
+                    android:textCursorDrawable="@null"
                     android:inputType="textPersonName"
                     android:paddingLeft="10dp"
                     android:textColor="#FFFFFF"
-                    android:textColorHint="#FFFFFF"
+                    android:textColorHint="@drawable/selector"
                     android:textSize="15sp" />
 
                 <EditText
@@ -82,11 +83,12 @@
                     android:background="@drawable/signupbackground"
                     android:ems="10"
                     android:gravity="center"
+                    android:textCursorDrawable="@null"
                     android:hint="Email Id"
                     android:inputType="textEmailAddress"
                     android:paddingLeft="10dp"
                     android:textColor="#FFFFFF"
-                    android:textColorHint="#FFFFFF"
+                    android:textColorHint="@drawable/selector"
                     android:textSize="15dp" />
 
                 <EditText
@@ -100,29 +102,12 @@
                     android:background="@drawable/signupbackground"
                     android:ems="10"
                     android:gravity="center"
+                    android:textCursorDrawable="@null"
+                    android:textColorHint="@drawable/selector"
                     android:hint="Password"
                     android:inputType="textPassword"
                     android:paddingLeft="10dp"
                     android:textColor="#FFFFFF"
-                    android:textColorHint="#FFFFFF"
-                    android:textSize="15sp" />
-
-                <EditText
-                    android:id="@+id/editText4"
-                    android:layout_width="match_parent"
-                    android:layout_height="45dp"
-                    android:layout_below="@+id/editText3"
-                    android:layout_centerHorizontal="true"
-                    android:layout_marginRight="60dp"
-                    android:layout_marginTop="5dp"
-                    android:background="@drawable/signupbackground"
-                    android:ems="10"
-                    android:gravity="center"
-                    android:hint="Area PIN Code"
-                    android:inputType="date"
-                    android:paddingLeft="10dp"
-                    android:textColor="#FFFFFF"
-                    android:textColorHint="#FFFFFF"
                     android:textSize="15sp" />
 
                 <Spinner
@@ -152,16 +137,19 @@
         android:id="@+id/textView6"
         android:layout_width="300dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
         android:gravity="center"
         android:text="@string/login"
         android:textColor="#ffffff"
-        android:textSize="7dp" />
+        android:textSize="7dp"
+
+        />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_gravity="center_horizontal">
+            android:layout_gravity="center_horizontal"
+            >
 
 
             <com.rey.material.widget.Button
@@ -185,5 +173,16 @@
             </LinearLayout>
         </LinearLayout>
     </ScrollView>
+    <com.rey.material.widget.ProgressView
+        android:id="@+id/progress_imageLoading"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_centerInParent="true"
+        app:pv_autostart="true"
+        app:pv_circular="true"
+        app:pv_progressStyle="@style/Material.Drawable.CircularProgress"
+        app:pv_progressMode="indeterminate"
+        android:visibility="gone"
+        />
 
-</LinearLayout>
+</RelativeLayout>

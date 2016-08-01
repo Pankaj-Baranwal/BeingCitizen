@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import com.beingcitizen.R;
 import com.beingcitizen.adapters.DebateAdapter;
+import com.beingcitizen.beingcitizen.MainActivity;
 import com.beingcitizen.retrieveals.RetrieveAllDebates;
 
 import org.json.JSONObject;
@@ -29,6 +30,7 @@ public class Debate extends Fragment {
     SharedPreferences sharedpreferences;
     //String TITLES[] = {"Public Law & Order","Police","Public Health & Sanitation","Local Government","Communications – Roads & Bridges"
       //      ,"Water Supplies","Industries","Markets & Fairs","Trade & Commerce (within State)","State Taxes (Electricity, Land, Roads, Toll)"};
+    MainActivity parent;
 
 
     @Override
@@ -42,6 +44,7 @@ public class Debate extends Fragment {
         if (rootView!=null) {
             userList = (ListView) rootView.findViewById(R.id.debate_listview);
             setHasOptionsMenu(true);
+            parent.rl.setVisibility(View.VISIBLE);
             RetrieveAllDebates radb = new RetrieveAllDebates(Debate.this);
             radb.execute(uid);
         }
@@ -51,12 +54,14 @@ public class Debate extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.alldebates, container, false);
+        parent = (MainActivity)getActivity();
         return rootView;
     }
 
     public void functions(JSONObject s) {
         try {
             userList.setAdapter(new DebateAdapter(getContext(), s.getJSONArray("debates")));
+            parent.rl.setVisibility(View.GONE);
         } catch (Exception e) {
             e.printStackTrace();
             Log.e("TAG_ERROR", "ERROR   "+e.getMessage());

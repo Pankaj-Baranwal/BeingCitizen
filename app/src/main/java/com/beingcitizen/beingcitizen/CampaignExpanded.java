@@ -97,13 +97,14 @@ public class CampaignExpanded extends AppCompatActivity{
         like.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                like.setClickable(false);
                 if (foll.contentEquals("false")){
-                        SendFollowCampaign sfc = new SendFollowCampaign();
-                        sfc.execute(uid, campaign_id);
-                    }else{
-                        SendUnfollowCampaign sfc = new SendUnfollowCampaign();
-                        sfc.execute(uid, campaign_id);
-                    }
+                    SendFollowCampaign sfc = new SendFollowCampaign();
+                    sfc.execute(uid, campaign_id);
+                }else{
+                    SendUnfollowCampaign sfc = new SendUnfollowCampaign();
+                    sfc.execute(uid, campaign_id);
+                }
                 RetrieveSingleCampaign rsc = new RetrieveSingleCampaign(CampaignExpanded.this);
                 rsc.execute(uid, campaign_id);
             }
@@ -112,12 +113,13 @@ public class CampaignExpanded extends AppCompatActivity{
         volunteer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                volunteer.setClickable(false);
                 if (volu.contentEquals("false")){
-                        SendVolunteerCampaign sfc = new SendVolunteerCampaign();
-                        sfc.execute(uid, campaign_id);
-                    }else{
-                        SendUnvolunteerCampaign sfc = new SendUnvolunteerCampaign();
-                        sfc.execute(uid, campaign_id);
+                    SendVolunteerCampaign sfc = new SendVolunteerCampaign();
+                    sfc.execute(uid, campaign_id);
+                }else{
+                    SendUnvolunteerCampaign sfc = new SendUnvolunteerCampaign();
+                    sfc.execute(uid, campaign_id);
                 }
                 RetrieveSingleCampaign rsc = new RetrieveSingleCampaign(CampaignExpanded.this);
                 rsc.execute(uid, campaign_id);
@@ -138,15 +140,14 @@ public class CampaignExpanded extends AppCompatActivity{
     public boolean onOptionsItemSelected(MenuItem item){
         if (item.getItemId()==R.id.share){
                     Intent intent=new Intent(android.content.Intent.ACTION_SEND);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
-                    intent.setType("text/plain");
+                    intent.setType("image/*");
                     intent.putExtra(Intent.EXTRA_SUBJECT, title.getText().toString());
                     intent.putExtra(Intent.EXTRA_TITLE, title.getText().toString());
-// Add data to the intent, the receiving app will decide what to do with it.
-//            Uri uri = Uri.parse(url_img);
-//            intent.putExtra(Intent.EXTRA_STREAM, uri);
-//            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                     intent.putExtra(Intent.EXTRA_TEXT, "http://beingcitizen.com/Main/viewCampaign/"+campaign_id);
+                    // Add data to the intent, the receiving app will decide what to do with it.
+                    Uri uri = Uri.parse(url_img);
+                    intent.putExtra(Intent.EXTRA_STREAM, uri);
+                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                     startActivity(Intent.createChooser(intent, "Share via:"));
                 }
 
@@ -198,6 +199,8 @@ public class CampaignExpanded extends AppCompatActivity{
     }
 
     public void functions(JSONObject s) {
+        like.setClickable(true);
+        volunteer.setClickable(true);
         try {
             if (s != null) {
                 if (s.getJSONArray("campDetails").length() > 0) {

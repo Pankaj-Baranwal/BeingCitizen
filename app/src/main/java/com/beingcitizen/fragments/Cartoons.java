@@ -4,6 +4,7 @@ package com.beingcitizen.fragments;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.CardView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +28,8 @@ public class Cartoons  extends Fragment {
     private ListView userList;
     static JSONObject s;
     static boolean called = false;
+    ProgressView image_loading;
+    ImageView cartoon_image;
 
     //Drawable drawable;
     //String TITLES[] = {"Police","Public Law & Order"};
@@ -42,8 +45,9 @@ public class Cartoons  extends Fragment {
         if (called){
             TextView cartoon_title = (TextView)rootView.findViewById(R.id.cartoon_title);
             TextView cartoon_content= (TextView)rootView.findViewById(R.id.cartoon_text);
-            final ProgressView image_loading = (ProgressView) rootView.findViewById(R.id.progress_imageLoading);
-            final ImageView cartoon_image = (ImageView)rootView.findViewById(R.id.cartoon_image);
+            image_loading = (ProgressView) rootView.findViewById(R.id.progress_imageLoading);
+            image_loading.setVisibility(View.VISIBLE);
+            cartoon_image = (ImageView)rootView.findViewById(R.id.cartoon_image);
             JSONObject t = null;
             try {
                 int position = s.getJSONArray("cartoon").length()-1;
@@ -53,6 +57,7 @@ public class Cartoons  extends Fragment {
                     public void onSuccess() {
                         cartoon_image.setVisibility(View.VISIBLE);
                         image_loading.setVisibility(View.GONE);
+                        Log.e("ImageLoading", "imageLoading");
                     }
 
                     @Override

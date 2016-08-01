@@ -3,13 +3,13 @@ package com.beingcitizen.fragments;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
-import android.widget.Toast;
+import android.widget.RelativeLayout;
 
-import com.beingcitizen.BCApplication;
 import com.beingcitizen.R;
 import com.beingcitizen.adapters.BlogsAdapter;
 
@@ -24,14 +24,18 @@ public class Blogs extends Fragment {
     private ListView userList;
     static JSONObject s;
     static boolean called = false;
+    RelativeLayout rl;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         setHasOptionsMenu(true);
         View rootView = inflater.inflate(R.layout.allblogs, container, false);
+        rl = (RelativeLayout) rootView.findViewById(R.id.progress_imageLoading);
+        rl.setVisibility(View.VISIBLE);
         userList = (ListView) rootView.findViewById(R.id.blogs_listview);
         if (called) {
+            Log.e("CALLED", "YES");
             try {
                 if (s.getJSONArray("blog").length()!=0) {
                     JSONArray jA = new JSONArray();
@@ -45,16 +49,18 @@ public class Blogs extends Fragment {
                         jA = s.getJSONArray("blog");
                     }
                     userList.setAdapter(new BlogsAdapter(getActivity(), jA));
+                    rl.setVisibility(View.GONE);
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+        }else{
+            Log.e("CALLED", "NOT");
         }
         return rootView;
     }
 
     public static void function(JSONObject b){
-
         called = true;
         s = b;
     }

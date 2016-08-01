@@ -57,7 +57,6 @@ dependencies {
     }
     compile 'com.github.blackfizz:eazegraph:1.2.2@aar'
     compile 'com.nineoldandroids:library:2.4.0'
-    compile 'com.github.rey5137:material:1.2.4'
 
     //compile 'co.devcenter.square:android-ui-library:0.1'
 

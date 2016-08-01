@@ -9,7 +9,6 @@ import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +22,7 @@ import android.widget.Toast;
 import com.beingcitizen.R;
 import com.beingcitizen.adapters.CampaignAdapter;
 import com.beingcitizen.beingcitizen.CreateCampaign;
+import com.beingcitizen.beingcitizen.MainActivity;
 import com.beingcitizen.interfaces.adapterUpdate;
 import com.beingcitizen.interfaces.retrieveCamp;
 import com.beingcitizen.retrieveals.RetrieveCampaign;
@@ -50,17 +50,16 @@ public class AllCampaign extends Fragment implements retrieveCamp, adapterUpdate
     CampaignAdapter cA;
     boolean rooted = false;
     SharedPreferences sp;
-
+    MainActivity parent;
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         facebookSDKInitialize();
-
         sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
         uid = sp.getString("id", "16");
         if (rootView!=null){
-            Log.e("TAG_Allcampaign", "Not null on attached");
             rooted = true;
+            parent.rl.setVisibility(View.VISIBLE);
             RetrieveCampaign rtC = new RetrieveCampaign(AllCampaign.this);
             rtC.execute(uid);
             userList = (ListView) rootView.findViewById(R.id.allcampaign_listview);
@@ -133,6 +132,7 @@ public class AllCampaign extends Fragment implements retrieveCamp, adapterUpdate
                              Bundle savedInstanceState) {
         setHasOptionsMenu(true);
         rootView = inflater.inflate(R.layout.allcampaigns, container, false);
+        parent = (MainActivity)getActivity();
         return rootView;
     }
 
@@ -140,6 +140,7 @@ public class AllCampaign extends Fragment implements retrieveCamp, adapterUpdate
 
     @Override
     public void onResume() {
+        parent.rl.setVisibility(View.VISIBLE);
         RetrieveCampaign rtC = new RetrieveCampaign(AllCampaign.this);
         rtC.execute(uid);
         super.onResume();
@@ -172,13 +173,10 @@ public class AllCampaign extends Fragment implements retrieveCamp, adapterUpdate
                     for (int i = 0; i < jAExtra.length(); i++) {
                         jA.put(jAExtra.getJSONObject(i));
                     }
-                    JSONArray jB = new JSONArray();
-                    for (int i =0; i<(jA.length()>10?10:jA.length()); i++){
-                        jB.put(jA.getJSONObject(i));
-                    }
                     //
-                    cA = new CampaignAdapter(getContext(), jB, this);
+                    cA = new CampaignAdapter(getContext(), jA, this);
                     userList.setAdapter(cA);
+                    parent.rl.setVisibility(View.GONE);
                     cA.notifyDataSetChanged();
                 }
             } catch (JSONException e) {

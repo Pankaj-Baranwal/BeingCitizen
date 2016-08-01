@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="#000000"
     android:gravity="center_horizontal"
-    android:orientation="vertical">
+    >
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -49,8 +49,9 @@
         android:gravity="center"
         android:hint="E-mail"
         android:inputType="textPersonName"
+        android:textCursorDrawable="@null"
+        android:textColorHint="@drawable/selector"
         android:textColor="#ffffff"
-        android:textColorHint="#FFFFFF"
         android:textSize="15dp" />
 
     <EditText
@@ -64,7 +65,8 @@
         android:hint="Password"
         android:inputType="textPassword"
         android:textColor="#ffffff"
-        android:textColorHint="#FFFFFF"
+        android:textCursorDrawable="@null"
+        android:textColorHint="@drawable/selector"
         android:textSize="15dp" />
 
 
@@ -114,4 +116,15 @@
     </LinearLayout>
         </LinearLayout>
     </ScrollView>
-</LinearLayout>
+    <com.rey.material.widget.ProgressView
+        android:id="@+id/progress_imageLoading"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_centerInParent="true"
+        app:pv_autostart="true"
+        app:pv_circular="true"
+        app:pv_progressStyle="@style/Material.Drawable.CircularProgress"
+        app:pv_progressMode="indeterminate"
+        android:visibility="gone"
+        />
+</RelativeLayout>
