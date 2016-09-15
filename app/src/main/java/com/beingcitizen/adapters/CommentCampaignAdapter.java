@@ -1,7 +1,6 @@
 package com.beingcitizen.adapters;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,12 +10,17 @@ import android.widget.TextView;
 
 import com.beingcitizen.R;
 import com.beingcitizen.interfaces.callUserProfile;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 /**
  * Created by pankaj on 3/6/16.
+ *
+ * This class is the adapter to fill the entries in the comments section for a particular campaign.
  */
 public class CommentCampaignAdapter extends BaseAdapter {
     private Context mContext;
@@ -78,14 +82,18 @@ public class CommentCampaignAdapter extends BaseAdapter {
         RelativeLayout rL_user = (RelativeLayout)rowView.findViewById(R.id.rL_user);
         TextView user_name = (TextView) rowView.findViewById(R.id.user_name);
         TextView comment_text = (TextView) rowView.findViewById(R.id.comment_text);
+        CircleImageView user_image = (CircleImageView)rowView.findViewById(R.id.user_image);
         if (total>0) {
             try {
                 user_name.setText(categorynam.getJSONArray("comment").getJSONObject(position).getString("name"));
                 comment_text.setText(categorynam.getJSONArray("comment").getJSONObject(position).getString("content"));
                 uid = categorynam.getJSONArray("comment").getJSONObject(position).getString("user_id");
-            } catch (JSONException e) {
-                Log.e("ERROR","ERROR_COMMENT");
-                e.printStackTrace();
+                if (!categorynam.getJSONArray("comment").getJSONObject(position).getString("uimage").contains("null")) {
+                    String user_img_loc = "http://beingcitizen.com/uploads/display/" + categorynam.getJSONArray("comment").getJSONObject(position).getString("uimage") + categorynam.getJSONArray("comment").getJSONObject(position).getString("uext");
+                    Picasso.with(mContext).load(user_img_loc).resize(100, 100).error(R.drawable.ic_profile).into(user_image);
+                }
+            } catch (JSONException ignored) {
+
             }
         }
         if (!nulling) {

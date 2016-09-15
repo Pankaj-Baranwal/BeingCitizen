@@ -1,5 +1,6 @@
 package com.beingcitizen.beingcitizen;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -13,10 +14,10 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.beingcitizen.R;
 import com.beingcitizen.retrieveals.RetrieveSingleCampaign;
@@ -25,10 +26,11 @@ import com.beingcitizen.retrieveals.SendUnfollowCampaign;
 import com.beingcitizen.retrieveals.SendUnvolunteerCampaign;
 import com.beingcitizen.retrieveals.SendVolunteerCampaign;
 import com.facebook.share.model.ShareLinkContent;
+import com.facebook.share.widget.ShareDialog;
+import com.rey.material.widget.Button;
 import com.rey.material.widget.ProgressView;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
-import com.twitter.sdk.android.tweetcomposer.TweetComposer;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -138,47 +140,31 @@ public class CampaignExpanded extends AppCompatActivity{
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
-        if (item.getItemId()==R.id.share){
-                    Intent intent=new Intent(android.content.Intent.ACTION_SEND);
-                    intent.setType("image/*");
-                    intent.putExtra(Intent.EXTRA_SUBJECT, title.getText().toString());
-                    intent.putExtra(Intent.EXTRA_TITLE, title.getText().toString());
-                    intent.putExtra(Intent.EXTRA_TEXT, "http://beingcitizen.com/Main/viewCampaign/"+campaign_id);
-                    // Add data to the intent, the receiving app will decide what to do with it.
-                    Uri uri = Uri.parse(url_img);
-                    intent.putExtra(Intent.EXTRA_STREAM, uri);
-                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        if (item.getItemId()==R.id.share) {
+            final Dialog dialogLogout = new Dialog(this);
+            dialogLogout.requestWindowFeature(Window.FEATURE_NO_TITLE);
+            dialogLogout.setContentView(R.layout.dialog_share);
+            Button fb = (Button) dialogLogout.findViewById(R.id.fb);
+            Button others = (Button) dialogLogout.findViewById(R.id.others);
+            fb.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    shareOnFacebook(url_img, campaign_txt.getText().toString(), title.getText().toString());
+                    dialogLogout.dismiss();
+                }
+            });
+            others.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(Intent.ACTION_SEND);
+                    intent.setType("text/plain");
+                    intent.putExtra(android.content.Intent.EXTRA_TEXT, "http://beingcitizen.com/Main/viewCampaign/"+campaign_id);
+                    intent.putExtra(android.content.Intent.EXTRA_STREAM, url_img);
                     startActivity(Intent.createChooser(intent, "Share via:"));
                 }
-
-
-//            final Dialog dialogLogout = new Dialog(this);
-//            dialogLogout.requestWindowFeature(Window.FEATURE_NO_TITLE);
-//            dialogLogout.setContentView(R.layout.dialog_share);
-//            FloatingActionButton fb = (FloatingActionButton)dialogLogout.findViewById(R.id.fab_fb);
-//            FloatingActionButton whatsapp = (FloatingActionButton)dialogLogout.findViewById(R.id.fab_whatsapp);
-//            fb.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    shareOnFacebook(url_img, campaign_txt.getText().toString(), title.getText().toString());
-//                    dialogLogout.dismiss();
-//                }
-//            });
-//            whatsapp.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    shareOnWhatsapp(Uri.parse(url_img), campaign_txt.getText().toString());
-//                    dialogLogout.dismiss();
-//                }
-//            });
-//            Button update = (Button) dialogLogout.findViewById(R.id.update);
-//            update.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    dialogLogout.dismiss();
-//                }
-//            });
-//            dialogLogout.show();
+            });
+            dialogLogout.show();
+        }
         else
             finish();
         return true;
@@ -226,7 +212,7 @@ public class CampaignExpanded extends AppCompatActivity{
                     ImageView level_img = (ImageView) findViewById(R.id.game_img);
                     title.setText(s.getJSONArray("campDetails").getJSONObject(0).getString("cname"));
                     username.setText(s.getJSONArray("campDetails").getJSONObject(0).getString("name"));
-                    time_posted.setText("Posted at " + s.getJSONArray("campDetails").getJSONObject(0).getString("created_at"));
+                    time_posted.setText("Posted at " + s.getJSONArray("campDetails").getJSONObject(0).getString("ccreated_at"));
                     campaign_txt.setText(s.getJSONArray("campDetails").getJSONObject(0).getString("campaign_text").substring(0, s.getJSONArray("campDetails").getJSONObject(0).getString("campaign_text").length() > 550 ? 550 : s.getJSONArray("campDetails").getJSONObject(0).getString("campaign_text").length()));
                     num_followers.setText(s.getString("fols") + " followers");
                     num_volunteers.setText(s.getString("vols") + " volunteers");
@@ -279,94 +265,6 @@ public class CampaignExpanded extends AppCompatActivity{
         }
     }
 
-//    public void follow_function(JSONObject param) {
-//        if (param.has("status")){
-//            try {
-//                if (param.getString("status").contentEquals("true")) {
-//                    Toast.makeText(this, "Followed", Toast.LENGTH_SHORT).show();
-//                    RetrieveSingleCampaign rsc = new RetrieveSingleCampaign(CampaignExpanded.this);
-//                    rsc.execute(uid, campaign_id);
-//                }
-//            } catch (JSONException e) {
-//                e.printStackTrace();
-//            }
-//        }else{
-//            Toast.makeText(this, "Unable to process", Toast.LENGTH_SHORT).show();
-//        }
-//    }
-//
-//    public void volunteer_function(JSONObject param) {
-//        if (param.has("status")){
-//            try {
-//                if (param.getString("status").contentEquals("true")) {
-//                    Toast.makeText(this, "Volunteered", Toast.LENGTH_SHORT).show();
-//                    RetrieveSingleCampaign rsc = new RetrieveSingleCampaign(CampaignExpanded.this);
-//                    rsc.execute(uid, campaign_id);
-//                }
-//            } catch (JSONException e) {
-//                e.printStackTrace();
-//            }
-//        }else
-//            Toast.makeText(this, "Unable to process", Toast.LENGTH_SHORT).show();
-//    }
-//
-//    public void unfollow_function(JSONObject param) {
-//        if (param.has("status")){
-//            try {
-//                if (param.getString("status").contentEquals("true")) {
-//                    Toast.makeText(this, "UnFollowed", Toast.LENGTH_SHORT).show();
-//
-//                }
-//            } catch (JSONException e) {
-//                e.printStackTrace();
-//            }
-//        }else
-//            Toast.makeText(this, "Unable to process", Toast.LENGTH_SHORT).show();
-//    }
-//
-//    public void unvolunteer_function(JSONObject param) {
-//        if (param.has("status")){
-//            try {
-//                if (param.getString("status").contentEquals("true")) {
-//                    Toast.makeText(this, "UnVolunteered", Toast.LENGTH_SHORT).show();
-//                    RetrieveSingleCampaign rsc = new RetrieveSingleCampaign(CampaignExpanded.this);
-//                    rsc.execute(uid, campaign_id);
-//                }
-//            } catch (JSONException e) {
-//                e.printStackTrace();
-//            }
-//        }else
-//            Toast.makeText(this, "Unable to process", Toast.LENGTH_SHORT).show();
-//    }
-
-    private void shareOnWhatsapp(Uri imageUri, String picture_text){
-        /**
-         * Show share dialog BOTH image and text
-         */
-        Intent shareIntent = new Intent();
-        shareIntent.setAction(Intent.ACTION_SEND);
-        //Target whatsapp:
-        shareIntent.setPackage("com.whatsapp");
-        //Add text and then Image URI
-        shareIntent.putExtra(Intent.EXTRA_TEXT, picture_text);
-        shareIntent.putExtra(Intent.EXTRA_STREAM, imageUri);
-        shareIntent.setType("image/*");
-        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-
-        try {
-            startActivity(shareIntent);
-        } catch (android.content.ActivityNotFoundException ex) {
-            Toast.makeText(CampaignExpanded.this, "Whatsapp not installed!", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private void shareOnTwitter(File pictureFile, String picture_text){
-        TweetComposer.Builder builder = new TweetComposer.Builder(this)
-                .text(picture_text)
-                .image(Uri.fromFile(pictureFile));
-        builder.show();
-    }
-
     private void shareOnFacebook(String pictureFile, String text, String title){
         ShareLinkContent content = new ShareLinkContent.Builder()
                 .setContentTitle(title)
@@ -374,6 +272,6 @@ public class CampaignExpanded extends AppCompatActivity{
                 .setImageUrl(Uri.parse(pictureFile))
                 .setContentDescription(text)
                 .build();
-//        ShareDialog.show(CampaignExpanded.this, content);
+        ShareDialog.show(CampaignExpanded.this, content);
     }
 }

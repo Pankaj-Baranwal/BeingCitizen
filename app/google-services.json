@@ -1,33 +1,33 @@
 {
   "project_info": {
-    "project_number": "588760769931",
-    "project_id": "being-citizen"
+    "project_number": "638621106270",
+    "project_id": "firebase-beingcitizen"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:588760769931:android:e82d9c264ed88187",
+        "mobilesdk_app_id": "1:638621106270:android:e82d9c264ed88187",
         "android_client_info": {
           "package_name": "com.beingcitizen"
         }
       },
       "oauth_client": [
         {
-          "client_id": "588760769931-jgi604u9o70l41bn0un5lfl7gbqmg1cl.apps.googleusercontent.com",
+          "client_id": "638621106270-e53vk2kleok0v48eksl137c7v7pmtmo8.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.beingcitizen",
-            "certificate_hash": "253BF9C345C9EC78145D1BF50F9AC28D3FCCB217"
+            "certificate_hash": "C2729BAE11C17E21DA1B2EBEDEDF3063E13121D0"
           }
         },
         {
-          "client_id": "588760769931-otr468hbb13nlj0tpduvvm3dg7otmpob.apps.googleusercontent.com",
+          "client_id": "638621106270-hrd8jsc2h6e7acigqartu5vjmfk90i5d.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDYpaJ9ilmagc7sMpQ5vaVBb3TUCJhcASw"
+          "current_key": "AIzaSyCEy2KqYCADZh9Ao4NPm8JcSqFxohJq0xc"
         }
       ],
       "services": {

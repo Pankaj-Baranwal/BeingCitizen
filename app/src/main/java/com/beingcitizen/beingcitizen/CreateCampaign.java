@@ -1,18 +1,22 @@
 package com.beingcitizen.beingcitizen;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.Dialog;
+import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
@@ -21,12 +25,13 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Base64;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
@@ -42,8 +47,9 @@ import com.beingcitizen.R;
 import com.beingcitizen.retrieveals.RetrieveAllConstituency;
 import com.beingcitizen.retrieveals.RetrieveTags;
 import com.github.clans.fab.FloatingActionButton;
-import com.github.clans.fab.FloatingActionMenu;
 import com.rey.material.widget.Button;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -51,26 +57,29 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
  * Created by saransh on 12-07-2015.
+ *
+ * Handles new campaign creation.
  */
 public class CreateCampaign extends AppCompatActivity {
-    Spinner consti_spinner, category_spinner, tag_spinner, followable, volunteerable;
+    Spinner consti_spinner, category_spinner, tag_spinner;
     EditText title_create, text_create;
-    String category="err", tag="err", consti="err", text="", tags = "", name = "", iname = "", followable_val = "err", volunteerable_val = "err";
+    String category="err", tag="err", consti="err", text="", name = "", iname = "temp", followable_val = "1", volunteerable_val = "1";
     Bitmap bitmap = null;
-    boolean camera = false;
-    FloatingActionMenu fab_menu;
-    // private Dialog dialogLogout;
+    CheckBox can_follow, can_volunteer;
+    boolean calledUpload = false;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,7 +90,7 @@ public class CreateCampaign extends AppCompatActivity {
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         FloatingActionButton fab_camera = (FloatingActionButton) findViewById(R.id.fab_camera);
-        FloatingActionButton fab_gallery = (FloatingActionButton) findViewById(R.id.fab_gallery);
+
         title_create = (EditText)findViewById(R.id.title_create);
         text_create = (EditText) findViewById(R.id.text_create);
 
@@ -90,8 +99,8 @@ public class CreateCampaign extends AppCompatActivity {
         rac.execute();
         tag_spinner = (Spinner)findViewById(R.id.tag_spinner);
         category_spinner = (Spinner)findViewById(R.id.category_spinner);
-        volunteerable = (Spinner)findViewById(R.id.volunteerable_spinner);
-        followable = (Spinner)findViewById(R.id.followable_spinner);
+        can_volunteer = (CheckBox) findViewById(R.id.can_volunteer);
+        can_follow = (CheckBox) findViewById(R.id.can_follow);
 
         category_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -116,7 +125,7 @@ public class CreateCampaign extends AppCompatActivity {
                 if (position==0){
                     tag = "err";
                 }else
-                    tag = (String)parent.getItemAtPosition(position);
+                    tag = ((String)parent.getItemAtPosition(position));
             }
 
             @Override
@@ -139,52 +148,23 @@ public class CreateCampaign extends AppCompatActivity {
 
             }
         });
-
-        followable.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        can_follow.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (position==0)
-                    followable_val = "err";
-                else
-                    followable_val = (position==1?1:0)+"";
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    followable_val = isChecked?"1":"0";
             }
-
+        });
+        can_volunteer.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                volunteerable_val = isChecked?"1":"0";
             }
         });
 
-        volunteerable.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (position==0)
-                    volunteerable_val = "err";
-                else
-                    volunteerable_val = (position==1?1:0)+"";
-            }
 
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-
-        fab_menu = (FloatingActionMenu) findViewById(R.id.fab_main);
-        fab_menu.setClosedOnTouchOutside(true);
-        //ImageView buttonLoadImage = (ImageView) findViewById(R.id.buttonLoadPicture);
         fab_camera.setOnClickListener(new View.OnClickListener() {
-
             @Override
             public void onClick(View v) {
-                camera = true;
-                insertDummyContactWrapper();
-            }
-        });
-        fab_gallery.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                camera = false;
                 insertDummyContactWrapper();
             }
         });
@@ -208,11 +188,11 @@ public class CreateCampaign extends AppCompatActivity {
                     Toast.makeText(CreateCampaign.this, "Enter correct Tag", Toast.LENGTH_SHORT).show();
                 }else if (bitmap==null){
                     Toast.makeText(CreateCampaign.this, "Upload an image", Toast.LENGTH_SHORT).show();
-                }else if (followable_val.contentEquals("err") || volunteerable_val.contentEquals("err")){
+                }else if (followable_val.contentEquals("0") && volunteerable_val.contentEquals("0")){
                     Toast.makeText(CreateCampaign.this, "Fill up all options!", Toast.LENGTH_SHORT).show();
                 }else {
-                    makeCampaign();
-                    fab_menu.close(true);
+                    if (!calledUpload)
+                        makeCampaign();
                 }
             }
         });
@@ -220,7 +200,7 @@ public class CreateCampaign extends AppCompatActivity {
 
     void makeCampaign(){
         final Dialog dialog = new Dialog(CreateCampaign.this);
-        dialog.setContentView(R.layout.dialog_progress);
+        dialog.setContentView(R.layout.dialog_create_campaign);
         dialog.setTitle("Updating Indexes");
         dialog.show();
         StringRequest myReq = new StringRequest(Request.Method.POST,
@@ -228,17 +208,18 @@ public class CreateCampaign extends AppCompatActivity {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
+                        calledUpload = false;
                         dialog.dismiss();
                         finish();
-                        Log.e("RESPONSE", response);
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
+                        calledUpload = false;
+                        Toast.makeText(CreateCampaign.this, "Something went wrong!", Toast.LENGTH_SHORT).show();
                         dialog.dismiss();
                         finish();
-                        Log.e("RESPONSE", "ERROR!");
                     }
                 }) {
             protected Map<String, String> getParams() throws com.android.volley.AuthFailureError {
@@ -251,14 +232,14 @@ public class CreateCampaign extends AppCompatActivity {
                 params.put("text", text);
                 params.put("const", consti);
                 params.put("category", category);
-                params.put("tags", tags);
+                params.put("tags", tag);
                 params.put("ext", ".JPG");
                 params.put("volunteerable", volunteerable_val);
                 params.put("followable", followable_val);
-                bitmap.recycle();
                 return params;
-            };
+            }
         };
+        calledUpload = true;
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         requestQueue.add(myReq);
     }
@@ -266,8 +247,8 @@ public class CreateCampaign extends AppCompatActivity {
     public String getStringImage(Bitmap bmp){
         int width = bmp.getWidth();
         int height = bmp.getHeight();
-        float scaleWidth = (float) 0.25;
-        float scaleHeight = (float) 0.25;
+        float scaleWidth = (float) 0.80;
+        float scaleHeight = (float) 0.80;
         // CREATE A MATRIX FOR THE MANIPULATION
         Matrix matrix = new Matrix();
         // RESIZE THE BIT MAP
@@ -283,100 +264,131 @@ public class CreateCampaign extends AppCompatActivity {
         return Base64.encodeToString(imageBytes, Base64.DEFAULT);
     }
 
+    public Intent getPickImageChooserIntent() {
+
+// Determine Uri of camera image to  save.
+        Uri outputFileUri =  getCaptureImageOutputUri();
+
+        List<Intent> allIntents = new  ArrayList<>();
+        PackageManager packageManager =  getPackageManager();
+
+// collect all camera intents
+        Intent captureIntent = new  Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+        List<ResolveInfo> listCam =  packageManager.queryIntentActivities(captureIntent, 0);
+        for (ResolveInfo res : listCam) {
+            Intent intent = new  Intent(captureIntent);
+            intent.setComponent(new ComponentName(res.activityInfo.packageName, res.activityInfo.name));
+            intent.setPackage(res.activityInfo.packageName);
+            if (outputFileUri != null) {
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
+            }
+            allIntents.add(intent);
+        }
+
+// collect all gallery intents
+        Intent galleryIntent = new  Intent(Intent.ACTION_GET_CONTENT);
+        galleryIntent.setType("image/*");
+        List<ResolveInfo> listGallery =  packageManager.queryIntentActivities(galleryIntent, 0);
+        for (ResolveInfo res : listGallery) {
+            Intent intent = new  Intent(galleryIntent);
+            intent.setComponent(new ComponentName(res.activityInfo.packageName, res.activityInfo.name));
+            intent.setPackage(res.activityInfo.packageName);
+            allIntents.add(intent);
+        }
+
+// the main intent is the last in the  list (fucking android) so pickup the useless one
+        Intent mainIntent =  allIntents.get(allIntents.size() - 1);
+        for (Intent intent : allIntents) {
+            if  (intent.getComponent().getClassName().equals("com.android.documentsui.DocumentsActivity"))  {
+                mainIntent = intent;
+                break;
+            }
+        }
+        allIntents.remove(mainIntent);
+
+// Create a chooser from the main  intent
+        Intent chooserIntent =  Intent.createChooser(mainIntent, "Select source");
+
+// Add all other intents
+        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS,  allIntents.toArray(new Parcelable[allIntents.size()]));
+
+        return chooserIntent;
+    }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        ImageView imageView = (ImageView) findViewById(R.id.imgView);
-        //dialogLogout.dismiss();
-        if (resultCode == RESULT_OK) {
-            if (requestCode == 1) {
-                File f = new File(Environment.getExternalStorageDirectory().toString());
-                for (File temp : f.listFiles()) {
-                    if (temp.getName().equals("temp.jpg")) {
-                        f = temp;
-                        break;
-                    }
+    public void onActivityResult(int  requestCode, int resultCode, Intent data) {
+        if (resultCode == Activity.RESULT_OK) {
+            final ImageView imageView = (ImageView) findViewById(R.id.imgView);
+            Uri imageUri = getPickImageResultUri(data);
+            iname = getRealPathFromURI(imageUri);
+            final File file = new File(iname);
+            Picasso.with(CreateCampaign.this).load(file).resize(512, 512).into(new Target() {
+                @Override
+                public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                    Picasso.with(CreateCampaign.this).load(file).resize(120, 120).into(imageView);
+                    savebitmap(bitmap);
                 }
-                try {
-                    BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
-                    bitmapOptions.inJustDecodeBounds = true;
-                    BitmapFactory.decodeFile(f.getAbsolutePath(),
-                            bitmapOptions);
-                    bitmapOptions.inSampleSize = calculateInSampleSize(bitmapOptions, 256, 256);
-                    bitmapOptions.inJustDecodeBounds = false;
-                    bitmap = BitmapFactory.decodeFile(f.getAbsolutePath(),
-                            bitmapOptions);
 
-                    imageView.setImageBitmap(bitmap);
-
-                    String path = Environment
-                            .getExternalStorageDirectory()
-                            + File.separator
-                            + "Phoenix" + File.separator + "default";
-                    f.delete();
-                    OutputStream outFile = null;
-                    iname = String.valueOf(System.currentTimeMillis());
-                    File file = new File(path, iname + ".jpg");
-                    try {
-                        outFile = new FileOutputStream(file);
-                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outFile);
-                        outFile.flush();
-                        outFile.close();
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
+                @Override
+                public void onBitmapFailed(Drawable errorDrawable) {
+                    Toast.makeText(CreateCampaign.this, "", Toast.LENGTH_SHORT).show();
                 }
-            } else if (requestCode == 2) {
 
-                Uri selectedImage = data.getData();
-                String[] filePath = {MediaStore.Images.Media.DATA};
-                Cursor c = getContentResolver().query(selectedImage, filePath, null, null, null);
-                c.moveToFirst();
-                int columnIndex = c.getColumnIndex(filePath[0]);
-                String picturePath = c.getString(columnIndex);
-                Log.e("PICTURE", picturePath);
-                c.close();
-                BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
-                bitmapOptions.inJustDecodeBounds = true;
-                BitmapFactory.decodeFile(picturePath, bitmapOptions);
-                bitmapOptions.inSampleSize = calculateInSampleSize(bitmapOptions, 256, 256);
-                bitmapOptions.inJustDecodeBounds = false;
-                bitmap = BitmapFactory.decodeFile(picturePath, bitmapOptions);
-                Log.e("path of image", picturePath + "");
-                imageView.setImageBitmap(bitmap);
-            }
+                @Override
+                public void onPrepareLoad(Drawable placeHolderDrawable) {
+                    
+                }
+            });
         }
     }
 
-    public static int calculateInSampleSize(
-            BitmapFactory.Options options, int reqWidth, int reqHeight) {
-        // Raw height and width of image
-        final int height = options.outHeight;
-        final int width = options.outWidth;
-        int inSampleSize = 1;
-
-        if (height > reqHeight || width > reqWidth) {
-
-            final int halfHeight = height / 2;
-            final int halfWidth = width / 2;
-
-            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
-            // height and width larger than the requested height and width.
-            while ((halfHeight / inSampleSize) > reqHeight
-                    && (halfWidth / inSampleSize) > reqWidth) {
-                inSampleSize *= 2;
-            }
+    private void savebitmap(Bitmap bmp) {
+        FileOutputStream fOut = null;
+        if (bmp!=null)
+            bitmap = bmp;
+        else
+            Toast.makeText(CreateCampaign.this, "Please try again!", Toast.LENGTH_SHORT).show();
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("ddHHmmss");
+            iname = sdf.format(new Date())+"pickImageResult.jpg";
+            File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), iname);
+            fOut = new FileOutputStream(file);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fOut);
+            fOut.flush();
+            fOut.close();
+        } catch (IOException ignored) {
         }
 
-        return inSampleSize;
+    }
+
+    private String getRealPathFromURI(Uri contentURI) {
+        String result;
+        Cursor cursor = getContentResolver().query(contentURI, null, null, null, null);
+        if (cursor == null) {
+            result = contentURI.getPath();
+        } else {
+            cursor.moveToFirst();
+            int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+            result = cursor.getString(idx);
+            cursor.close();
+        }
+        return result;
+    }
+
+    public Uri getPickImageResultUri(Intent  data) {
+        boolean isCamera = true;
+        if (data != null && data.getData() != null) {
+            String action = data.getAction();
+            isCamera = action != null  && action.equals(MediaStore.ACTION_IMAGE_CAPTURE);
+        }
+        return isCamera ?  getCaptureImageOutputUri() : data.getData();
+    }
+
+    private Uri getCaptureImageOutputUri() {
+        File file = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+        File f = new File(file, "pickImageResult.jpg");
+        Uri outputFileUri = Uri.fromFile(f);
+        return outputFileUri;
     }
 
     public void allConsts(JSONObject s) {
@@ -427,8 +439,8 @@ public class CreateCampaign extends AppCompatActivity {
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
+    protected void onDestroy() {
+        super.onDestroy();
         if (bitmap!=null){
             if (!bitmap.isRecycled())
                 bitmap.recycle();
@@ -437,52 +449,6 @@ public class CreateCampaign extends AppCompatActivity {
 
     final private int REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS = 124;
 
-    private void insertDummyContact() {
-        if (camera) {
-            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            File f = new File(Environment.getExternalStorageDirectory(), "temp.jpg");
-            intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(f));
-            startActivityForResult(intent, 1);
-            fab_menu.close(true);
-        }else{
-            Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-            startActivityForResult(intent, 2);
-            fab_menu.close(true);
-        }
-    }
-
-    private void insertDummyContactWrapper() {
-        List<String> permissionsNeeded = new ArrayList<String>();
-
-        final List<String> permissionsList = new ArrayList<String>();
-        if (!addPermission(permissionsList, Manifest.permission.CAMERA))
-            permissionsNeeded.add("CAMERA");
-        if (!addPermission(permissionsList, Manifest.permission.WRITE_EXTERNAL_STORAGE))
-            permissionsNeeded.add("WRITE EXTERNAL STORAGE");
-
-        if (permissionsList.size() > 0) {
-            if (permissionsNeeded.size() > 0) {
-                // Need Rationale
-                String message = "You need to grant access to " + permissionsNeeded.get(0);
-                for (int i = 1; i < permissionsNeeded.size(); i++)
-                    message = message + ", " + permissionsNeeded.get(i);
-                showMessageOKCancel(message,
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                ActivityCompat.requestPermissions(CreateCampaign.this, permissionsList.toArray(new String[permissionsList.size()]),
-                                        REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS);
-                            }
-                        });
-                return;
-            }
-            ActivityCompat.requestPermissions(this, permissionsList.toArray(new String[permissionsList.size()]),
-                    REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS);
-            return;
-        }
-
-        insertDummyContact();
-    }
 
     private boolean addPermission(List<String> permissionsList, String permission) {
         if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
@@ -519,7 +485,7 @@ public class CreateCampaign extends AppCompatActivity {
                 if (perms.get(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
                         && perms.get(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
                     // All Permissions Granted
-                    insertDummyContact();
+                    startActivityForResult(getPickImageChooserIntent(), 200);
                 } else {
                     // Permission Denied
                     Toast.makeText(CreateCampaign.this, "Some Permission is Denied", Toast.LENGTH_SHORT)
@@ -530,5 +496,36 @@ public class CreateCampaign extends AppCompatActivity {
             default:
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
+    }
+
+    private void insertDummyContactWrapper() {
+        List<String> permissionsNeeded = new ArrayList<String>();
+
+        final List<String> permissionsList = new ArrayList<String>();
+        if (!addPermission(permissionsList, Manifest.permission.CAMERA))
+            permissionsNeeded.add("CAMERA");
+        if (!addPermission(permissionsList, Manifest.permission.WRITE_EXTERNAL_STORAGE))
+            permissionsNeeded.add("WRITE EXTERNAL STORAGE");
+        if (permissionsList.size() > 0) {
+            if (permissionsNeeded.size() > 0) {
+                // Need Rationale
+                String message = "You need to grant access to " + permissionsNeeded.get(0);
+                for (int i = 1; i < permissionsNeeded.size(); i++)
+                    message = message + ", " + permissionsNeeded.get(i);
+                showMessageOKCancel(message,
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                ActivityCompat.requestPermissions(CreateCampaign.this, permissionsList.toArray(new String[permissionsList.size()]),
+                                        REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS);
+                            }
+                        });
+                return;
+            }
+            ActivityCompat.requestPermissions(this, permissionsList.toArray(new String[permissionsList.size()]),
+                    REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS);
+            return;
+        }
+        startActivityForResult(getPickImageChooserIntent(), 200);
     }
 }

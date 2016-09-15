@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.CardView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,6 +31,8 @@ import org.json.JSONException;
 
 /**
  * Created by saransh on 23-06-2015.
+ *
+ * This class is the adapter to fill the entries in the campaigns section.
  */
 public class CampaignAdapter extends BaseAdapter{
     private Context mContext;
@@ -133,7 +134,7 @@ public class CampaignAdapter extends BaseAdapter{
             if (status.contentEquals("1")){
                 verification.setBackgroundColor(0xB1FF0000);
             }else if (status.contentEquals("2")){
-                verification.setBackgroundColor(0xB10000FF);
+                verification.setBackgroundColor(0xB1FDC008);
             }
             else{
                 verification.setBackgroundColor(0xB111FF1D);
@@ -155,11 +156,10 @@ public class CampaignAdapter extends BaseAdapter{
             city_name.setText(categorynam.getJSONObject(position).getString("cconstituency"));
             String campaign_text = categorynam.getJSONObject(position).getString("campaign_text");
             if (campaign_text.length()>200)
-                campaign_text=campaign_text.substring(0, 200);
+                campaign_text=campaign_text.substring(0, 197)+"...";
             info_campaign.setText(campaign_text);
             String cat = categorynam.getJSONObject(position).getString("category");
             category.setText(cat.length()<22?cat:cat.substring(0, 22)+"...");
-            Log.e("cate", cat);
             switch (cat){
                 case "Law and Order":
                     category_img.setImageResource(R.drawable.public_law_and_order_black);
@@ -180,7 +180,6 @@ public class CampaignAdapter extends BaseAdapter{
                     category_img.setImageResource(R.drawable.market_black);
                     break;
                 case "Environment and Horticulture":
-                    Log.e("Environ", "setImage");
                     category_img.setImageResource(R.drawable.ecology_black);
                     break;
                 case "Tourism, Art and Culture":
@@ -194,8 +193,7 @@ public class CampaignAdapter extends BaseAdapter{
                     break;
             }
         } catch (JSONException e) {
-            //Log.e("ERROR", "YEES");
-            Log.getStackTraceString(e);
+
         }
         like.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -206,7 +204,6 @@ public class CampaignAdapter extends BaseAdapter{
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                Log.e("LIKE", likeable[0] +" "+ uid+" "+ campaign_id);
                 if (likeable[0]){
                     like.setBackgroundResource(R.drawable.like_on);
                     try {
@@ -240,7 +237,6 @@ public class CampaignAdapter extends BaseAdapter{
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                Log.e("VOLUNTEER", volunteerable[0] +" "+ uid+" "+ campaign_id);
                 if (volunteerable[0]){
                     volunteer.setBackgroundResource(R.drawable.volunteer_on);
                     try {

@@ -2,7 +2,6 @@ package com.beingcitizen.retrieveals;
 
 import android.content.Context;
 import android.os.AsyncTask;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.beingcitizen.Http;
@@ -31,9 +30,7 @@ public class RetrieveMlaID extends AsyncTask<String, Void, String> {
         Http http = new Http();
         try {
             bool = http.read("http://beingcitizen.com/bc/index.php/main/getmla?const="+params[0].replace(" ", "%20"));
-        } catch (IOException e) {
-            e.printStackTrace();
-            Log.e("TAG_ERROR", "ERROR");
+        } catch (IOException ignored) {
         }
         return bool;
     }

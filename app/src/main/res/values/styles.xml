@@ -2,7 +2,7 @@
 
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
 
-        <item name="colorPrimary">#00796B</item>
+        <item name="colorPrimary">#222222</item>
         <item name="colorPrimaryDark">#000000</item>
         <item name="colorAccent">#ffffff</item>
     </style>
@@ -11,6 +11,10 @@
         <!-- android:textColorSecondary is used for coloring the navigation drawer icon and up arrow. -->
         <item name="android:textColorSecondary">#ffffff</item><!-- hamburger color-->
         <item name="android:textColorPrimary">#FFFFFF</item>
+    </style>
+    <style name="checkBoxStyle" parent="Base.Theme.AppCompat">
+        <item name="colorAccent">#00796B</item>
+        <item name="android:textColorSecondary">#60B079</item>
     </style>
 
 

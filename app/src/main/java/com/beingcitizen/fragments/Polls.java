@@ -8,7 +8,6 @@ import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.CardView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +25,8 @@ import org.json.JSONObject;
 
 /**
  * Created by saransh on 21-06-2015.
+ *
+ * Parent Fragment for polls list page. Loads and populates list of polls.
  */
 public class Polls  extends Fragment {
     CardView cardView;
@@ -122,7 +123,6 @@ public class Polls  extends Fragment {
             try {
                 if (s.getJSONArray("poll").length() > 0) {
                     t = s.getJSONArray("poll").getJSONObject(0);
-                    Log.e("POLL", s.getJSONObject("pie").length() + "");
                     if (s.getJSONObject("pie").length() > 1) {
                         pollable = false;
                         float dv1 = 0, dv2 = 0, dv3 = 0;
@@ -166,10 +166,9 @@ public class Polls  extends Fragment {
                     pollable = false;
                     poll_title.setText("No Polls Found!");
                 }
-                }catch(JSONException e){
-                    Log.e("TAG_ERROR", "Polls error");
-                    e.printStackTrace();
-                }
+            }catch(JSONException e){
+                Toast.makeText(getContext(), "Something went wrong!", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 

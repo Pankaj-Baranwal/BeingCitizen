@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
@@ -33,6 +32,8 @@ import java.util.Date;
 
 /**
  * Created by saransh on 14-06-2015.
+ *
+ * Handles populating comments for both debate and campaign.
  */
 public class CommentActivity extends Activity implements callUserProfile {
     String uid = "16", calling= null;
@@ -78,7 +79,7 @@ public class CommentActivity extends Activity implements callUserProfile {
             public void onClick(View v) {
                 if (calling!=null){
                     if (nature.contentEquals("err")){
-                        Toast.makeText(CommentActivity.this, "Incorrect Entry", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(CommentActivity.this, "Incomplete Entry", Toast.LENGTH_SHORT).show();
                     }else {
                         SendDebateComment sdc = new SendDebateComment(CommentActivity.this);
                         String comm = comment.getText().toString();
@@ -143,21 +144,14 @@ public class CommentActivity extends Activity implements callUserProfile {
                     }
                 }
             }
-            for (int i=0; i<total.length(); i++){
-                Log.e("TOTAL"+i, total.getJSONObject(i).getString("created_at"));
-            }
-            s.put("total_sorted", total);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        } catch (ParseException e) {
-            e.printStackTrace();
+        } catch (JSONException | ParseException e) {
         }
         if (first_time) {
-            ca = new CommentAdapter(this, s);
+            ca = new CommentAdapter(this, total);
             commentList.setAdapter(ca);
             first_time = false;
         }else{
-            ca.updating(s);
+            ca.updating(total);
             ca.notifyDataSetChanged();
         }
     }
@@ -183,7 +177,6 @@ public class CommentActivity extends Activity implements callUserProfile {
         }else{
             cca.updating(s);
             cca.notifyDataSetChanged();
-            Log.e("DATASET", "Changed");
         }
     }
 

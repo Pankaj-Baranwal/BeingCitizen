@@ -1,7 +1,6 @@
 package com.beingcitizen.retrieveals;
 
 import android.os.AsyncTask;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.beingcitizen.Http;
@@ -36,11 +35,8 @@ public class RetrieveUserProfile extends AsyncTask<String, Void, String> {
         String bool = "";
         Http http = new Http();
         try {
-            Log.e("User", "http://beingcitizen.com/bc/index.php/main/userprofile?current_user="+params[0]+"&id="+params[1]);
             bool = http.read("http://beingcitizen.com/bc/index.php/main/userprofile?current_user="+params[0]+"&id="+params[1]);
-        } catch (IOException e) {
-            e.printStackTrace();
-            Log.e("TAG_ERROR", "ERROR");
+        } catch (IOException ignored) {
         }
         return bool;
     }
@@ -60,7 +56,6 @@ public class RetrieveUserProfile extends AsyncTask<String, Void, String> {
         } catch (JSONException e) {
             if (!notUser)
             Toast.makeText(context, "Error retrieving data", Toast.LENGTH_SHORT).show();
-            e.printStackTrace();
         }
     }
 }

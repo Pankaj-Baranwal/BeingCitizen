@@ -3,7 +3,6 @@
     xmlns:fab="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/tools"
     android:orientation="vertical">
 <FrameLayout
     android:layout_width="match_parent"
@@ -11,7 +10,9 @@
     <ListView
         android:id="@+id/allcampaign_listview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:divider="@null"
+        />
 
     <com.github.clans.fab.FloatingActionMenu
         android:id="@+id/fab_main"

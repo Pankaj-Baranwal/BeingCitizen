@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -24,10 +23,12 @@ import org.json.JSONObject;
 
 /**
  * Created by saransh on 14-06-2015.
+ *
+ * Implementation of User login using emailID and password.
  */
 public class LoginActivity extends Activity implements com.beingcitizen.interfaces.login, mla_id {
 
-    public TextView welocomeback, citizen, forgotPassword;
+    public TextView welocomeback, citizen;
     public Button login;
     public EditText email, password;
     String uid = "16";
@@ -57,14 +58,6 @@ public class LoginActivity extends Activity implements com.beingcitizen.interfac
             });
             email = (EditText) findViewById(R.id.editText);
             password = (EditText) findViewById(R.id.editText2);
-            forgotPassword = (TextView) findViewById(R.id.textView5);
-            forgotPassword.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    //TODO: Forgot passowrd
-                    Toast.makeText(LoginActivity.this, "Facility not available yet", Toast.LENGTH_SHORT).show();
-                }
-            });
 
             // Font path
             String fontPath = "fonts/GOTHIC_0.TTF";
@@ -80,7 +73,6 @@ public class LoginActivity extends Activity implements com.beingcitizen.interfac
             login.setTypeface(tf1);
             email.setTypeface(tf);
             password.setTypeface(tf);
-            forgotPassword.setTypeface(tf);
         }
     }
 
@@ -116,14 +108,20 @@ public class LoginActivity extends Activity implements com.beingcitizen.interfac
                 edit.putString("name", s.getString("name"));
                 edit.putString("email", s.getString("email"));
                 edit.putString("sex", s.getString("sex"));
-                edit.putString("const", s.getString("const"));
+                if (s.has("const"))
+                edit.putString("constituency", s.getString("const"));
                 edit.apply();
             } catch (JSONException e) {
-                e.printStackTrace();
-                Log.e("ERROR", "Error in storing to shared prefs");
+                Toast.makeText(LoginActivity.this, "Something went wrong", Toast.LENGTH_SHORT).show();
             }
             RetrieveMlaID rmlaid = new RetrieveMlaID(LoginActivity.this, LoginActivity.this);
-            rmlaid.execute(sharedpreferences.getString("const", "Burari"));
+            if (sharedpreferences.contains("constituency")) {
+                rmlaid.execute(sharedpreferences.getString("constituency", "no_const"));
+            }else{
+                loading.setVisibility(View.GONE);
+                Toast.makeText(LoginActivity.this, "No MLA found!", Toast.LENGTH_SHORT).show();
+                finish();
+            }
         } else {
             loading.setVisibility(View.GONE);
             Toast.makeText(this, "Incorrect details", Toast.LENGTH_SHORT).show();

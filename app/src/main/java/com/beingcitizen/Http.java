@@ -3,8 +3,6 @@ package com.beingcitizen;
 /**
  * Created by pankaj on 18/3/16.
  */
-import android.util.Log;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,8 +30,8 @@ public class Http {
             }
             httpData = stringBuffer.toString();
             bufferedReader.close();
-        } catch (Exception e) {
-            Log.e("Reading Http url", e.toString());
+        } catch (Exception ignored) {
+
         } finally {
             if (inputStream != null) {
                 inputStream.close();

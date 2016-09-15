@@ -1,15 +1,11 @@
 package com.beingcitizen.retrieveals;
 
 import android.os.AsyncTask;
-import android.util.Log;
 
 import com.beingcitizen.Http;
 import com.beingcitizen.fragments.AllCampaign;
 
-import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.io.IOException;
 
 /**
  * Created by pankaj on 27/6/16.
@@ -28,11 +24,8 @@ public class SendHashTag extends AsyncTask<String, Void, JSONObject> {
         try {
             bool = new JSONObject(http.read("http://beingcitizen.com/bc/index.php/main/createfeed?uid="+params[0]+"&feed="+params[1].replace(" ", "%20")+"&feed-states="+params[2].replace(" ", "%20")));
 
-        } catch (IOException e) {
-            e.printStackTrace();
-            Log.e("TAG_ERROR", "ERROR");
-        } catch (JSONException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+
         }
         return bool;
     }

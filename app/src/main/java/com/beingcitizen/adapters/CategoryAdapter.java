@@ -11,10 +11,10 @@ import android.widget.TextView;
 
 import com.beingcitizen.R;
 
-import java.util.ArrayList;
-
 /**
  * Created by saransh on 21-06-2015.
+ *
+ * * This class is the adapter to fill the entries in the menu section on campaign page.
  */
 public class CategoryAdapter extends BaseAdapter{
     private Context mContext;

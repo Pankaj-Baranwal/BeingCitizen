@@ -4,14 +4,11 @@ package com.beingcitizen.fragments;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.CardView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.beingcitizen.R;
 import com.rey.material.widget.ProgressView;
@@ -23,9 +20,10 @@ import org.json.JSONObject;
 
 /**
  * Created by saransh on 21-06-2015.
+ *
+ * Fragment for cartoons section. Loads cartoon of the day.
  */
 public class Cartoons  extends Fragment {
-    private ListView userList;
     static JSONObject s;
     static boolean called = false;
     ProgressView image_loading;
@@ -57,7 +55,6 @@ public class Cartoons  extends Fragment {
                     public void onSuccess() {
                         cartoon_image.setVisibility(View.VISIBLE);
                         image_loading.setVisibility(View.GONE);
-                        Log.e("ImageLoading", "imageLoading");
                     }
 
                     @Override
@@ -68,7 +65,6 @@ public class Cartoons  extends Fragment {
 
                 cartoon_title.setText(t.getString("Cartoon of the day"));
                 cartoon_content.setText(t.getString("description"));
-                //imgLoad.setImage("http://beingcitizen.com/bc/index.php/uploads/display/"+t.getString("carimage")+t.getString("carext"), cartoon_image);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -83,9 +79,5 @@ public class Cartoons  extends Fragment {
     {
         called = true;
         s = b;
-    }
-
-    public void cartoon_function(JSONObject s) {
-        Toast.makeText(getActivity(), " Liked! ", Toast.LENGTH_SHORT).show();
     }
 }

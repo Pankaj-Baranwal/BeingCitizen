@@ -3,9 +3,6 @@ package com.beingcitizen.beingcitizen;
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.Signature;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -20,7 +17,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -34,6 +30,7 @@ import com.beingcitizen.adapters.Draweradapter;
 import com.beingcitizen.fragments.Campaign;
 import com.beingcitizen.fragments.DailyDigest;
 import com.beingcitizen.fragments.Debate;
+import com.beingcitizen.fragments.Help;
 import com.beingcitizen.fragments.TermsCondition;
 import com.beingcitizen.interfaces.adapterUpdate;
 import com.beingcitizen.interfaces.getUserProfile;
@@ -50,31 +47,35 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
+/**
+ * Created by Pankaj Baranwal on 14-07-2016
+ *
+ * Handles calls to all fragments like campaign, debate, about us, logout etc.
+ * Also responsible for navigation drawer functionality.
+ */
 
 public class MainActivity extends AppCompatActivity implements OnMenuItemClickListener, retrieveCamp, getUserProfile {
 
     //First We Declare Titles And Icons For Our Navigation Drawer List View
     //This Icons And Titles Are holded in an Array as you can see
 
-    String TITLES[] = {"Campaign", "Debate", "Daily Digest", "Terms and Conditions", "Help", "Logout"};
-    String menuTITLES[] = {"Law and Order", "Public Health and Sanitation", "Communication", "Water-Irrigation,Drainage,Embankments", "Lands, Agriculture", "Trade,Commerce,Employment", "Environment & Holticulture", "Tourism, Art and Culture", "Power", "Corruption/Vigillance"};
+    String TITLES[] = {"Campaign", "Debate", "Daily Digest", "Privacy Policy", "About", "Logout"};
+    String menuTITLES[] = {"Law and Order", "Public health and Sanitation", "Communication", "Water-Irrigation,Drainage,Embankments", "Lands, Agriculture", "Trade,Commerce,Employment", "Environment and Horticulture", "Tourism, Art and Culture", "Power", "Corruption/Vigillance"};
     int ICONS[] = {R.drawable.campaign, R.drawable.debates, R.drawable.digest, R.drawable.terms, R.drawable.help, R.drawable.logout};
 
     //Similarly we Create a String Resource for the name and email in the header view
     //And we also create a int resource for profile picture in the header view
 
-    String NAME_i, EMAIL_i, MLA_name="No_mla_id", consti;
+    String NAME_i, EMAIL_i, MLA_nam1e="No_mla_id", consti;
     String selected="";
 
-    JSONObject response, profile_pic_data, profile_pic_url;
     int PROFILE= R.drawable.ic_profile2;
     Fragment campaign = new Campaign();
     Fragment debate = new Debate();
     Fragment dailydigest = new DailyDigest();
     Fragment terms = new TermsCondition();
+    Fragment about = new Help();
     private Toolbar toolbar;     // Declaring the Toolbar Object
     RecyclerView mRecyclerView;                           // Declaring RecyclerView
     RecyclerView.Adapter mAdapter;                        // Declaring Adapter For Recycler View
@@ -85,7 +86,12 @@ public class MainActivity extends AppCompatActivity implements OnMenuItemClickLi
     ActionBarDrawerToggle mDrawerToggle;                  // Declaring Action Bar Drawer Toggle
     SharedPreferences sharedpreferences;
     SharedPreferences.Editor editor;
+    boolean exiting = false;
     public RelativeLayout rl;
+//    FragmentManager fragmentManager = getSupportFragmentManager();
+//    FragmentTransaction ft = fragmentManager.beginTransaction();
+//
+//    RecyclerView recyclerVi;
 
 
     @Override
@@ -93,18 +99,6 @@ public class MainActivity extends AppCompatActivity implements OnMenuItemClickLi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         rl = (RelativeLayout)findViewById(R.id.progress_imageLoading);
-        try {
-            PackageInfo info = getPackageManager().getPackageInfo(
-                    "com.beingcitizen.beingcitizen",
-                    PackageManager.GET_SIGNATURES);
-            for (Signature signature : info.signatures) {
-                MessageDigest md = MessageDigest.getInstance("SHA");
-                md.update(signature.toByteArray());
-                //Log.d("KeyHash:", Base64.encodeToString(md.digest(), Base64.DEFAULT));
-            }
-        } catch (PackageManager.NameNotFoundException | NoSuchAlgorithmException ignored) {
-            Log.e("PACkageManager", "ERROR");
-        }
         if (savedInstanceState == null) {
             FragmentManager fragmentManager = getSupportFragmentManager();
             FragmentTransaction ft = fragmentManager.beginTransaction();
@@ -126,8 +120,8 @@ public class MainActivity extends AppCompatActivity implements OnMenuItemClickLi
         editor = sharedpreferences.edit();
         NAME_i=sharedpreferences.getString("name", null);
         EMAIL_i=sharedpreferences.getString("email", null);
-        MLA_name = sharedpreferences.getString("mla_id", "null");
-        consti = sharedpreferences.getString("constituency", null);
+        final String MLA_name = sharedpreferences.getString("mla_id", "No_mla_id");
+        consti = sharedpreferences.getString("constituency", "");
         mAdapter = new Draweradapter(TITLES, ICONS, NAME_i, EMAIL_i, MLA_name, consti, PROFILE);
         // And passing the titles,icons,header view name, header view email,
         // and header view profile picture
@@ -147,15 +141,13 @@ public class MainActivity extends AppCompatActivity implements OnMenuItemClickLi
         mRecyclerView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
             @Override
             public boolean onInterceptTouchEvent(RecyclerView recyclerView, MotionEvent motionEvent) {
+                exiting = false;
                 View child = recyclerView.findChildViewUnder(motionEvent.getX(), motionEvent.getY());
                 int childv = recyclerView.getChildPosition(child);
-                //LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-               // LinearLayout rowView = (LinearLayout)inflater.inflate(R.layout.item_row, null);
-                //TextView textView = (TextView) rowView.findViewById(R.id.rowText);
-
 
                 FragmentManager fragmentManager = getSupportFragmentManager();
                 FragmentTransaction ft = fragmentManager.beginTransaction();
+
                 if (child != null && mGestureDetector.onTouchEvent(motionEvent)) {
                     Drawer.closeDrawers();
                     switch (childv) {
@@ -193,14 +185,14 @@ public class MainActivity extends AppCompatActivity implements OnMenuItemClickLi
                         case 4:
                             Draweradapter.mSelectedPosition=4;
                             recyclerView.getAdapter().notifyDataSetChanged();
-                            getSupportActionBar().setTitle("Terms & Conditions");
+                            getSupportActionBar().setTitle("Privacy Policy");
                             ft.replace(R.id.content_frame, terms);
                             break;
                         case 5:
                             Draweradapter.mSelectedPosition=5;
                             recyclerView.getAdapter().notifyDataSetChanged();
-                            //TODO: HELP...
-                            Toast.makeText(MainActivity.this, "COMING SOON", Toast.LENGTH_SHORT).show();
+                            getSupportActionBar().setTitle("About");
+                            ft.replace(R.id.content_frame, about);
                             break;
                         case 6:
                             Draweradapter.mSelectedPosition=6;
@@ -208,11 +200,10 @@ public class MainActivity extends AppCompatActivity implements OnMenuItemClickLi
                             logout();
                             break;
                         default:
-                            Toast.makeText(MainActivity.this, "default: "+ recyclerView.getChildAdapterPosition(child), Toast.LENGTH_SHORT).show();
+
                             break;
                     }
                     ft.commit();
-                    // Toast.makeText(MainActivity.this, "The Item Clicked is: " + recyclerView.getChildPosition(child), Toast.LENGTH_SHORT).show();
 
                     return true;
 
@@ -378,6 +369,16 @@ public class MainActivity extends AppCompatActivity implements OnMenuItemClickLi
     public void getImage(String img) {
         String image_loc = "http://beingcitizen.com/uploads/display/"+img;
         if (Draweradapter.profile!=null)
-        Picasso.with(this).load(image_loc).resize(256, 256).into(Draweradapter.profile);
+        Picasso.with(this).load(image_loc).resize(256, 256).error(R.drawable.ic_profile2).into(Draweradapter.profile);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (!exiting){
+            exiting = true;
+            Toast.makeText(MainActivity.this, "Press again to exit!", Toast.LENGTH_SHORT).show();
+        }else{
+            super.onBackPressed();
+        }
     }
 }

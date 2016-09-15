@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +21,8 @@ import org.json.JSONObject;
 
 /**
  * Created by saransh on 19-06-2015.
+ *
+ * Parent Fragment for debates list page. Loads and populates list of debates.
  */
 public class Debate extends Fragment {
     View rootView = null;
@@ -63,8 +64,9 @@ public class Debate extends Fragment {
             userList.setAdapter(new DebateAdapter(getContext(), s.getJSONArray("debates")));
             parent.rl.setVisibility(View.GONE);
         } catch (Exception e) {
-            e.printStackTrace();
-            Log.e("TAG_ERROR", "ERROR   "+e.getMessage());
+            Toast.makeText(getContext(), "Something went wrong!", Toast.LENGTH_SHORT).show();
         }
     }
+
+
 }

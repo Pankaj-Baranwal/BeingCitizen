@@ -20,6 +20,8 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
  * Created by hp1 on 28-12-2014.
+ *
+ * Contains layout implementation for navigation drawer.
  */
 public class Draweradapter extends RecyclerView.Adapter<Draweradapter.ViewHolder>{
 

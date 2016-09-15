@@ -48,7 +48,7 @@
         android:ems="10"
         android:gravity="center"
         android:hint="E-mail"
-        android:inputType="textPersonName"
+        android:inputType="textEmailAddress"
         android:textCursorDrawable="@null"
         android:textColorHint="@drawable/selector"
         android:textColor="#ffffff"
@@ -67,16 +67,6 @@
         android:textColor="#ffffff"
         android:textCursorDrawable="@null"
         android:textColorHint="@drawable/selector"
-        android:textSize="15dp" />
-
-
-    <TextView
-        android:id="@+id/textView5"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="25dp"
-        android:text="Forgot Password"
-        android:textColor="#ffffff"
         android:textSize="15dp" />
 
     <TextView

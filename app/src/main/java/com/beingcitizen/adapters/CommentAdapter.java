@@ -2,12 +2,10 @@ package com.beingcitizen.adapters;
 
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -15,40 +13,32 @@ import com.beingcitizen.R;
 import com.beingcitizen.beingcitizen.UserProfileActivity;
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
  * Created by saransh on 23-06-2015.
+ *
+ * This class is the adapter to fill the entries in the comments section within a particular debate.
  */
 public class CommentAdapter extends BaseAdapter{
     private Context mContext;
-    public JSONObject categorynam;
+    public JSONArray categorynam;
     String uid = "16";
     int total = 0;
-    public CommentAdapter(Context c, JSONObject categoryname) {
+    public CommentAdapter(Context c, JSONArray categoryname) {
         this.mContext = c;
 
         this.categorynam = categoryname;
         // this.icons = icons;
-        try {
-            total = categorynam.getJSONArray("total_sorted").length();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
+        total = categorynam.length();
     }
 
-    public void updating(JSONObject s){
+    public void updating(JSONArray s){
         categorynam = s;
-        try {
-            total = categorynam.getJSONArray("total_sorted").length();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
+        total = categorynam.length();
     }
 
 
@@ -80,12 +70,12 @@ public class CommentAdapter extends BaseAdapter{
         final TextView user_name_against = (TextView) rowView.findViewById(R.id.user_name_against);
         CircleImageView user_image_against = (CircleImageView)rowView.findViewById(R.id.user_image_against);
         TextView comment_text_against = (TextView) rowView.findViewById(R.id.comment_text_against);
-        LinearLayout ll_for = (LinearLayout) rowView.findViewById(R.id.lL_for);
-        LinearLayout ll_against = (LinearLayout) rowView.findViewById(R.id.lL_against);
-        String which = "for";
+//        LinearLayout ll_for = (LinearLayout) rowView.findViewById(R.id.lL_for);
+//        LinearLayout ll_against = (LinearLayout) rowView.findViewById(R.id.lL_against);
+        String which;
         try {
             if (total > 0) {
-                if (categorynam.getJSONArray("total_sorted").getJSONObject(position).getString("which").contentEquals("for")) {
+                if (categorynam.getJSONObject(position).getString("which").contentEquals("for")) {
                     which = "for";
                     rL_user.setBackgroundColor(0xB111FF1D);
                     rL_user_against.setVisibility(View.GONE);
@@ -97,32 +87,34 @@ public class CommentAdapter extends BaseAdapter{
                     rL_user.setVisibility(View.GONE);
                 }
                 if (which.contentEquals("for")) {
-                    user_name.setText(categorynam.getJSONArray("total_sorted").getJSONObject(position).getString("name"));
-                    comment_text.setText(categorynam.getJSONArray("total_sorted").getJSONObject(position).getString("content"));
-                    uid = categorynam.getJSONArray("total_sorted").getJSONObject(position).getString("user_id");
-                    String user_img_loc = "http://beingcitizen.com/uploads/display/" + categorynam.getJSONArray("total_sorted").getJSONObject(position).getString("uimage") + categorynam.getJSONArray("for").getJSONObject(position).getString("uext");
-                    Picasso.with(mContext).load(user_img_loc).resize(100, 100).into(user_image);
+                    user_name.setText(categorynam.getJSONObject(position).getString("name"));
+                    comment_text.setText(categorynam.getJSONObject(position).getString("content"));
+                    uid = categorynam.getJSONObject(position).getString("user_id");
+                    if (!categorynam.getJSONObject(position).getString("uimage").contains("null")) {
+                        String user_img_loc = "http://beingcitizen.com/uploads/display/" + categorynam.getJSONObject(position).getString("uimage") + categorynam.getJSONObject(position).getString("uext");
+                        Picasso.with(mContext).load(user_img_loc).resize(100, 100).error(R.drawable.ic_profile).into(user_image);
+                    }
                 }else{
-                    user_name_against.setText(categorynam.getJSONArray("total_sorted").getJSONObject(position).getString("name"));
-                    comment_text_against.setText(categorynam.getJSONArray("total_sorted").getJSONObject(position).getString("content"));
-                    uid = categorynam.getJSONArray("total_sorted").getJSONObject(position).getString("user_id");
-                    String user_img_loc = "http://beingcitizen.com/uploads/display/" + categorynam.getJSONArray("total_sorted").getJSONObject(position).getString("uimage") + categorynam.getJSONArray("for").getJSONObject(position).getString("uext");
-                    Picasso.with(mContext).load(user_img_loc).resize(100, 100).into(user_image_against);
+                    user_name_against.setText(categorynam.getJSONObject(position).getString("name"));
+                    comment_text_against.setText(categorynam.getJSONObject(position).getString("content"));
+                    uid = categorynam.getJSONObject(position).getString("user_id");
+                    if (!categorynam.getJSONObject(position).getString("uimage").contains("null")) {
+                        String user_img_loc = "http://beingcitizen.com/uploads/display/" + categorynam.getJSONObject(position).getString("uimage") + categorynam.getJSONObject(position).getString("uext");
+                        Picasso.with(mContext).load(user_img_loc).resize(100, 100).error(R.drawable.ic_profile).into(user_image_against);
+                    }
                 }
             }
         }catch (JSONException e) {
-            e.printStackTrace();
+
         }
         rL_user.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 try {
-                    Log.e("POSITION", position+"");
-                    uid = categorynam.getJSONArray("total_sorted").getJSONObject(position).getString("user_id");
+                    uid = categorynam.getJSONObject(position).getString("user_id");
                 }catch (JSONException e) {
-                    Log.getStackTraceString(e);
+
                 }
-                Log.e("COMMENT_UID", uid+"");
                 Intent intent = new Intent(mContext, UserProfileActivity.class);
                 intent.putExtra("uid", uid);
                 mContext.startActivity(intent);
@@ -132,12 +124,10 @@ public class CommentAdapter extends BaseAdapter{
             @Override
             public void onClick(View v) {
                 try {
-                    Log.e("POSITION", position+"");
-                    uid = categorynam.getJSONArray("total_sorted").getJSONObject(position).getString("user_id");
+                    uid = categorynam.getJSONObject(position).getString("user_id");
                 }catch (JSONException e) {
-                    Log.getStackTraceString(e);
+
                 }
-                Log.e("COMMENT_UID", uid+"");
                 Intent intent = new Intent(mContext, UserProfileActivity.class);
                 intent.putExtra("uid", uid);
                 mContext.startActivity(intent);

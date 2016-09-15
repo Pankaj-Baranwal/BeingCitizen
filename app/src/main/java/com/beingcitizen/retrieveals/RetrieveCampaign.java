@@ -1,7 +1,6 @@
 package com.beingcitizen.retrieveals;
 
 import android.os.AsyncTask;
-import android.util.Log;
 
 import com.beingcitizen.Http;
 import com.beingcitizen.interfaces.retrieveCamp;
@@ -29,11 +28,7 @@ public class RetrieveCampaign extends AsyncTask<String, Void, JSONObject> {
         try {
             bool = new JSONObject(http.read("http://beingcitizen.com/bc/index.php/main/campaign?id="+params[0]));
 
-        } catch (IOException e) {
-            e.printStackTrace();
-            Log.e("TAG_ERROR", "ERROR");
-        } catch (JSONException e) {
-            e.printStackTrace();
+        } catch (IOException | JSONException ignored) {
         }
         return bool;
     }
@@ -44,8 +39,6 @@ public class RetrieveCampaign extends AsyncTask<String, Void, JSONObject> {
         if (ref!=null && s!=null) {
             ref.retrieve(s);
         }
-        else
-            Log.e("NULL", "not geting right json");
     }
 }
 

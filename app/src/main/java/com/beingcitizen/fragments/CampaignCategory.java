@@ -14,6 +14,8 @@ import com.beingcitizen.adapters.CategoryAdapter;
 
 /**
  * Created by saransh on 21-06-2015.
+ *
+ * Fragment to actually fill up the menu items in campaigns section.
  */
 public class CampaignCategory  extends Fragment {
     private ListView userList;

@@ -1,7 +1,6 @@
 package com.beingcitizen.retrieveals;
 
 import android.os.AsyncTask;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.beingcitizen.Http;
@@ -28,10 +27,7 @@ public class RetrieveMlaProfile extends AsyncTask<String, Void, String> {
         Http http = new Http();
         try {
             bool = http.read("http://beingcitizen.com/bc/index.php/main/mlaprofile?id="+params[0]+"&user_id="+params[1]);
-            Log.e(" MLA", params[0]);
-        } catch (IOException e) {
-            e.printStackTrace();
-            Log.e("TAG_ERROR", "ERROR");
+        } catch (IOException ignored) {
         }
         return bool;
     }
@@ -43,7 +39,6 @@ public class RetrieveMlaProfile extends AsyncTask<String, Void, String> {
             JSONObject obj = new JSONObject(s);
             context.functions(obj);
         } catch (JSONException e) {
-            Log.getStackTraceString(e);
             Toast.makeText(context, "Error retrieving data", Toast.LENGTH_SHORT).show();
         }
     }

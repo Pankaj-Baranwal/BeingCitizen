@@ -1,7 +1,6 @@
 package com.beingcitizen.retrieveals;
 
 import android.os.AsyncTask;
-import android.util.Log;
 
 import com.beingcitizen.Http;
 import com.beingcitizen.beingcitizen.CommentActivity;
@@ -28,11 +27,7 @@ public class SendDebateComment extends AsyncTask<String, Void, JSONObject> {
         try {
             bool = new JSONObject(http.read("http://beingcitizen.com/bc/index.php/main/argue?uid="+params[0]+"&debate_id="+params[1]+"&nature="+params[2]+"&comment="+params[3].replace(" ", "%20")));
 
-        } catch (IOException e) {
-            e.printStackTrace();
-            Log.e("TAG_ERROR", "ERROR");
-        } catch (JSONException e) {
-            e.printStackTrace();
+        } catch (IOException | JSONException ignored) {
         }
         return bool;
     }

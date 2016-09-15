@@ -2,6 +2,8 @@ package com.beingcitizen.beingcitizen;
 
 /**
  * Created by saransh on 14-06-2015.
+ *
+ * The starting splash screen. Self explanatory.
  */
 
 import android.Manifest;

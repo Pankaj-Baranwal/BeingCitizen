@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.CardView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +23,8 @@ import org.json.JSONException;
 
 /**
  * Created by saransh on 27-06-2015.
+ *
+ * This class is the adapter to fill the entries in the blogs section.
  */
 public class BlogsAdapter extends BaseAdapter implements View.OnClickListener {
     private Context mContext;
@@ -90,11 +91,9 @@ public class BlogsAdapter extends BaseAdapter implements View.OnClickListener {
             blog_text.setText(categorynam.getJSONObject(position).getString("title"));
             user_name.setText(categorynam.getJSONObject(position).getString("author"));
             posted_at.setText(categorynam.getJSONObject(position).getString("created_at"));
-            Log.e("blog", categorynam.getJSONObject(position).getString("title"));
 
-        } catch (JSONException e) {
-            Log.e("error_blog", "sdfg");
-            e.printStackTrace();
+        } catch (JSONException ignored) {
+
         }
 
         cardView.setOnClickListener(new View.OnClickListener() {
@@ -102,6 +101,7 @@ public class BlogsAdapter extends BaseAdapter implements View.OnClickListener {
             public void onClick(View view) {
                 Intent i = new Intent(mContext, BlogExpanded.class);
                 try {
+                    url_img = "http://beingcitizen.com/uploads/blogs/" + categorynam.getJSONObject(position).getString("bimage") + categorynam.getJSONObject(position).getString("bext");
                     BlogExpanded.function(categorynam.getJSONObject(position), url_img);
                 } catch (JSONException e) {
                     e.printStackTrace();

@@ -14,11 +14,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.beingcitizen.R;
 import com.beingcitizen.adapters.CampaignAdapter;
 import com.beingcitizen.beingcitizen.CreateCampaign;
@@ -37,10 +44,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
  * Created by saransh on 22-06-2015.
+ *
+ * Parent Fragment for campaign list page. Loads and populates list of campaigns.
  */
 public class AllCampaign extends Fragment implements retrieveCamp, adapterUpdate {
     private ListView userList;
@@ -81,8 +92,35 @@ public class AllCampaign extends Fragment implements retrieveCamp, adapterUpdate
                     final Dialog dialogLogout = new Dialog(getActivity());
                     dialogLogout.requestWindowFeature(Window.FEATURE_NO_TITLE);
                     dialogLogout.setContentView(R.layout.addhash);
-                    Spinner tags = (Spinner) dialogLogout.findViewById(R.id.tags_spinner);
+                    final Spinner tags = (Spinner) dialogLogout.findViewById(R.id.tags_spinner);
+                    final List<String> feed_text = new ArrayList<String>();
                     final String[] feed_tag = {""};
+                    StringRequest myReq = new StringRequest(Request.Method.GET,
+                            "http://beingcitizen.com/bc/index.php/main/getfeedtags",
+                            new Response.Listener<String>() {
+                                @Override
+                                public void onResponse(String response) {
+                                    try {
+                                        feed_text.add("--- Select a Tag ---");
+                                        JSONObject jo = new JSONObject(response);
+                                        for (int i=0; i<jo.getJSONArray("tags").length(); i++){
+                                            feed_text.add(jo.getJSONArray("tags").getJSONObject(i).getString("name"));
+                                        }
+                                        ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, feed_text);
+                                        tags.setAdapter(adapter);
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            },
+                            new Response.ErrorListener() {
+                                @Override
+                                public void onErrorResponse(VolleyError error) {
+                                    Toast.makeText(getContext(), "Unable to load!", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                    RequestQueue requestQueue = Volley.newRequestQueue(getContext());
+                    requestQueue.add(myReq);
                     tags.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                         @Override
                         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {

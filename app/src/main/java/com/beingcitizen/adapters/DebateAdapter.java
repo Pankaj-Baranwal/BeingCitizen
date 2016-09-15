@@ -24,6 +24,8 @@ import org.json.JSONException;
 
 /**
  * Created by saransh on 27-06-2015.
+ *
+ * This class is the adapter to fill the entries in the debates section.
  */
 public class DebateAdapter extends BaseAdapter{
     private Context mContext;
@@ -114,7 +116,11 @@ public class DebateAdapter extends BaseAdapter{
 
 
                 title_debate.setText(categorynam.getJSONObject(position).getString("name"));
-                content_debate.setText(categorynam.getJSONObject(position).getString("debate_text"));
+                String debate_text = categorynam.getJSONObject(position).getString("debate_text");
+                if (debate_text.length()>200){
+                    debate_text = debate_text.substring(0, 197) + "...";
+                }
+                content_debate.setText(debate_text);
                 String for_val, against_val;
                 if (categorynam.getJSONObject(position).getString("fore")!=null)
                     for_val =  categorynam.getJSONObject(position).getString("fore");

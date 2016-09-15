@@ -9,7 +9,6 @@ import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.InputFilter;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.MenuItem;
@@ -29,6 +28,8 @@ import org.json.JSONObject;
 
 /**
  * Created by saransh on 12-07-2015.
+ *
+ * Contains functions to fill in MLA Profile page. Information being called using RetrieveMlaProfile class.
  */
 public class MlaProfileActivity extends AppCompatActivity {
     private Toolbar toolbar;
@@ -48,7 +49,6 @@ public class MlaProfileActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
         mla_id = sp.getString("mla_id", "m001");
-        Log.e("mla_id", mla_id+"");
         img_mla = (ImageView)findViewById(R.id.profile_picture);
         mla_consti = (TextView)findViewById(R.id.mla_consti);
         mla_name = (TextView)findViewById(R.id.mla_name);
@@ -70,7 +70,6 @@ public class MlaProfileActivity extends AppCompatActivity {
                 JSONArray info = obj.getJSONArray("info");
                 name = info.getJSONObject(0).getString("name");
                 num_camp = obj.getJSONArray("new").length() + obj.getJSONArray("active").length() + obj.getJSONArray("closed").length();
-                Log.e("LENGTH", num_camp + "");
                 consti = info.getJSONObject(0).getString("constituency");
                 gender = info.getJSONObject(0).getString("gender");
                 String image_loc = "http://beingcitizen.com/uploads/mla/display/" + info.getJSONObject(0).getString("mlaimage") + info.getJSONObject(0).getString("mlaext");
@@ -128,7 +127,17 @@ public class MlaProfileActivity extends AppCompatActivity {
             }
             rlp_ll.addRule(RelativeLayout.ALIGN_BOTTOM, img.getId());
             LinearLayout lL = new LinearLayout(this);
-            lL.setBackgroundColor(0xB111FF1D);
+            try {
+                String status = campStarted.getJSONObject(i).getString("status");
+                if (status.contentEquals("1")){
+                    lL.setBackgroundColor(0xB1FF0000);
+                }else if (status.contentEquals("2")){
+                    lL.setBackgroundColor(0xB1FDC008);
+                }else{
+                    lL.setBackgroundColor(0xB111FF1D);
+                }
+            } catch (JSONException ignored) {
+            }
             lL.setGravity(Gravity.BOTTOM);
             rlp_ll.setMargins(px, 0, px, 0);
             lL.setLayoutParams(rlp_ll);
@@ -195,7 +204,18 @@ public class MlaProfileActivity extends AppCompatActivity {
             }
             rlp_ll.addRule(RelativeLayout.ALIGN_BOTTOM, img.getId());
             LinearLayout lL = new LinearLayout(this);
-            lL.setBackgroundColor(0xB111FF1D);
+            try {
+                String status = campStarted.getJSONObject(i).getString("status");
+                if (status.contentEquals("1")){
+                    lL.setBackgroundColor(0xB1FF0000);
+                }else if (status.contentEquals("2")){
+                    lL.setBackgroundColor(0xB1FDC008);
+                }else{
+                    lL.setBackgroundColor(0xB111FF1D);
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
             lL.setGravity(Gravity.BOTTOM);
             rlp_ll.setMargins(px, 0, px, 0);
             lL.setLayoutParams(rlp_ll);

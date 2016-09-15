@@ -15,7 +15,6 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
@@ -70,6 +69,8 @@ import java.util.Arrays;
 
 /**
  * Created by saransh on 14-06-2015.
+ *
+ * Facebook, Gmail login implemented here.
  */
 public class LoginMain extends Activity implements GoogleApiClient.ConnectionCallbacks,GoogleApiClient.OnConnectionFailedListener, retrieveCampaign, signUp_interface, mla_id, com.beingcitizen.interfaces.login {
     SharedPreferences sharedpreferences;
@@ -92,25 +93,13 @@ public class LoginMain extends Activity implements GoogleApiClient.ConnectionCal
     ProfileTracker mProfileTracker;
     RelativeLayout rl_progress;
     ProgressView progress;
+    boolean loggedIn = false;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         sharedpreferences = PreferenceManager.getDefaultSharedPreferences(LoginMain.this);
-
-//        requestWindowFeature(Window.FEATURE_NO_TITLE);
-//        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-//        //hideSystemUI();
-//        if(Build.VERSION.SDK_INT > 11 && Build.VERSION.SDK_INT < 19) { // lower api
-//            View v = this.getWindow().getDecorView();
-//            v.setSystemUiVisibility(View.GONE);
-//        } else if(Build.VERSION.SDK_INT >= 19) {
-//            //for new api versions.
-//            View decorView = getWindow().getDecorView();
-//            int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
-//            decorView.setSystemUiVisibility(uiOptions);
-//        }
         facebookSDKInitialize();
         setContentView(R.layout.login);
 
@@ -186,19 +175,16 @@ And then callback manager will handle the login responses.
             @Override
             public void onSuccess(LoginResult login_result) {
                 getUserInfo(login_result);
-//                Toast.makeText(LoginMain.this,full_name,Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onCancel() {
-                Toast.makeText(LoginMain.this, "Cannot launch Facebook!", Toast.LENGTH_SHORT).show();
-                // code for cancellation
+
             }
 
             @Override
             public void onError(FacebookException exception) {
                 Toast.makeText(LoginMain.this, "Cannot launch Facebook!", Toast.LENGTH_SHORT).show();
-                Log.getStackTraceString(exception);
             }
         });
     }
@@ -228,12 +214,10 @@ When the request is completed, a callback is called to handle the success condit
                             gender = json_object.getString("gender");
                             name = json_object.getString("name");
                             password = "extra_farjiwork";
-                            Log.e("ID", json_object.getString("id"));
                             RetrieveFeedTask rft = new RetrieveFeedTask(LoginMain.this);
                             rft.execute(email_id, "extra_farjiwork");
                         } catch (JSONException e) {
-                            e.printStackTrace();
-                            Log.e("TAG_EMAIL", "ERROR");
+                            Toast.makeText(LoginMain.this, "Could not retrieve data!", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -301,8 +285,7 @@ When the request is completed, a callback is called to handle the success condit
             });
             dialogLogout.show();
         } catch (JSONException e) {
-            Log.e("namearray", "ERROR");
-            e.printStackTrace();
+            Toast.makeText(LoginMain.this, "Something went wrong!", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -323,8 +306,7 @@ When the request is completed, a callback is called to handle the success condit
                 startActivity(i);
                 finish();
             } catch (JSONException e) {
-                Log.e("TAG_function", "JSONERROR");
-                e.printStackTrace();
+                Toast.makeText(LoginMain.this, "Something went wrong!", Toast.LENGTH_SHORT).show();
             }
         }else{
             RetrieveFeedTask rft = new RetrieveFeedTask(LoginMain.this);
@@ -343,9 +325,15 @@ When the request is completed, a callback is called to handle the success condit
             edit.putString("mla_id", "No_mla_id");
         }
         edit.apply();
-        RetrieveSignUp rsup = new RetrieveSignUp(LoginMain.this, LoginMain.this);
-        rl_progress.setVisibility(View.VISIBLE);
-        rsup.execute(name.replace(" ", "%20"), email_id, password.replace(" ", "%20"), gender, sharedpreferences.getString("constituency", "").replace(" ", "%20"));
+        if (!loggedIn) {
+            RetrieveSignUp rsup = new RetrieveSignUp(LoginMain.this, LoginMain.this);
+            rl_progress.setVisibility(View.VISIBLE);
+            rsup.execute(name.replace(" ", "%20"), email_id, password.replace(" ", "%20"), gender, sharedpreferences.getString("constituency", "").replace(" ", "%20"));
+        }else{
+            Intent i = new Intent(getBaseContext(), MainActivity.class);
+            startActivity(i);
+            finish();
+        }
     }
 
     @Override
@@ -358,15 +346,15 @@ When the request is completed, a callback is called to handle the success condit
                 edit.putString("name", s.getString("name"));
                 edit.putString("email", s.getString("email"));
                 edit.putString("sex", s.getString("sex"));
-                edit.putString("const", s.getString("const"));
+                edit.putString("constituency", s.getString("const"));
                 edit.apply();
-                Intent i = new Intent(getBaseContext(), MainActivity.class);
+                RetrieveMlaID rmlaid = new RetrieveMlaID(LoginMain.this, LoginMain.this);
+                rmlaid.execute(s.getString("const"));
+                loggedIn = true;
                 rl_progress.setVisibility(View.GONE);
-                startActivity(i);
-                finish();
             } catch (JSONException e) {
-                e.printStackTrace();
-                Log.e("ERROR", "Error in storing to shared prefs");
+                rl_progress.setVisibility(View.GONE);
+                Toast.makeText(LoginMain.this, "Something went wrong!", Toast.LENGTH_SHORT).show();
             }
         } else if(s.has("user_id")) {
             SharedPreferences.Editor edit = sharedpreferences.edit();
@@ -376,15 +364,15 @@ When the request is completed, a callback is called to handle the success condit
                 edit.putString("name", s.getString("name"));
                 edit.putString("email", s.getString("email"));
                 edit.putString("sex", s.getString("sex"));
-                edit.putString("const", s.getString("const"));
+                edit.putString("constituency", s.getString("const"));
                 edit.apply();
                 Intent i = new Intent(getBaseContext(), MainActivity.class);
                 rl_progress.setVisibility(View.GONE);
                 startActivity(i);
                 finish();
             } catch (JSONException e) {
-                e.printStackTrace();
-                Log.e("ERROR", "Error in storing to shared prefs");
+                rl_progress.setVisibility(View.GONE);
+                Toast.makeText(LoginMain.this, "Something went wrong!", Toast.LENGTH_SHORT).show();
             }
         }else{
             rl_progress.setVisibility(View.GONE);
@@ -545,7 +533,6 @@ getProfileInfo();
 
     @Override
     public void onConnectionFailed(ConnectionResult result) {
-        Log.i(TAG, "onConnectionFailed");
         if (!result.hasResolution()) {
             GooglePlayServicesUtil.getErrorDialog(result.getErrorCode(), this,
                     0).show();
@@ -568,12 +555,8 @@ getProfileInfo();
     @Override
     public void onConnected(Bundle arg0) {
         mSignInClicked = false;
-        //Toast.makeText(this, "User is connected!", Toast.LENGTH_LONG).show();
         rl_progress.setVisibility(View.VISIBLE);
         getProfileInfo();
-//        Intent i = new Intent(getBaseContext(), MainActivity.class);
-//        startActivity(i);
-//        finish();
     }
 
 
@@ -599,15 +582,6 @@ getProfileInfo();
             }
         }
     }
-    /*   @Override
-       protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-           overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
-       }
-   */
-//    public void show(String str)
-//    {
-//        Toast.makeText(this, str, Toast.LENGTH_LONG).show();
-//    }
 
     private void gPlusRevokeAccess() {
         if (googleApiClient.isConnected()) {
@@ -616,7 +590,6 @@ getProfileInfo();
                     .setResultCallback(new ResultCallback<Status>() {
                         @Override
                         public void onResult(Status arg0) {
-                            Log.e("MainActivity", "User access revoked!");
                             buidNewGoogleApiClient();
                        googleApiClient.connect();
                             changeUI(false);
@@ -648,21 +621,16 @@ getProfileInfo();
     private void getProfileInfo() {
 
         try {
-
-
             if (Plus.PeopleApi.getCurrentPerson(googleApiClient) != null) {
                 Person currentPerson = Plus.PeopleApi.getCurrentPerson(googleApiClient);
-                Log.e("TAG", currentPerson.getDisplayName()+" "+ currentPerson.getGender()+" "+ currentPerson.getName()+" "+ currentPerson.getAboutMe()+ " "+ currentPerson.getBirthday()+" " + currentPerson.getAgeRange()+" "+ currentPerson.getId());
                 setPersonalInfo(currentPerson);
-
             } else {
                 Toast.makeText(getApplicationContext(),
                         "No Personal info mention", Toast.LENGTH_LONG).show();
-
             }
 
         } catch (Exception e) {
-            Log.getStackTraceString(e);
+
         }
 
     }

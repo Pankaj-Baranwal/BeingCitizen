@@ -11,11 +11,9 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
-
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ImageSpan;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -23,6 +21,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+
 import com.beingcitizen.R;
 import com.beingcitizen.interfaces.adapterUpdate;
 import com.beingcitizen.interfaces.retrieveCamp;
@@ -41,6 +40,8 @@ import java.util.List;
 
 /**
  * Created by saransh on 19-06-2015.
+ *
+ * Parent Fragment for campaign list page. Also contains Menu of categories implementation. Loads and populates list of campaigns and Menu Items.
  */
 public class Campaign extends Fragment implements retrieveCamp {
 
@@ -198,18 +199,6 @@ public class Campaign extends Fragment implements retrieveCamp {
         return super.onOptionsItemSelected(item);
     }
 
-   // set this to set according to category
-
-
-//    public void onMenuItemClick(View clickedView, int position) {
-////        selected = menuObjects.get(position).getTitle();
-////        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getContext());
-////        RetrieveCampaign rtC = new RetrieveCampaign(Campaign.this);
-////        String uid = sp.getString("id", "16");
-////        rtC.execute(uid);
-////        Toast.makeText(Campaign.this.getActivity(), "Clicked on position: " + position, Toast.LENGTH_SHORT).show();
-//    }
-
     @Override
     public void retrieve(JSONObject param) {
         try {
@@ -236,7 +225,6 @@ public class Campaign extends Fragment implements retrieveCamp {
 
         @Override
         public Fragment getItem(int position) {
-            Log.e("POSITION", position+"");
             switch (position) {
 
                 // Open FragmentTab1.java

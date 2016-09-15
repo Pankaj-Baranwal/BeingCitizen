@@ -3,7 +3,6 @@ package com.beingcitizen.fragments;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +18,8 @@ import org.json.JSONObject;
 
 /**
  * Created by saransh on 22-06-2015.
+ *
+ * Parent Fragment for blog list page. Loads and populates list of blogs.
  */
 public class Blogs extends Fragment {
     private ListView userList;
@@ -35,7 +36,6 @@ public class Blogs extends Fragment {
         rl.setVisibility(View.VISIBLE);
         userList = (ListView) rootView.findViewById(R.id.blogs_listview);
         if (called) {
-            Log.e("CALLED", "YES");
             try {
                 if (s.getJSONArray("blog").length()!=0) {
                     JSONArray jA = new JSONArray();
@@ -54,8 +54,6 @@ public class Blogs extends Fragment {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-        }else{
-            Log.e("CALLED", "NOT");
         }
         return rootView;
     }

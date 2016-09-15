@@ -25,7 +25,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.InputFilter;
 import android.util.Base64;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.Menu;
@@ -69,6 +68,8 @@ import java.util.Map;
 
 /**
  * Created by saransh on 12-07-2015.
+ *
+ * Contains functions to fill in User Profile page. Information called using RetrieveUserProfile class.
  */
 public class UserProfileActivity extends AppCompatActivity {
     private Toolbar toolbar;
@@ -105,20 +106,8 @@ public class UserProfileActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
-        switch (item.getItemId()) {
-            case R.id.menu_profile_edit:
-                Toast.makeText(UserProfileActivity.this, "Edit: ", Toast.LENGTH_SHORT).show();
-                break;
-
-            default:
-                finish();
-                break;
-
-        }
+        finish();
         return super.onOptionsItemSelected(item);
-
-
     }
 
     @Override
@@ -127,23 +116,6 @@ public class UserProfileActivity extends AppCompatActivity {
         //getMenuInflater().inflate(R.menu.menu_edit, menu);
         return true;
     }
-
-
-//    public Bitmap getBitmapFromURL(String src) {
-//        try {
-//            java.net.URL url = new java.net.URL(src);
-//            HttpURLConnection connection = (HttpURLConnection) url
-//                    .openConnection();
-//            connection.setDoInput(true);
-//            connection.connect();
-//            InputStream input = connection.getInputStream();
-//            Bitmap myBitmap = BitmapFactory.decodeStream(input);
-//            return myBitmap;
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//            return null;
-//        }
-//    }
 
     public void functions(JSONObject obj) {
         try {
@@ -166,7 +138,7 @@ public class UserProfileActivity extends AppCompatActivity {
             TextView hash = (TextView) findViewById(R.id.feed);
             TextView hash_tag = (TextView) findViewById(R.id.hash_tag);
             if (obj.getJSONArray("feed").length()>0) {
-                hash.setText(obj.getJSONArray("feed").getJSONObject(0).getString("content"));
+                hash.setText("#"+obj.getJSONArray("feed").getJSONObject(0).getString("content"));
                 hash_tag.setText(obj.getJSONArray("feed").getJSONObject(0).getString("tag"));
             }
             //hash.setText(obj.getJSONArray("feed").getJSONObject(0).getString("content"));
@@ -190,7 +162,7 @@ public class UserProfileActivity extends AppCompatActivity {
 
     private void createUIForFollowed(JSONArray campStarted) {
         LinearLayout created_lL = (LinearLayout) findViewById(R.id.lL_campaigns_followed);
-        for (int i =0; i<campStarted.length(); i++){
+        for (int i =campStarted.length()-1; i>=0; i--){
             Resources r = this.getResources();
             int px;
             px = (int) TypedValue.applyDimension(
@@ -223,7 +195,7 @@ public class UserProfileActivity extends AppCompatActivity {
                 if (status.contentEquals("1")){
                     lL.setBackgroundColor(0xB1FF0000);
                 }else if (status.contentEquals("2")){
-                    lL.setBackgroundColor(0xB10000FF);
+                    lL.setBackgroundColor(0xB1FDC008);
                 }else{
                     lL.setBackgroundColor(0xB111FF1D);
                 }
@@ -268,7 +240,7 @@ public class UserProfileActivity extends AppCompatActivity {
 
     private void createUIForCreated(JSONArray campStarted){
         LinearLayout created_lL = (LinearLayout) findViewById(R.id.lL_campaigns_created);
-        for (int i =0; i<campStarted.length(); i++){
+        for (int i =campStarted.length()-1; i>=0; i--){
             Resources r = this.getResources();
             int px;
             px = (int) TypedValue.applyDimension(
@@ -301,7 +273,7 @@ public class UserProfileActivity extends AppCompatActivity {
                 if (status.contentEquals("1")){
                     lL.setBackgroundColor(0xB1FF0000);
                 }else if (status.contentEquals("2")){
-                    lL.setBackgroundColor(0xB10000FF);
+                    lL.setBackgroundColor(0xB1FDC008);
                 }else{
                     lL.setBackgroundColor(0xB111FF1D);
                 }
@@ -348,7 +320,6 @@ public class UserProfileActivity extends AppCompatActivity {
     void sendUserImage(){
         final Dialog dialog = new Dialog(UserProfileActivity.this);
         dialog.setContentView(R.layout.dialog_progress);
-        dialog.setTitle("Updating Index\nChanges will take effect on app restart");
         dialog.show();
         StringRequest myReq = new StringRequest(Request.Method.POST,
                 "http://beingcitizen.com/bc/index.php/main/editPhoto",
@@ -356,7 +327,6 @@ public class UserProfileActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(String response) {
                         dialog.dismiss();
-                        Log.e("RESPONSE", response);
                     }
                 },
                 new Response.ErrorListener() {
@@ -364,7 +334,6 @@ public class UserProfileActivity extends AppCompatActivity {
                     public void onErrorResponse(VolleyError error) {
                         Toast.makeText(UserProfileActivity.this, "Error Uploading", Toast.LENGTH_SHORT).show();
                         dialog.dismiss();
-                        Log.e("RESPONSE", "ERROR!");
                     }
                 }) {
             protected Map<String, String> getParams() throws com.android.volley.AuthFailureError {
@@ -461,7 +430,6 @@ public class UserProfileActivity extends AppCompatActivity {
                 String picturePath = c.getString(columnIndex);
                 File f = new File(picturePath);
                 iname = f.getName();
-                Log.e("PICTURE", picturePath);
                 c.close();
                 BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
                 bitmapOptions.inJustDecodeBounds = true;
@@ -553,6 +521,8 @@ public class UserProfileActivity extends AppCompatActivity {
         if (getIntent().getExtras()!=null) {
             uid = getIntent().getExtras().getString("uid");
             if (uid.contentEquals(uid_viewer)){
+                LinearLayout ll_email = (LinearLayout)findViewById(R.id.ll_email);
+                ll_email.setVisibility(View.VISIBLE);
                 follow_button.setVisibility(View.GONE);
             }
         }else{
@@ -667,9 +637,3 @@ public class UserProfileActivity extends AppCompatActivity {
         }
     }
 }
-
-
-
-/*
-
- */

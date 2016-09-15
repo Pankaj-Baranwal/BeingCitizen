@@ -1,7 +1,6 @@
 package com.beingcitizen.retrieveals;
 
 import android.os.AsyncTask;
-import android.util.Log;
 
 import com.beingcitizen.Http;
 import com.beingcitizen.beingcitizen.CreateCampaign;
@@ -28,11 +27,7 @@ public class RetrieveTags extends AsyncTask<String, Void, JSONObject> {
         Http http = new Http();
         try {
             bool = new JSONObject(http.read("http://beingcitizen.com/bc/index.php/main/getTags?category="+params[0].replace(" ", "%20")));
-        } catch (IOException e) {
-            e.printStackTrace();
-            Log.e("TAG_ERROR", "ERROR");
-        } catch (JSONException e) {
-            e.printStackTrace();
+        } catch (IOException | JSONException ignored) {
         }
         return bool;
     }

@@ -22,6 +22,13 @@ import org.json.JSONObject;
 
 import java.util.Locale;
 
+/**
+ * Created by Pankaj Baranwal on 24-07-2016.
+ *
+ * Parent Fragment for daily digest section. Loads and further sends to individual fragments
+ * details of polls, blogs, and cartoon.
+ */
+
 public class DailyDigest extends Fragment implements ActionBar.TabListener {
 
     SectionsPagerAdapter mSectionsPagerAdapter;
@@ -38,7 +45,7 @@ public class DailyDigest extends Fragment implements ActionBar.TabListener {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getContext());
         parent.rl.setVisibility(View.VISIBLE);
         RetrieveDailyDigest rdd = new RetrieveDailyDigest(this);
-        uid = sp.getString("uid", "16");
+        uid = sp.getString("id", "16");
         rdd.execute(uid);
     }
 
@@ -63,7 +70,7 @@ public class DailyDigest extends Fragment implements ActionBar.TabListener {
         mTabs.setDistributeEvenly(true);
 
         //set tab strip backgroung color (grey)
-        mTabs.setBackgroundColor(0xFF009688);
+        mTabs.setBackgroundColor(0xFF222222);
         setHasOptionsMenu(true);
         return view;
     }

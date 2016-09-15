@@ -7,7 +7,6 @@ import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
@@ -34,6 +33,8 @@ import java.util.ArrayList;
 
 /**
  * Created by zon 14-06-2015.
+ *
+ * Contains implementation of User sign-up page and dialog boxes for pin code and constituency retrieval.
  */
 public class signUp extends Activity implements retrieveCampaign, signUp_interface, mla_id {
 
@@ -96,7 +97,6 @@ public class signUp extends Activity implements retrieveCampaign, signUp_interfa
 
     public void onClickSign(View v) {
         if (name.getText().toString().length() > 0 && email.getText().toString().length() > 0 && password.getText().toString().length() > 0 && gender_text.length() > 0) {
-            Toast.makeText(signUp.this, "Details sent", Toast.LENGTH_SHORT).show();
             final Dialog dialogLogout = new Dialog(this);
             dialogLogout.requestWindowFeature(Window.FEATURE_NO_TITLE);
             dialogLogout.setContentView(R.layout.dialog_pincode);
@@ -185,8 +185,8 @@ public class signUp extends Activity implements retrieveCampaign, signUp_interfa
             });
             dialogLogout.show();
         } catch (JSONException e) {
-            Log.e("namearray", "ERROR");
-            e.printStackTrace();
+            loading.setVisibility(View.GONE);
+            Toast.makeText(signUp.this, "Something went wrong!", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -207,8 +207,7 @@ public class signUp extends Activity implements retrieveCampaign, signUp_interfa
                 startActivity(i);
                 finish();
             } catch (JSONException e) {
-                Log.e("TAG_function", "JSONERROR");
-                e.printStackTrace();
+                Toast.makeText(signUp.this, "Something went wrong!", Toast.LENGTH_SHORT).show();
             }
         }else if(obj.has("status")){
             try {
