@@ -14,7 +14,8 @@ Build and run!
 
 ### Prerequisites  
 
-Libraries used:  
+Libraries used:
+
     - compile 'de.hdodenhof:circleimageview:1.2.1'  
     - compile 'com.android.support:cardview-v7:23.4.0'  
     - compile 'com.android.support:recyclerview-v7:23.4.0'  
